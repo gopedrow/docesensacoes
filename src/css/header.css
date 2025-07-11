@@ -23,8 +23,8 @@ header {
 }
 
 #nav_logo img {
-    height: 50px;
-    width: 50px;
+    height: 10px;
+    width: 10px;
     object-fit: contain;
     flex-shrink: 0;
 }
@@ -92,8 +92,8 @@ header {
 
     /* Logo mantém o mesmo tamanho no mobile */
     #nav_logo img {
-        height: 50px;
-        width: 50px;
+        height: 10px;
+        width: 10px;
         object-fit: contain;
         flex-shrink: 0;
     }
