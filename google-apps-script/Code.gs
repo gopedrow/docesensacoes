@@ -1,5 +1,5 @@
 // Configurações da planilha
-const SPREADSHEET_ID = 'SUA_SPREADSHEET_ID_AQUI'; // Substitua pelo ID da sua planilha
+const SPREADSHEET_ID = '1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso'; // Substitua pelo ID da sua planilha
 const SHEET_NAMES = {
   PRODUTOS: 'Produtos',
   USUARIOS: 'Usuarios',
@@ -65,7 +65,6 @@ function getProdutos() {
   try {
     const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PRODUTOS);
     const data = sheet.getDataRange().getValues();
-    const headers = data[0];
     const produtos = [];
     
     for (let i = 1; i < data.length; i++) {

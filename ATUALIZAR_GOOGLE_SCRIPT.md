@@ -9,6 +9,7 @@ O arquivo `google-apps-script/Code.gs` foi corrigido com as seguintes melhorias:
 1. **Verificação segura de parâmetros**: Agora verifica se `e.parameter` e `e.postData` existem antes de acessá-los
 2. **Headers CORS**: Adicionados headers para permitir requisições cross-origin
 3. **Tratamento de erro melhorado**: Melhor tratamento de requisições GET vs POST
+4. **ID da planilha configurado**: O ID da sua planilha já está configurado no código
 
 ## Passos para Atualizar
 
@@ -21,11 +22,7 @@ O arquivo `google-apps-script/Code.gs` foi corrigido com as seguintes melhorias:
 - Apague todo o conteúdo atual
 - Cole o novo código do arquivo `google-apps-script/Code.gs`
 
-### 3. Configurar o ID da Planilha
-- Substitua `'SUA_SPREADSHEET_ID_AQUI'` na linha 2 pelo ID real da sua planilha
-- O ID está na URL da planilha: `https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/edit`
-
-### 4. Salvar e Implantar
+### 3. Salvar e Implantar
 - Clique em "Salvar" (Ctrl+S)
 - Clique em "Implantar" > "Nova implantação"
 - Escolha "Web app"
@@ -35,12 +32,12 @@ O arquivo `google-apps-script/Code.gs` foi corrigido com as seguintes melhorias:
 - Clique em "Implantar"
 - Copie a nova URL da API
 
-### 5. Atualizar o Frontend
+### 4. Atualizar o Frontend
 - Abra o arquivo `src/javascript/config.js`
 - Substitua a URL da API pela nova URL copiada
 - Salve o arquivo
 
-### 6. Testar
+### 5. Testar
 - Acesse a página do cardápio
 - Verifique se os produtos carregam corretamente
 
@@ -57,4 +54,8 @@ Adicione alguns produtos na aba "Produtos" para testar:
 ID | Nome | Descrição | Preço | Categoria | Imagem | Ativo
 1 | Brigadeiro | Delicioso brigadeiro caseiro | 5.00 | Doces | dish.png | TRUE
 2 | Beijinho | Beijinho tradicional | 4.50 | Doces | dish2.png | TRUE
-``` 
+3 | Bolo de Chocolate | Bolo caseiro de chocolate | 25.00 | Bolos | dish3.png | TRUE
+```
+
+## ID da Planilha Configurado
+O ID da sua planilha `1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso` já está configurado no código. 
