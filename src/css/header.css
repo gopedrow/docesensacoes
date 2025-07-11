@@ -23,8 +23,10 @@ header {
 }
 
 #nav_logo img {
-    height: 40px;
-    width: auto;
+    height: 50px;
+    width: 50px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 #nav_logo span {
@@ -86,5 +88,13 @@ header {
     #mobile_nav_list .nav-item {
         list-style: none;
         text-align: center;
-    } 
+    }
+
+    /* Logo mantém o mesmo tamanho no mobile */
+    #nav_logo img {
+        height: 50px;
+        width: 50px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
 }
