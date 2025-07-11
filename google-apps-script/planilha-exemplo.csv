@@ -1,0 +1,11 @@
+ID,Nome,Descrição,Preço,Categoria,Imagem,Ativo
+1,Brigadeiro Gourmet,Brigadeiro tradicional com chocolate belga de alta qualidade,5.50,Docinhos,dish.png,TRUE
+2,Cupcake Red Velvet,Cupcake de red velvet com cream cheese frosting,8.00,Cupcakes,dish2.png,TRUE
+3,Alfajor Tradicional,Alfajor argentino com doce de leite caseiro,6.50,Alfajores,dish3.png,TRUE
+4,Donut Chocolate,Donut frito com cobertura de chocolate belga,7.50,Donuts,dish4.png,TRUE
+5,Brigadeiro Branco,Brigadeiro branco com chocolate branco premium,5.50,Docinhos,dish.png,TRUE
+6,Cupcake Chocolate,Cupcake de chocolate com ganache de chocolate,8.00,Cupcakes,dish2.png,TRUE
+7,Alfajor Chocolate,Alfajor com chocolate e doce de leite,7.00,Alfajores,dish3.png,TRUE
+8,Donut Morango,Donut com cobertura rosa e sprinkles coloridos,7.50,Donuts,dish4.png,TRUE
+9,Brigadeiro Caramelo,Brigadeiro com caramelo salgado,6.00,Docinhos,dish.png,TRUE
+10,Cupcake Baunilha,Cupcake de baunilha com buttercream,8.00,Cupcakes,dish2.png,TRUE 

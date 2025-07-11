@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary-1: #FFF0F5;
+      --color-primary-2: #FFB6C1;
+      --color-primary-3: #FF69B4;
+      --color-primary-4: #FF1493;
+      --color-primary-5: #FF69B4;
+      --color-primary-6: #EB2E7D;
+
+      --color-neutral-0: #fff;
+      --color-neutral-1: #1d1d1d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--color-primary-1);
+      padding: 2rem;
+      color: var(--color-neutral-1);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .cart-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .cart-item {
+      background-color: var(--color-neutral-0);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin-right: 1.5rem;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .item-description {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .item-price {
+      font-weight: 700;
+      margin-left: 1.5rem;
+      white-space: nowrap;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .quantity-controls button {
+      padding: 0.5rem 1.2rem;
+      background-color: var(--color-primary-3);
+      border: none;
+      color: white;
+      border-radius: 32px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .delivery-options {
+      background-color: var(--color-neutral-0);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .delivery-options h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .option input {
+      margin-top: 4px;
+    }
+
+    .summary-card {
+      background-color: var(--color-primary-1);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .checkout-button {
+      margin-top: 2rem;
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background-color: var(--color-primary-4);
+      color: white;
+      border: none;
+      border-radius: 32px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="cart-container">
+    <h1>Meu Carrinho</h1>
+
+    <div class="cart-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="Produto 1">
+      <div class="item-info">
+        <div class="item-title">Xiaomi 365</div>
+        <div class="item-description">Cor: Branco // Extra Sport Tire + Bateria High 100</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>1</span>
+        <button>+</button>
+      </div>
+      <div class="item-price">484,99€</div>
+    </div>
+
+    <div class="cart-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="Produto 2">
+      <div class="item-info">
+        <div class="item-title">Ninebot ES2</div>
+        <div class="item-description">Cor: Preto // Extra Full Tire</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>3</span>
+        <button>+</button>
+      </div>
+      <div class="item-price">1469,97€</div>
+    </div>
+
+    <div class="delivery-options">
+      <h2>Escolha a forma de entrega</h2>
+      <div class="option">
+        <input type="radio" name="delivery" checked>
+        <label>Retirar na loja (até 20 min) - <strong>GRÁTIS</strong></label>
+      </div>
+      <div class="option">
+        <input type="radio" name="delivery">
+        <label>Entrega em domicílio (2 a 4 dias) - <strong>9,90€</strong></label>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>1954,97€</span>
+        </div>
+        <div class="summary-row">
+          <span>Entrega</span>
+          <span>GRÁTIS</span>
+        </div>
+        <div class="summary-row" style="font-weight: 700;">
+          <span>Total</span>
+          <span>1954,97€</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="checkout-button">Finalizar compra</button>
+  </div>
+</body>
+</html>

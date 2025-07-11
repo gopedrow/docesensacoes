@@ -1,0 +1,321 @@
+// Configurações da planilha
+const SPREADSHEET_ID = 'SUA_SPREADSHEET_ID_AQUI'; // Substitua pelo ID da sua planilha
+const SHEET_NAMES = {
+  PRODUTOS: 'Produtos',
+  USUARIOS: 'Usuarios',
+  PEDIDOS: 'Pedidos',
+  AVALIACOES: 'Avaliacoes'
+};
+
+// Função principal para lidar com requisições
+function doGet(e) {
+  return handleRequest(e);
+}
+
+function doPost(e) {
+  return handleRequest(e);
+}
+
+function handleRequest(e) {
+  try {
+    const action = e.parameter.action || e.postData.contents ? JSON.parse(e.postData.contents).action : null;
+    
+    if (!action) {
+      return createResponse(400, { error: 'Ação não especificada' });
+    }
+    
+    switch (action) {
+      case 'getProdutos':
+        return getProdutos();
+      case 'getProduto':
+        return getProduto(e.parameter.id || JSON.parse(e.postData.contents).id);
+      case 'createUsuario':
+        return createUsuario(JSON.parse(e.postData.contents));
+      case 'loginUsuario':
+        return loginUsuario(JSON.parse(e.postData.contents));
+      case 'createPedido':
+        return createPedido(JSON.parse(e.postData.contents));
+      case 'getPedidos':
+        return getPedidos(e.parameter.usuarioId);
+      case 'createAvaliacao':
+        return createAvaliacao(JSON.parse(e.postData.contents));
+      case 'getAvaliacoes':
+        return getAvaliacoes(e.parameter.produtoId);
+      default:
+        return createResponse(400, { error: 'Ação não reconhecida' });
+    }
+  } catch (error) {
+    return createResponse(500, { error: 'Erro interno do servidor: ' + error.toString() });
+  }
+}
+
+// Função para obter todos os produtos
+function getProdutos() {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PRODUTOS);
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const produtos = [];
+    
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (row[6] === true) { // Coluna "Ativo"
+        const produto = {
+          id: row[0],
+          nome: row[1],
+          descricao: row[2],
+          preco: row[3],
+          categoria: row[4],
+          imagem: row[5],
+          ativo: row[6]
+        };
+        produtos.push(produto);
+      }
+    }
+    
+    return createResponse(200, { produtos: produtos });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao buscar produtos: ' + error.toString() });
+  }
+}
+
+// Função para obter um produto específico
+function getProduto(id) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PRODUTOS);
+    const data = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] == id && data[i][6] === true) {
+        const produto = {
+          id: data[i][0],
+          nome: data[i][1],
+          descricao: data[i][2],
+          preco: data[i][3],
+          categoria: data[i][4],
+          imagem: data[i][5],
+          ativo: data[i][6]
+        };
+        return createResponse(200, { produto: produto });
+      }
+    }
+    
+    return createResponse(404, { error: 'Produto não encontrado' });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao buscar produto: ' + error.toString() });
+  }
+}
+
+// Função para criar novo usuário
+function createUsuario(data) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.USUARIOS);
+    
+    // Verificar se email já existe
+    const existingData = sheet.getDataRange().getValues();
+    for (let i = 1; i < existingData.length; i++) {
+      if (existingData[i][2] === data.email) {
+        return createResponse(400, { error: 'Email já cadastrado' });
+      }
+    }
+    
+    const id = Date.now().toString();
+    const dataCadastro = new Date().toISOString();
+    
+    const newRow = [
+      id,
+      data.nome,
+      data.email,
+      data.telefone,
+      data.endereco,
+      dataCadastro
+    ];
+    
+    sheet.appendRow(newRow);
+    
+    return createResponse(201, { 
+      message: 'Usuário criado com sucesso',
+      usuario: {
+        id: id,
+        nome: data.nome,
+        email: data.email,
+        telefone: data.telefone,
+        endereco: data.endereco,
+        dataCadastro: dataCadastro
+      }
+    });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao criar usuário: ' + error.toString() });
+  }
+}
+
+// Função para login de usuário
+function loginUsuario(data) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.USUARIOS);
+    const sheetData = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < sheetData.length; i++) {
+      if (sheetData[i][2] === data.email) {
+        const usuario = {
+          id: sheetData[i][0],
+          nome: sheetData[i][1],
+          email: sheetData[i][2],
+          telefone: sheetData[i][3],
+          endereco: sheetData[i][4],
+          dataCadastro: sheetData[i][5]
+        };
+        return createResponse(200, { usuario: usuario });
+      }
+    }
+    
+    return createResponse(401, { error: 'Email não encontrado' });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro no login: ' + error.toString() });
+  }
+}
+
+// Função para criar novo pedido
+function createPedido(data) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PEDIDOS);
+    
+    const id = Date.now().toString();
+    const dataPedido = new Date().toISOString();
+    
+    const newRow = [
+      id,
+      data.usuarioId,
+      JSON.stringify(data.produtos),
+      data.total,
+      'Pendente',
+      dataPedido
+    ];
+    
+    sheet.appendRow(newRow);
+    
+    return createResponse(201, { 
+      message: 'Pedido criado com sucesso',
+      pedido: {
+        id: id,
+        usuarioId: data.usuarioId,
+        produtos: data.produtos,
+        total: data.total,
+        status: 'Pendente',
+        data: dataPedido
+      }
+    });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao criar pedido: ' + error.toString() });
+  }
+}
+
+// Função para obter pedidos de um usuário
+function getPedidos(usuarioId) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PEDIDOS);
+    const data = sheet.getDataRange().getValues();
+    const pedidos = [];
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1] == usuarioId) {
+        const pedido = {
+          id: data[i][0],
+          usuarioId: data[i][1],
+          produtos: JSON.parse(data[i][2]),
+          total: data[i][3],
+          status: data[i][4],
+          data: data[i][5]
+        };
+        pedidos.push(pedido);
+      }
+    }
+    
+    return createResponse(200, { pedidos: pedidos });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao buscar pedidos: ' + error.toString() });
+  }
+}
+
+// Função para criar nova avaliação
+function createAvaliacao(data) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.AVALIACOES);
+    
+    const id = Date.now().toString();
+    const dataAvaliacao = new Date().toISOString();
+    
+    const newRow = [
+      id,
+      data.produtoId,
+      data.usuarioId,
+      data.nota,
+      data.comentario,
+      dataAvaliacao
+    ];
+    
+    sheet.appendRow(newRow);
+    
+    return createResponse(201, { 
+      message: 'Avaliação criada com sucesso',
+      avaliacao: {
+        id: id,
+        produtoId: data.produtoId,
+        usuarioId: data.usuarioId,
+        nota: data.nota,
+        comentario: data.comentario,
+        data: dataAvaliacao
+      }
+    });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao criar avaliação: ' + error.toString() });
+  }
+}
+
+// Função para obter avaliações de um produto
+function getAvaliacoes(produtoId) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.AVALIACOES);
+    const data = sheet.getDataRange().getValues();
+    const avaliacoes = [];
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1] == produtoId) {
+        const avaliacao = {
+          id: data[i][0],
+          produtoId: data[i][1],
+          usuarioId: data[i][2],
+          nota: data[i][3],
+          comentario: data[i][4],
+          data: data[i][5]
+        };
+        avaliacoes.push(avaliacao);
+      }
+    }
+    
+    return createResponse(200, { avaliacoes: avaliacoes });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao buscar avaliações: ' + error.toString() });
+  }
+}
+
+// Função para criar resposta HTTP
+function createResponse(statusCode, data) {
+  const response = {
+    statusCode: statusCode,
+    data: data,
+    timestamp: new Date().toISOString()
+  };
+  
+  const output = ContentService.createTextOutput(JSON.stringify(response));
+  output.setMimeType(ContentService.MimeType.JSON);
+  
+  return output;
+}
+
+// Função para lidar com requisições OPTIONS (CORS)
+function doOptions(e) {
+  const output = ContentService.createTextOutput('');
+  output.setMimeType(ContentService.MimeType.TEXT);
+  return output;
+} 

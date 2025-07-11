@@ -1,0 +1,72 @@
+/* Contêiner dos botões principais */
+#cta_buttons {
+  display: flex;
+  gap: 24px;
+}
+
+/* Links dentro dos botões */
+#cta_buttons a {
+  text-decoration: none;
+  color: var(--color-neutral-1);
+}
+
+/* Botão de telefone */
+#phone_button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 8px 14px;
+  font-weight: 500;
+  box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+#phone_button button {
+  box-shadow: none;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Ícone de carrinho */
+.cart-icon {
+  background-color: #333;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cart-icon:hover {
+  background-color: #555;
+}
+
+.cart-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: white;
+}
+
+/* Botão de compra */
+.buy-button {
+  background-color: #ff69b4;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buy-button:hover {
+  background-color: #e553a0;
+}

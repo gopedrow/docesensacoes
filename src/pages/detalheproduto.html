@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Produto - Confeitaria</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --color-primary-1: #FFF0F5;
+      --color-primary-2: #FFB6C1;
+      --color-primary-3: #FF69B4;
+      --color-primary-4: #FF1493;
+      --color-primary-5: #FF69B4;
+      --color-primary-6: #EB2E7D;
+
+      --color-neutral-0: #fff;
+      --color-neutral-1: #1d1d1d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background-color: var(--color-primary-1);
+      padding: 2rem;
+      color: var(--color-neutral-1);
+    }
+
+    .product-detail-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: var(--color-neutral-0);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 240px;
+      background-color: var(--color-primary-2);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-6);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--color-primary-6);
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      display: block;
+      margin-top: 1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .add-to-cart-btn {
+      width: 100%;
+      background: var(--color-primary-6);
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .add-to-cart-btn:hover {
+      background: var(--color-primary-4);
+    }
+  </style>
+</head>
+<body>
+  <div class="product-detail-container">
+    <div class="product-image">
+      Imagem do Produto
+    </div>
+
+    <h1>Brigadeiro Belga</h1>
+    <p>Docinho tradicional feito com chocolate belga e finalizado com granulados gourmet. Ideal para festas e comemorações.</p>
+
+    <label for="quantity">Quantidade</label>
+    <input type="number" id="quantity" name="quantity" min="1" value="1">
+
+    <label for="notes">Observações</label>
+    <input type="text" id="notes" name="notes" placeholder="Ex: sem granulado, mais cremoso, etc.">
+
+    <button class="add-to-cart-btn">
+      Adicionar ao Carrinho
+    </button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Nós - Confeitaria</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary-1: #FFF0F5;
+      --color-primary-2: #FFB6C1;
+      --color-primary-3: #FF69B4;
+      --color-primary-4: #FF1493;
+      --color-primary-5: #FF69B4;
+      --color-primary-6: #EB2E7D;
+      --color-neutral-0: #fff;
+      --color-neutral-1: #1d1d1d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--color-primary-1);
+      color: var(--color-neutral-1);
+      padding: 2rem;
+    }
+
+    .about-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: var(--color-neutral-0);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .about-image,
+    .mid-image {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .about-title {
+      font-size: 2rem;
+      color: var(--color-primary-6);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .about-description {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--color-neutral-1);
+      text-align: justify;
+      margin-bottom: 1.5rem;
+    }
+
+    .extra-info {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-top: 1rem;
+    }
+
+    .signup-card {
+      max-width: 800px;
+      margin: 2rem auto 0;
+      background-color: var(--color-neutral-0);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .signup-button {
+      background-color: var(--color-primary-5);
+      color: white;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .signup-button:hover {
+      background-color: var(--color-primary-6);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .about-container,
+      .signup-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="about-container">
+    <img src="/caminho/para/imagem-capa.jpg" alt="Imagem da confeitaria" class="about-image" />
+
+    <h1 class="about-title">Sobre Nós</h1>
+
+    <p class="about-description">
+      Somos uma confeitaria especializada em delícias por delivery. Oferecemos um cardápio variado com docinhos gourmet, cupcakes, alfajores, donuts e criações sazonais irresistíveis. Cada produto é preparado com ingredientes selecionados e um toque de carinho que só uma verdadeira confeiteira pode oferecer. Nosso compromisso é levar sabor, qualidade e encantamento até você, seja para um momento especial ou para adoçar o seu dia.
+    </p>
+
+    <img src="/caminho/para/imagem-meio.jpg" alt="Docinhos e produtos" class="mid-image" />
+
+    <p class="about-description">
+      Trabalhamos com valores sólidos: transparência, carinho no preparo e respeito às necessidades dos nossos clientes. Nosso atendimento é pensado para garantir uma experiência doce, prática e memorável.
+    </p>
+
+    <p class="extra-info">
+      Ao criar uma conta no nosso site, você pode acompanhar seus pedidos, participar de promoções exclusivas, acumular pontos de fidelidade para trocar por descontos e fazer parte da nossa comunidade de apaixonados por doces. Além disso, se você é profissional de eventos, buffets ou trabalha com festas, oferecemos condições especiais e vantagens exclusivas para agregar valor ao seu trabalho.
+    </p>
+  </div>
+
+  <div class="signup-card">
+    <button class="signup-button">Crie sua conta e junte-se à nossa comunidade de doceiros</button>
+  </div>
+</body>
+</html>
