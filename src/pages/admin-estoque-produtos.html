@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Estoque | Admin - Doce Sensações</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/button.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .estoque-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 2rem 2.5rem;
+        }
+        .estoque-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--color-primary-6);
+            font-size: 2rem;
+        }
+        .produtos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        .produtos-table th, .produtos-table td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .produtos-table th {
+            background: var(--color-primary-1);
+            color: var(--color-primary-6);
+            font-weight: 700;
+        }
+        .produtos-table td img {
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .estoque-input {
+            width: 60px;
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .btn-salvar {
+            padding: 0.4rem 1.2rem;
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+        .indisponivel {
+            color: #fff;
+            background: #e57373;
+            border-radius: 8px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="estoque-container">
+        <h2 class="estoque-title dancing-script-600">Gerenciar Estoque de Produtos</h2>
+        <table class="produtos-table" id="produtos-table">
+            <thead>
+                <tr>
+                    <th>Imagem</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Produtos serão inseridos via JS -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // Exemplo de produtos cadastrados (substituir por integração futura)
+        let produtos = [
+            {
+                id: 1,
+                nome: "Brigadeiro Gourmet",
+                descricao: "Brigadeiro tradicional com chocolate belga.",
+                preco: 3.50,
+                estoque: 12,
+                imagem: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=80&q=80"
+            },
+            {
+                id: 2,
+                nome: "Cupcake Red Velvet",
+                descricao: "Cupcake macio com cobertura de cream cheese.",
+                preco: 7.00,
+                estoque: 0,
+                imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80"
+            },
+            {
+                id: 3,
+                nome: "Alfajor Argentino",
+                descricao: "Alfajor recheado com doce de leite e coberto com chocolate.",
+                preco: 6.00,
+                estoque: 5,
+                imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80"
+            }
+        ];
+
+        function renderProdutos() {
+            const tbody = document.querySelector('#produtos-table tbody');
+            tbody.innerHTML = '';
+            produtos.forEach((produto, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><img src="${produto.imagem}" alt="${produto.nome}"></td>
+                    <td>${produto.nome}</td>
+                    <td>${produto.descricao}</td>
+                    <td>R$ ${produto.preco.toFixed(2)}</td>
+                    <td>
+                        <input type="number" class="estoque-input" min="0" value="${produto.estoque}" data-idx="${idx}">
+                        <button class="btn-default btn-salvar" data-idx="${idx}"><i class="fa-solid fa-floppy-disk"></i></button>
+                    </td>
+                    <td>${produto.estoque > 0 ? '' : '<span class="indisponivel">Indisponível</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Atualiza estoque ao clicar em salvar
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-salvar')) {
+                const idx = e.target.closest('.btn-salvar').dataset.idx;
+                const input = document.querySelector(`.estoque-input[data-idx="${idx}"]`);
+                let novoEstoque = parseInt(input.value);
+                if (isNaN(novoEstoque) || novoEstoque < 0) novoEstoque = 0;
+                produtos[idx].estoque = novoEstoque;
+                renderProdutos();
+            }
+        });
+
+        // Inicializa a tabela
+        renderProdutos();
+    </script>
+</body>
+</html> 
