@@ -15,8 +15,20 @@ header {
 }
 
 #nav_logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 24px;
     color: var(--color-primary-6);
+}
+
+#nav_logo img {
+    height: 40px;
+    width: auto;
+}
+
+#nav_logo span {
+    font-weight: 600;
 }
 
 #nav_list {
