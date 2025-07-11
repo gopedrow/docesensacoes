@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Cardápio</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .error { background: #ffebee; border-color: #f44336; }
+        .success { background: #e8f5e8; border-color: #4caf50; }
+        .info { background: #e3f2fd; border-color: #2196f3; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Debug do Cardápio</h1>
+    
+    <div class="debug-section info">
+        <h3>1. Verificando Carregamento dos Scripts</h3>
+        <div id="script-status"></div>
+    </div>
+    
+    <div class="debug-section info">
+        <h3>2. Testando API</h3>
+        <button onclick="testAPI()">Testar API</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="debug-section info">
+        <h3>3. Simulando Página Cardápio</h3>
+        <button onclick="simulateCardapio()">Simular Cardápio</button>
+        <div id="cardapio-result"></div>
+        <div id="products-display"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        // 1. Verificar carregamento dos scripts
+        function checkScripts() {
+            const status = document.getElementById('script-status');
+            let html = '<ul>';
+            
+            // Verificar jQuery
+            if (typeof $ !== 'undefined') {
+                html += '<li style="color: green;">✅ jQuery carregado</li>';
+            } else {
+                html += '<li style="color: red;">❌ jQuery não carregado</li>';
+            }
+            
+            // Tentar carregar config.js
+            const script = document.createElement('script');
+            script.src = 'src/javascript/config.js';
+            script.onload = function() {
+                if (typeof API_CONFIG !== 'undefined') {
+                    html += '<li style="color: green;">✅ config.js carregado</li>';
+                    html += '<li style="color: green;">✅ API_CONFIG disponível</li>';
+                    if (typeof apiService !== 'undefined') {
+                        html += '<li style="color: green;">✅ apiService disponível</li>';
+                    } else {
+                        html += '<li style="color: red;">❌ apiService não disponível</li>';
+                    }
+                } else {
+                    html += '<li style="color: red;">❌ config.js não carregou corretamente</li>';
+                }
+                status.innerHTML = html + '</ul>';
+            };
+            script.onerror = function() {
+                html += '<li style="color: red;">❌ Erro ao carregar config.js</li>';
+                status.innerHTML = html + '</ul>';
+            };
+            document.head.appendChild(script);
+        }
+
+        // 2. Testar API
+        async function testAPI() {
+            const result = document.getElementById('api-result');
+            result.innerHTML = 'Testando...';
+            
+            try {
+                // Teste direto da API
+                const response = await fetch('https://script.google.com/macros/s/AKfycbzYAgXHlYvBbxjHNuIF-O8ILKiM7GkdwMBJZBxLFjis13Wp9NTDNc0zU1AT-EBGoNVwqQ/exec?action=getProdutos');
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <div class="success">
+                        <h4>✅ API funcionando!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                
+                return data;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro na API</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                return null;
+            }
+        }
+
+        // 3. Simular página cardápio
+        async function simulateCardapio() {
+            const result = document.getElementById('cardapio-result');
+            const display = document.getElementById('products-display');
+            
+            result.innerHTML = 'Simulando...';
+            
+            try {
+                // Testar API primeiro
+                const apiData = await testAPI();
+                
+                if (apiData && apiData.data && apiData.data.produtos) {
+                    const produtos = apiData.data.produtos;
+                    
+                    result.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Produtos encontrados: ${produtos.length}</h4>
+                        </div>
+                    `;
+                    
+                    // Exibir produtos
+                    display.innerHTML = '';
+                    produtos.forEach(produto => {
+                        const card = createProductCard(produto);
+                        display.appendChild(card);
+                    });
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Nenhum produto encontrado</h4>
+                            <pre>${JSON.stringify(apiData, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Erro ao simular cardápio</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function createProductCard(produto) {
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                padding: 20px;
+                margin: 10px;
+                max-width: 300px;
+            `;
+            
+            card.innerHTML = `
+                <h3>${produto.nome}</h3>
+                <p><strong>Preço:</strong> R$ ${produto.preco}</p>
+                <p><strong>Categoria:</strong> ${produto.categoria}</p>
+                <p>${produto.descricao}</p>
+                <p><strong>ID:</strong> ${produto.id}</p>
+                <p><strong>Imagem:</strong> ${produto.imagem}</p>
+            `;
+            
+            return card;
+        }
+
+        // Inicializar debug
+        window.onload = function() {
+            checkScripts();
+        };
+    </script>
+</body>
+</html> 

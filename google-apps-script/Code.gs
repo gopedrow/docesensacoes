@@ -1,11 +1,5 @@
 // Configurações da planilha
-const SPREADSHEET_ID = '1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso'; // Substitua pelo ID da sua planilha
-const SHEET_NAMES = {
-  PRODUTOS: 'Produtos',
-  USUARIOS: 'Usuarios',
-  PEDIDOS: 'Pedidos',
-  AVALIACOES: 'Avaliacoes'
-};
+const SPREADSHEET_ID = '1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso';
 
 // Função principal para lidar com requisições
 function doGet(e) {
@@ -32,6 +26,8 @@ function handleRequest(e) {
       return createResponse(400, { error: 'Ação não especificada' });
     }
     
+    console.log('Ação solicitada:', action);
+    
     switch (action) {
       case 'getProdutos':
         return getProdutos();
@@ -53,9 +49,10 @@ function handleRequest(e) {
         const avaliacaoProdutoId = e.parameter ? e.parameter.produtoId : (e.postData && e.postData.contents ? JSON.parse(e.postData.contents).produtoId : null);
         return getAvaliacoes(avaliacaoProdutoId);
       default:
-        return createResponse(400, { error: 'Ação não reconhecida' });
+        return createResponse(400, { error: 'Ação não reconhecida: ' + action });
     }
   } catch (error) {
+    console.error('Erro no handleRequest:', error);
     return createResponse(500, { error: 'Erro interno do servidor: ' + error.toString() });
   }
 }
@@ -63,13 +60,26 @@ function handleRequest(e) {
 // Função para obter todos os produtos
 function getProdutos() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PRODUTOS);
+    console.log('Iniciando busca de produtos...');
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produtos');
+    
+    if (!sheet) {
+      console.error('Aba "Produtos" não encontrada');
+      return createResponse(404, { error: 'Aba "Produtos" não encontrada na planilha' });
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log('Dados brutos da planilha:', data);
+    
     const produtos = [];
     
+    // Pular a primeira linha (cabeçalhos)
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      if (row[6] === true) { // Coluna "Ativo"
+      console.log('Processando linha:', row);
+      
+      // Verificar se o produto está ativo (coluna 6, índice 6)
+      if (row[6] === true || row[6] === 'TRUE' || row[6] === 1) {
         const produto = {
           id: row[0],
           nome: row[1],
@@ -80,11 +90,14 @@ function getProdutos() {
           ativo: row[6]
         };
         produtos.push(produto);
+        console.log('Produto adicionado:', produto);
       }
     }
     
+    console.log('Total de produtos encontrados:', produtos.length);
     return createResponse(200, { produtos: produtos });
   } catch (error) {
+    console.error('Erro ao buscar produtos:', error);
     return createResponse(500, { error: 'Erro ao buscar produtos: ' + error.toString() });
   }
 }
@@ -92,11 +105,11 @@ function getProdutos() {
 // Função para obter um produto específico
 function getProduto(id) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PRODUTOS);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produtos');
     const data = sheet.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
-      if (data[i][0] == id && data[i][6] === true) {
+      if (data[i][0] == id && (data[i][6] === true || data[i][6] === 'TRUE' || data[i][6] === 1)) {
         const produto = {
           id: data[i][0],
           nome: data[i][1],
@@ -119,7 +132,7 @@ function getProduto(id) {
 // Função para criar novo usuário
 function createUsuario(data) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.USUARIOS);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Usuarios');
     
     // Verificar se email já existe
     const existingData = sheet.getDataRange().getValues();
@@ -162,7 +175,7 @@ function createUsuario(data) {
 // Função para login de usuário
 function loginUsuario(data) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.USUARIOS);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Usuarios');
     const sheetData = sheet.getDataRange().getValues();
     
     for (let i = 1; i < sheetData.length; i++) {
@@ -188,7 +201,7 @@ function loginUsuario(data) {
 // Função para criar novo pedido
 function createPedido(data) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PEDIDOS);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Pedidos');
     
     const id = Date.now().toString();
     const dataPedido = new Date().toISOString();
@@ -223,7 +236,7 @@ function createPedido(data) {
 // Função para obter pedidos de um usuário
 function getPedidos(usuarioId) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.PEDIDOS);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Pedidos');
     const data = sheet.getDataRange().getValues();
     const pedidos = [];
     
@@ -250,7 +263,7 @@ function getPedidos(usuarioId) {
 // Função para criar nova avaliação
 function createAvaliacao(data) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.AVALIACOES);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Avaliacoes');
     
     const id = Date.now().toString();
     const dataAvaliacao = new Date().toISOString();
@@ -285,7 +298,7 @@ function createAvaliacao(data) {
 // Função para obter avaliações de um produto
 function getAvaliacoes(produtoId) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAMES.AVALIACOES);
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Avaliacoes');
     const data = sheet.getDataRange().getValues();
     const avaliacoes = [];
     
@@ -317,16 +330,19 @@ function createResponse(statusCode, data) {
     timestamp: new Date().toISOString()
   };
   
-  const output = ContentService.createTextOutput(JSON.stringify(response));
-  output.setMimeType(ContentService.MimeType.JSON);
-  
-  return output;
+  // Usar HtmlService para permitir CORS
+  return HtmlService.createHtmlOutput(JSON.stringify(response))
+    .setMimeType(ContentService.MimeType.JSON)
+    .addMetaTag('Access-Control-Allow-Origin', '*')
+    .addMetaTag('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .addMetaTag('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
 }
 
 // Função para lidar com requisições OPTIONS (CORS)
 function doOptions(e) {
-  const output = ContentService.createTextOutput('');
-  output.setMimeType(ContentService.MimeType.TEXT);
-  
-  return output;
+  return HtmlService.createHtmlOutput('')
+    .setMimeType(ContentService.MimeType.TEXT)
+    .addMetaTag('Access-Control-Allow-Origin', '*')
+    .addMetaTag('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .addMetaTag('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
 } 

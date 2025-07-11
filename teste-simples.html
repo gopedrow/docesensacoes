@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples - API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Teste Simples da API</h1>
+    
+    <button onclick="testarAPI()">Testar API</button>
+    <div id="resultado"></div>
+
+    <script>
+        async function testarAPI() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = 'Testando...';
+            
+            try {
+                const url = 'https://script.google.com/macros/s/AKfycbzYAgXHlYvBbxjHNuIF-O8ILKiM7GkdwMBJZBxLFjis13Wp9NTDNc0zU1AT-EBGoNVwqQ/exec?action=getProdutos';
+                console.log('Fazendo requisição para:', url);
+                
+                const response = await fetch(url);
+                console.log('Status da resposta:', response.status);
+                
+                const data = await response.json();
+                console.log('Dados recebidos:', data);
+                
+                if (data.statusCode === 200 && data.data && data.data.produtos) {
+                    resultado.innerHTML = `
+                        <div class="success">
+                            <h3>✅ API funcionando!</h3>
+                            <p><strong>Produtos encontrados:</strong> ${data.data.produtos.length}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultado.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Resposta inesperada</h3>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                resultado.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Erro na requisição</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Teste automático
+        window.onload = function() {
+            console.log('Página carregada, testando API...');
+            testarAPI();
+        };
+    </script>
+</body>
+</html> 

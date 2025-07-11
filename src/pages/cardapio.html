@@ -75,6 +75,7 @@
     }
 
     /* Estilos do componente de produto */
+    /* Estilos do componente de produto */
     .product-card {
       background: var(--color-neutral-0);
       border-radius: 16px;
@@ -96,6 +97,20 @@
       position: relative;
       height: 200px;
       overflow: hidden;
+    }
+
+    .promo-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(135deg, var(--color-primary-6), var(--color-primary-4));
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
     .product-image {
@@ -142,6 +157,13 @@
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+    }
+
+    .price-original {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 14px;
+      margin-bottom: 4px;
     }
 
     .product-price {
@@ -444,16 +466,35 @@
     // Função para carregar produtos
     async function loadProducts() {
       try {
-        const response = await apiService.getProdutos();
+        console.log('=== DEBUG: Iniciando carregamento de produtos ===');
+        console.log('apiService disponível:', typeof apiService !== 'undefined');
+        console.log('API_CONFIG:', typeof API_CONFIG !== 'undefined' ? API_CONFIG : 'não disponível');
         
-        if (response && response.produtos && response.produtos.length > 0) {
+        if (typeof apiService === 'undefined') {
+          throw new Error('apiService não está disponível. Verifique se config.js foi carregado.');
+        }
+        
+        console.log('Fazendo requisição para a API...');
+        const response = await apiService.getProdutos();
+        console.log('Resposta recebida:', response);
+        console.log('Tipo da resposta:', typeof response);
+        console.log('É array?', Array.isArray(response));
+        
+        if (response && response.produtos && Array.isArray(response.produtos) && response.produtos.length > 0) {
+          console.log('✅ Produtos encontrados:', response.produtos.length);
+          console.log('Primeiro produto:', response.produtos[0]);
           displayProducts(response.produtos);
         } else {
+          console.log('❌ Nenhum produto encontrado ou resposta inválida');
+          console.log('Estrutura da resposta:', response);
+          console.log('response.produtos existe?', response && response.produtos);
+          console.log('response.produtos é array?', response && response.produtos && Array.isArray(response.produtos));
           showNoProducts();
         }
       } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-        showError();
+        console.error('❌ Erro ao carregar produtos:', error);
+        console.error('Stack trace:', error.stack);
+        showError(error.message);
       }
     }
 
@@ -463,7 +504,7 @@
       container.empty();
       
       produtos.forEach(produto => {
-        const productCard = createProductCard(produto);
+        const productCard = createProductCardFromTemplate(produto);
         container.append(productCard);
       });
       
@@ -476,13 +517,21 @@
       });
     }
 
-    // Função para criar card de produto
-    function createProductCard(produto) {
+    // Função para criar card de produto usando o template
+    function createProductCardFromTemplate(produto) {
+      // Carregar o template
       const template = `
-        <div class="product-card" data-product-id="${produto.id}">
+        <div class="product-card" data-product-id="{{PRODUCT_ID}}">
           <div class="product-image-container">
+            <!-- Badge de promoção (opcional) -->
+            <div class="promo-badge" style="display: {{SHOW_PROMO_BADGE}};">
+              {{PROMO_TEXT}}
+            </div>
+            
+            <!-- Imagem do produto -->
             <div class="product-image">
-              <img src="../images/${produto.imagem}" alt="${produto.nome}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <img src="{{PRODUCT_IMAGE}}" alt="{{PRODUCT_NAME}}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <!-- Placeholder caso a imagem não carregue -->
               <div class="image-placeholder" style="display: none;">
                 <i class="fa-solid fa-image"></i>
                 <span>Imagem não disponível</span>
@@ -491,23 +540,33 @@
           </div>
 
           <div class="product-info">
+            <!-- Preço original (se houver desconto) -->
+            <div class="price-original" style="display: {{SHOW_ORIGINAL_PRICE}};">
+              R$ {{ORIGINAL_PRICE}}
+            </div>
+            
+            <!-- Preço atual -->
             <div class="product-price">
-              R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}
+              R$ {{PRODUCT_PRICE}}
             </div>
             
-            <h3 class="product-name">${produto.nome}</h3>
+            <!-- Nome do produto -->
+            <h3 class="product-name">{{PRODUCT_NAME}}</h3>
             
-            <p class="product-description">${produto.descricao}</p>
+            <!-- Descrição do produto -->
+            <p class="product-description">{{PRODUCT_DESCRIPTION}}</p>
             
+            <!-- Categoria -->
             <div class="product-category">
-              <span class="category-badge">${produto.categoria}</span>
+              <span class="category-badge">{{PRODUCT_CATEGORY}}</span>
             </div>
             
+            <!-- Ações -->
             <div class="product-actions">
-              <button class="add-to-cart-btn" onclick="addToCart('${produto.id}')" title="Adicionar ao carrinho">
+              <button class="add-to-cart-btn" onclick="addToCart('{{PRODUCT_ID}}')" title="Adicionar ao carrinho">
                 <i class="fa-solid fa-cart-plus"></i>
               </button>
-              <button class="buy-now-btn" onclick="buyNow('${produto.id}')">
+              <button class="buy-now-btn" onclick="buyNow('{{PRODUCT_ID}}')">
                 Comprar agora
               </button>
             </div>
@@ -515,17 +574,32 @@
         </div>
       `;
       
-      return template;
+      // Substituir placeholders pelos dados do produto
+      let productCard = template
+        .replace(/{{PRODUCT_ID}}/g, produto.id)
+        .replace(/{{PRODUCT_NAME}}/g, produto.nome)
+        .replace(/{{PRODUCT_DESCRIPTION}}/g, produto.descricao)
+        .replace(/{{PRODUCT_PRICE}}/g, parseFloat(produto.preco).toFixed(2).replace('.', ','))
+        .replace(/{{PRODUCT_CATEGORY}}/g, produto.categoria)
+        .replace(/{{PRODUCT_IMAGE}}/g, `../images/${produto.imagem}`)
+        .replace(/{{SHOW_PROMO_BADGE}}/g, 'none') // Por enquanto, sem promoções
+        .replace(/{{PROMO_TEXT}}/g, '')
+        .replace(/{{SHOW_ORIGINAL_PRICE}}/g, 'none') // Por enquanto, sem preços originais
+        .replace(/{{ORIGINAL_PRICE}}/g, '');
+      
+      return productCard;
     }
 
     // Função para mostrar mensagem de erro
-    function showError() {
+    function showError(errorMessage = '') {
       const container = $('#products-container');
+      const errorText = errorMessage ? `<p><strong>Erro:</strong> ${errorMessage}</p>` : '';
       container.html(`
         <div style="text-align: center; padding: 2rem; color: var(--color-primary-6);">
           <i class="fa-solid fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
           <h3>Erro ao carregar produtos</h3>
           <p>Não foi possível carregar os produtos no momento. Tente novamente mais tarde.</p>
+          ${errorText}
           <button onclick="loadProducts()" style="margin-top: 1rem; padding: 10px 20px; background: var(--color-primary-6); color: white; border: none; border-radius: 8px; cursor: pointer;">
             Tentar novamente
           </button>

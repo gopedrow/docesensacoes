@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste da API - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Teste da API - Doce Sensações</h1>
+        <p>Este arquivo testa a integração com o Google Apps Script.</p>
+
+        <div class="test-section">
+            <h3>Teste 1: Buscar Produtos</h3>
+            <button onclick="testGetProdutos()">Testar getProdutos</button>
+            <div id="result1" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Teste 2: Informações da API</h3>
+            <button onclick="testAPIInfo()">Mostrar informações da API</button>
+            <div id="result2" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Teste 3: Teste de CORS</h3>
+            <button onclick="testCORS()">Testar CORS</button>
+            <div id="result3" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração da API
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzYAgXHlYvBbxjHNuIF-O8ILKiM7GkdwMBJZBxLFjis13Wp9NTDNc0zU1AT-EBGoNVwqQ/exec';
+
+        function showResult(elementId, content, isError = false, isSuccess = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+            element.className = 'result';
+            if (isError) element.className += ' error';
+            if (isSuccess) element.className += ' success';
+        }
+
+        async function testGetProdutos() {
+            try {
+                showResult('result1', 'Fazendo requisição...');
+                
+                const response = await fetch(API_URL + '?action=getProdutos', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.statusCode === 200 && data.data && data.data.produtos) {
+                    showResult('result1', 
+                        `✅ Sucesso!\n\nStatus: ${data.statusCode}\nProdutos encontrados: ${data.data.produtos.length}\n\nDados dos produtos:\n${JSON.stringify(data.data.produtos, null, 2)}`, 
+                        false, true
+                    );
+                } else {
+                    showResult('result1', 
+                        `❌ Erro na resposta\n\nStatus: ${data.statusCode}\nResposta: ${JSON.stringify(data, null, 2)}`, 
+                        true
+                    );
+                }
+            } catch (error) {
+                showResult('result1', 
+                    `❌ Erro na requisição\n\nErro: ${error.message}\n\nDetalhes: ${error.stack}`, 
+                    true
+                );
+            }
+        }
+
+        function testAPIInfo() {
+            const info = {
+                'URL da API': API_URL,
+                'Endpoint de Produtos': API_URL + '?action=getProdutos',
+                'Método': 'GET',
+                'Headers': {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                'Modo': 'cors'
+            };
+            
+            showResult('result2', 
+                `📋 Informações da API\n\n${JSON.stringify(info, null, 2)}`
+            );
+        }
+
+        async function testCORS() {
+            try {
+                showResult('result3', 'Testando CORS...');
+                
+                // Teste OPTIONS
+                const optionsResponse = await fetch(API_URL, {
+                    method: 'OPTIONS',
+                    mode: 'cors'
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': optionsResponse.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': optionsResponse.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': optionsResponse.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                showResult('result3', 
+                    `✅ Teste CORS concluído\n\nStatus OPTIONS: ${optionsResponse.status}\nHeaders CORS:\n${JSON.stringify(corsHeaders, null, 2)}`, 
+                    false, true
+                );
+            } catch (error) {
+                showResult('result3', 
+                    `❌ Erro no teste CORS\n\nErro: ${error.message}`, 
+                    true
+                );
+            }
+        }
+
+        // Teste automático ao carregar a página
+        window.onload = function() {
+            console.log('Página de teste carregada');
+            console.log('API URL:', API_URL);
+        };
+    </script>
+</body>
+</html> 

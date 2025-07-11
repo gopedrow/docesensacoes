@@ -1,7 +1,7 @@
 // Configuração da API do Google Apps Script
 const API_CONFIG = {
     // URL da API do Google Apps Script
-    BASE_URL: 'https://script.google.com/macros/s/AKfycbxbSl8CDSGdCXsbbcrI7MAaHI4je5vkW_g87eb9Bwe4D0YhDUZaya5RAW54bJDNfv2OYQ/exec',
+    BASE_URL: 'https://script.google.com/macros/s/AKfycbzYAgXHlYvBbxjHNuIF-O8ILKiM7GkdwMBJZBxLFjis13Wp9NTDNc0zU1AT-EBGoNVwqQ/exec',
     
     // Endpoints da API
     ENDPOINTS: {
@@ -31,25 +31,28 @@ class APIService {
             const options = {
                 method: method,
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             };
 
             if (data && method !== 'GET') {
                 options.body = JSON.stringify(data);
+                options.headers['Content-Type'] = 'application/json';
             }
 
             const response = await fetch(url, options);
             console.log('Status da resposta:', response.status);
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const result = await response.json();
             console.log('Resposta da API:', result);
 
+            // Verificar se há erro na resposta
             if (result.statusCode >= 200 && result.statusCode < 300) {
+                // Retornar diretamente os dados, não o wrapper
                 return result.data;
             } else {
                 throw new Error(result.data?.error || result.error || 'Erro na requisição');
@@ -60,9 +63,18 @@ class APIService {
         }
     }
 
+
+
     // Buscar todos os produtos
     async getProdutos() {
-        return await this.makeRequest(API_CONFIG.ENDPOINTS.PRODUTOS);
+        try {
+            const response = await this.makeRequest(API_CONFIG.ENDPOINTS.PRODUTOS);
+            console.log('Produtos recebidos:', response);
+            return response;
+        } catch (error) {
+            console.error('Erro ao buscar produtos:', error);
+            throw error;
+        }
     }
 
     // Buscar produto específico
