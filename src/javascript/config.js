@@ -26,6 +26,8 @@ class APIService {
     async makeRequest(endpoint, method = 'GET', data = null) {
         try {
             const url = this.baseURL + endpoint;
+            console.log('Fazendo requisição para:', url);
+            
             const options = {
                 method: method,
                 headers: {
@@ -38,12 +40,19 @@ class APIService {
             }
 
             const response = await fetch(url, options);
+            console.log('Status da resposta:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const result = await response.json();
+            console.log('Resposta da API:', result);
 
             if (result.statusCode >= 200 && result.statusCode < 300) {
                 return result.data;
             } else {
-                throw new Error(result.data.error || 'Erro na requisição');
+                throw new Error(result.data?.error || result.error || 'Erro na requisição');
             }
         } catch (error) {
             console.error('Erro na API:', error);

@@ -18,7 +18,15 @@ function doPost(e) {
 
 function handleRequest(e) {
   try {
-    const action = e.parameter.action || e.postData.contents ? JSON.parse(e.postData.contents).action : null;
+    let action = null;
+    
+    // Verificar se é uma requisição GET ou POST
+    if (e.parameter && e.parameter.action) {
+      action = e.parameter.action;
+    } else if (e.postData && e.postData.contents) {
+      const postData = JSON.parse(e.postData.contents);
+      action = postData.action;
+    }
     
     if (!action) {
       return createResponse(400, { error: 'Ação não especificada' });
@@ -28,7 +36,8 @@ function handleRequest(e) {
       case 'getProdutos':
         return getProdutos();
       case 'getProduto':
-        return getProduto(e.parameter.id || JSON.parse(e.postData.contents).id);
+        const produtoId = e.parameter ? e.parameter.id : (e.postData && e.postData.contents ? JSON.parse(e.postData.contents).id : null);
+        return getProduto(produtoId);
       case 'createUsuario':
         return createUsuario(JSON.parse(e.postData.contents));
       case 'loginUsuario':
@@ -36,11 +45,13 @@ function handleRequest(e) {
       case 'createPedido':
         return createPedido(JSON.parse(e.postData.contents));
       case 'getPedidos':
-        return getPedidos(e.parameter.usuarioId);
+        const usuarioId = e.parameter ? e.parameter.usuarioId : (e.postData && e.postData.contents ? JSON.parse(e.postData.contents).usuarioId : null);
+        return getPedidos(usuarioId);
       case 'createAvaliacao':
         return createAvaliacao(JSON.parse(e.postData.contents));
       case 'getAvaliacoes':
-        return getAvaliacoes(e.parameter.produtoId);
+        const avaliacaoProdutoId = e.parameter ? e.parameter.produtoId : (e.postData && e.postData.contents ? JSON.parse(e.postData.contents).produtoId : null);
+        return getAvaliacoes(avaliacaoProdutoId);
       default:
         return createResponse(400, { error: 'Ação não reconhecida' });
     }
@@ -310,6 +321,11 @@ function createResponse(statusCode, data) {
   const output = ContentService.createTextOutput(JSON.stringify(response));
   output.setMimeType(ContentService.MimeType.JSON);
   
+  // Adicionar headers CORS
+  output.addHeader('Access-Control-Allow-Origin', '*');
+  output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  output.addHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
   return output;
 }
 
@@ -317,5 +333,11 @@ function createResponse(statusCode, data) {
 function doOptions(e) {
   const output = ContentService.createTextOutput('');
   output.setMimeType(ContentService.MimeType.TEXT);
+  
+  // Adicionar headers CORS para requisições OPTIONS
+  output.addHeader('Access-Control-Allow-Origin', '*');
+  output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  output.addHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
   return output;
 } 
