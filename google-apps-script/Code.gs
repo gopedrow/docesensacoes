@@ -320,11 +320,6 @@ function createResponse(statusCode, data) {
   const output = ContentService.createTextOutput(JSON.stringify(response));
   output.setMimeType(ContentService.MimeType.JSON);
   
-  // Adicionar headers CORS
-  output.addHeader('Access-Control-Allow-Origin', '*');
-  output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  output.addHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
   return output;
 }
 
@@ -332,11 +327,6 @@ function createResponse(statusCode, data) {
 function doOptions(e) {
   const output = ContentService.createTextOutput('');
   output.setMimeType(ContentService.MimeType.TEXT);
-  
-  // Adicionar headers CORS para requisições OPTIONS
-  output.addHeader('Access-Control-Allow-Origin', '*');
-  output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  output.addHeader('Access-Control-Allow-Headers', 'Content-Type');
   
   return output;
 } 
