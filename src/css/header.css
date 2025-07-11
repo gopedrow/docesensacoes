@@ -22,11 +22,9 @@ header {
     color: var(--color-primary-6);
 }
 
-#nav_logo img {
-    height: 10px;
-    width: 10px;
-    object-fit: contain;
-    flex-shrink: 0;
+#nav_logo i {
+    font-size: 24px;
+    color: var(--color-primary-6);
 }
 
 #nav_logo span {
@@ -90,11 +88,9 @@ header {
         text-align: center;
     }
 
-    /* Logo mantém o mesmo tamanho no mobile */
-    #nav_logo img {
-        height: 10px;
-        width: 10px;
-        object-fit: contain;
-        flex-shrink: 0;
+    /* Ícone mantém o mesmo tamanho no mobile */
+    #nav_logo i {
+        font-size: 24px;
+        color: var(--color-primary-6);
     }
 }
