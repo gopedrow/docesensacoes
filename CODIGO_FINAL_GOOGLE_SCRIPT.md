@@ -1,3 +1,12 @@
+# 🚨 CÓDIGO FINAL - Google Apps Script
+
+## ❌ PROBLEMA ATUAL
+A API ainda está retornando: `TypeError: output.addHeader is not a function`
+
+## ✅ SOLUÇÃO DEFINITIVA
+Copie **EXATAMENTE** este código para o Google Apps Script:
+
+```javascript
 // ID da planilha
 const SPREADSHEET_ID = '1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso';
 
@@ -121,4 +130,68 @@ function createResponse(statusCode, data) {
   
   return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON);
-} 
+}
+```
+
+## 📋 PASSOS PARA APLICAR
+
+### 1. Acessar Google Apps Script
+1. Vá para: https://script.google.com/
+2. Faça login com sua conta Google
+3. Abra o projeto: `AKfycbw2o3d6ytgBi91T6A8P8mhlUz_4c8hkxCEcbRrvTEWvSCtVswbJKmn8T6ydGC-Nz3LN`
+
+### 2. Substituir Código
+1. Abra o arquivo `Code.gs`
+2. **Selecione TODO** (Ctrl+A)
+3. **Delete TUDO**
+4. **Cole o código acima**
+5. **Salve** (Ctrl+S)
+
+### 3. Testar
+1. Abra: `http://localhost:8000/diagnostico-planilha.html`
+2. Clique em "Testar API"
+3. Verifique se retorna JSON válido
+
+## 🎯 ESTRUTURA DA PLANILHA
+
+A planilha deve ter uma aba chamada **"Produtos"** com esta estrutura:
+
+| A | B | C | D | E | F | G |
+|---|---|---|---|---|---|---|
+| ID | Nome | Descrição | Preço | Categoria | Imagem | Ativo |
+| 1 | Brigadeiro | Delicioso brigadeiro | 5.50 | Docinhos | dish.png | TRUE |
+| 2 | Cupcake | Cupcake de chocolate | 8.00 | Cupcakes | dish2.png | TRUE |
+
+## 🚨 IMPORTANTE
+
+- **NÃO** deixe nenhum código antigo
+- **COPIE EXATAMENTE** o código acima
+- **SALVE** após colar
+- **TESTE** antes de continuar
+
+## ✅ RESULTADO ESPERADO
+
+Após aplicar, a API deve retornar:
+```json
+{
+  "status": 200,
+  "data": {
+    "produtos": [
+      {
+        "id": "1",
+        "nome": "Brigadeiro",
+        "descricao": "Delicioso brigadeiro",
+        "preco": 5.50,
+        "categoria": "Docinhos",
+        "imagem": "dish.png",
+        "ativo": true
+      }
+    ]
+  },
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+---
+
+**Este código é ULTRA-SIMPLIFICADO e deve funcionar sem erros!** 🎯 

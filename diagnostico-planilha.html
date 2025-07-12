@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico - Planilha Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #FF5252;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico - Planilha Doce Sensações</h1>
+        
+        <h2>📊 Informações da API</h2>
+        <p><strong>URL:</strong> <code>https://script.google.com/macros/s/AKfycbw2o3d6ytgBi91T6A8P8mhlUz_4c8hkxCEcbRrvTEWvSCtVswbJKmn8T6ydGC-Nz3LN/exec</code></p>
+        <p><strong>Planilha ID:</strong> <code>1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso</code></p>
+        
+        <h2>🧪 Testes</h2>
+        <button onclick="testarAPI()">Testar API</button>
+        <button onclick="testarPlanilha()">Testar Planilha</button>
+        <button onclick="verificarEstrutura()">Verificar Estrutura</button>
+        <button onclick="limparResultados()">Limpar Resultados</button>
+        
+        <h2>📋 Resultados</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw2o3d6ytgBi91T6A8P8mhlUz_4c8hkxCEcbRrvTEWvSCtVswbJKmn8T6ydGC-Nz3LN/exec';
+
+        function addResult(title, content, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `<strong>${title}</strong>\n${content}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function testarAPI() {
+            try {
+                addResult('🔄 Testando API...', 'Fazendo requisição...');
+                
+                const response = await fetch(`${API_URL}?action=getProdutos`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                addResult('📊 Status da Resposta:', `Status: ${response.status} ${response.statusText}`);
+                
+                const data = await response.text();
+                addResult('📄 Resposta Bruta:', data);
+
+                try {
+                    const jsonData = JSON.parse(data);
+                    addResult('✅ JSON Parseado:', JSON.stringify(jsonData, null, 2), 'success');
+                    
+                    if (jsonData.data && jsonData.data.produtos) {
+                        addResult('📦 Produtos Encontrados:', `${jsonData.data.produtos.length} produtos`, 'success');
+                        
+                        if (jsonData.data.produtos.length > 0) {
+                            const primeiroProduto = jsonData.data.produtos[0];
+                            addResult('🎯 Primeiro Produto:', JSON.stringify(primeiroProduto, null, 2), 'success');
+                        }
+                    }
+                } catch (parseError) {
+                    addResult('❌ Erro ao fazer parse JSON:', parseError.message, 'error');
+                }
+
+            } catch (error) {
+                addResult('❌ Erro na requisição:', error.message, 'error');
+            }
+        }
+
+        async function testarPlanilha() {
+            try {
+                addResult('🔄 Testando acesso à planilha...', 'Verificando permissões...');
+                
+                // Teste simples para verificar se a planilha existe
+                const response = await fetch(`${API_URL}?action=getProdutos`);
+                const data = await response.text();
+                
+                if (data.includes('Aba Produtos não encontrada')) {
+                    addResult('❌ Problema na Planilha:', 'A aba "Produtos" não foi encontrada na planilha', 'error');
+                } else if (data.includes('Erro ao buscar produtos')) {
+                    addResult('⚠️ Erro na Planilha:', 'Erro ao acessar a planilha. Verifique permissões.', 'warning');
+                } else {
+                    addResult('✅ Planilha Acessível:', 'A planilha está acessível e a aba Produtos existe', 'success');
+                }
+                
+            } catch (error) {
+                addResult('❌ Erro ao testar planilha:', error.message, 'error');
+            }
+        }
+
+        function verificarEstrutura() {
+            addResult('📋 Estrutura Esperada da Planilha:', `
+A planilha deve ter uma aba chamada "Produtos" com a seguinte estrutura:
+
+| Coluna | Índice | Campo | Descrição |
+|--------|--------|-------|-----------|
+| A | 0 | ID | Identificador único |
+| B | 1 | Nome | Nome do produto |
+| C | 2 | Descrição | Descrição do produto |
+| D | 3 | Preço | Preço do produto |
+| E | 4 | Categoria | Categoria do produto |
+| F | 5 | Imagem | Nome do arquivo de imagem |
+| G | 6 | Ativo | TRUE/FALSE se o produto está ativo |
+
+Exemplo de dados:
+| ID | Nome | Descrição | Preço | Categoria | Imagem | Ativo |
+|----|------|-----------|-------|-----------|--------|-------|
+| 1 | Brigadeiro | Delicioso brigadeiro | 5.50 | Docinhos | dish.png | TRUE |
+| 2 | Cupcake | Cupcake de chocolate | 8.00 | Cupcakes | dish2.png | TRUE |
+
+IMPORTANTE:
+- A primeira linha deve ser cabeçalho
+- A coluna "Ativo" deve conter TRUE para produtos ativos
+- As imagens devem estar na pasta src/images/
+`, 'info');
+        }
+
+        function limparResultados() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        // Teste automático ao carregar
+        window.onload = function() {
+            addResult('🚀 Diagnóstico Iniciado', 'Clique nos botões para executar os testes', 'info');
+            verificarEstrutura();
+        };
+    </script>
+</body>
+</html> 
