@@ -17,7 +17,7 @@ function doOptions(e) {
     .setMimeType(ContentService.MimeType.TEXT)
     .setHeader('Access-Control-Allow-Origin', '*')
     .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
     .setHeader('Access-Control-Max-Age', '86400');
 }
 
@@ -567,7 +567,7 @@ function createResponse(statusCode, data) {
   // Adicionar headers CORS
   output.addHeader('Access-Control-Allow-Origin', '*');
   output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  output.addHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  output.addHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization');
   output.addHeader('Access-Control-Max-Age', '86400');
   
   return output;
