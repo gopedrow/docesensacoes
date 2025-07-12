@@ -330,19 +330,19 @@ function createResponse(statusCode, data) {
     timestamp: new Date().toISOString()
   };
   
-  // Usar HtmlService para permitir CORS
-  return HtmlService.createHtmlOutput(JSON.stringify(response))
+  // Usar ContentService para permitir CORS
+  return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON)
-    .addMetaTag('Access-Control-Allow-Origin', '*')
-    .addMetaTag('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .addMetaTag('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
 }
 
 // Função para lidar com requisições OPTIONS (CORS)
 function doOptions(e) {
-  return HtmlService.createHtmlOutput('')
+  return ContentService.createTextOutput('')
     .setMimeType(ContentService.MimeType.TEXT)
-    .addMetaTag('Access-Control-Allow-Origin', '*')
-    .addMetaTag('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .addMetaTag('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
 } 
