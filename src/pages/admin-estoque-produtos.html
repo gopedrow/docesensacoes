@@ -1,156 +1,285 @@
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Estoque | Admin - Doce Sensações</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/button.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/menu.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        .estoque-container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 2rem 2.5rem;
-        }
-        .estoque-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--color-primary-6);
-            font-size: 2rem;
-        }
-        .produtos-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2rem;
-        }
-        .produtos-table th, .produtos-table td {
-            padding: 0.75rem 0.5rem;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-        .produtos-table th {
-            background: var(--color-primary-1);
-            color: var(--color-primary-6);
-            font-weight: 700;
-        }
-        .produtos-table td img {
-            max-width: 60px;
-            max-height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        .estoque-input {
-            width: 60px;
-            padding: 0.3rem 0.5rem;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        .btn-salvar {
-            padding: 0.4rem 1.2rem;
-            font-size: 1rem;
-            margin-left: 0.5rem;
-        }
-        .indisponivel {
-            color: #fff;
-            background: #e57373;
-            border-radius: 8px;
-            padding: 0.2rem 0.7rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gerenciar Produtos - Doce Sensações</title>
+
+  <!-- Google Fonts SF Pro Display (similar to Apple's font) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Incluir componente de card de produto -->
+  <script src="../componentes/product-stock-card.html"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: #1d1d1f;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      color: #86868b;
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #007aff;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #86868b;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #86868b;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #86868b;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="estoque-container">
-        <h2 class="estoque-title dancing-script-600">Gerenciar Estoque de Produtos</h2>
-        <table class="produtos-table" id="produtos-table">
-            <thead>
-                <tr>
-                    <th>Imagem</th>
-                    <th>Nome</th>
-                    <th>Descrição</th>
-                    <th>Preço</th>
-                    <th>Estoque</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Produtos serão inseridos via JS -->
-            </tbody>
-        </table>
+  <div class="container">
+    <div class="header">
+      <h1>Gerenciar Produtos</h1>
+      <p>Visualize e gerencie todos os produtos do seu catálogo</p>
     </div>
-    <script>
-        // Exemplo de produtos cadastrados (substituir por integração futura)
-        let produtos = [
-            {
-                id: 1,
-                nome: "Brigadeiro Gourmet",
-                descricao: "Brigadeiro tradicional com chocolate belga.",
-                preco: 3.50,
-                estoque: 12,
-                imagem: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=80&q=80"
-            },
-            {
-                id: 2,
-                nome: "Cupcake Red Velvet",
-                descricao: "Cupcake macio com cobertura de cream cheese.",
-                preco: 7.00,
-                estoque: 0,
-                imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80"
-            },
-            {
-                id: 3,
-                nome: "Alfajor Argentino",
-                descricao: "Alfajor recheado com doce de leite e coberto com chocolate.",
-                preco: 6.00,
-                estoque: 5,
-                imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=80&q=80"
-            }
-        ];
 
-        function renderProdutos() {
-            const tbody = document.querySelector('#produtos-table tbody');
-            tbody.innerHTML = '';
-            produtos.forEach((produto, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><img src="${produto.imagem}" alt="${produto.nome}"></td>
-                    <td>${produto.nome}</td>
-                    <td>${produto.descricao}</td>
-                    <td>R$ ${produto.preco.toFixed(2)}</td>
-                    <td>
-                        <input type="number" class="estoque-input" min="0" value="${produto.estoque}" data-idx="${idx}">
-                        <button class="btn-default btn-salvar" data-idx="${idx}"><i class="fa-solid fa-floppy-disk"></i></button>
-                    </td>
-                    <td>${produto.estoque > 0 ? '' : '<span class="indisponivel">Indisponível</span>'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="total-produtos">0</div>
+        <div class="stat-label">Total de Produtos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="produtos-ativos">0</div>
+        <div class="stat-label">Produtos Ativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="produtos-pendentes">0</div>
+        <div class="stat-label">Pendentes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="valor-total">R$ 0</div>
+        <div class="stat-label">Valor Total</div>
+      </div>
+    </div>
+
+    <div class="products-grid" id="products-grid">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Carregando produtos...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dados de exemplo baseados no formulário de cadastro
+    let produtos = [
+      {
+        id: 1001,
+        nome: "Brigadeiro Gourmet",
+        descricao: "Brigadeiro tradicional com chocolate belga de alta qualidade, decorado com granulado dourado.",
+        preco: 3.50,
+        categoria: "Doce/Recheado",
+        modalidade: ["pronta_entrega", "encomendas"],
+        desconto: 10,
+        status: "ativo",
+        imagem: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 1002,
+        nome: "Cupcake Red Velvet",
+        descricao: "Cupcake macio com massa de red velvet e cobertura de cream cheese suave.",
+        preco: 7.00,
+        categoria: "Doce/Bolo",
+        modalidade: ["pronta_entrega", "sob_demanda"],
+        desconto: 0,
+        status: "ativo",
+        imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 1003,
+        nome: "Alfajor Argentino",
+        descricao: "Alfajor recheado com doce de leite artesanal e coberto com chocolate belga.",
+        preco: 6.00,
+        categoria: "Doce/Biscoito",
+        modalidade: ["importado"],
+        desconto: 15,
+        status: "pendente",
+        imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 1004,
+        nome: "Torta de Chocolate",
+        descricao: "Torta de chocolate com recheio cremoso e cobertura de ganache.",
+        preco: 25.00,
+        categoria: "Doce/Torta",
+        modalidade: ["encomendas", "sob_demanda"],
+        desconto: 0,
+        status: "ativo",
+        imagem: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 1005,
+        nome: "Trufa de Champagne",
+        descricao: "Trufa de chocolate com toque de champagne, envolta em cacau em pó.",
+        preco: 4.50,
+        categoria: "Doce/Trufa",
+        modalidade: ["pronta_entrega", "importado"],
+        desconto: 20,
+        status: "inativo",
+        imagem: "https://images.unsplash.com/photo-1481391319762-47dff72954d9?auto=format&fit=crop&w=400&q=80"
+      }
+    ];
+
+    // Definir funções de callback para o componente
+    window.onEditProduct = function(productId) {
+      alert(`Editar produto ID: ${productId}`);
+      // Aqui você pode implementar a lógica de edição
+    };
+
+    window.onDeleteProduct = function(productId) {
+      if (confirm('Tem certeza que deseja excluir este produto?')) {
+        produtos = produtos.filter(p => p.id !== productId);
+        renderProductCards(produtos, 'products-grid');
+        updateProductStats(produtos);
+      }
+    };
+
+    // Simular carregamento
+    setTimeout(() => {
+      renderProductCards(produtos, 'products-grid');
+      updateProductStats(produtos);
+    }, 1000);
+
+    // Integração com Google Sheets e localStorage
+    async function loadProductsFromAPI() {
+      try {
+        // Tentar carregar do Google Sheets
+        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHv5DIdmKIkCQU8NBfyZqNRCAbXyCxs0cUTGUMl3dEhX8BGz5QelTUh1nOcAYrW2VCxHAa7bPDx9_K9pztiQtx20WK3qjpwSpanmiNqQBb9sF5eMB9apVxjpjLpTeHqqTLaY-SF7002qgHxRfxzvSkXD8Jwl3Sv4w5XExBzYBo2ErHt4JwhJlaK_Mq4hC5zi-U_P-ntYf6-NDHuNregusFqIav51nV3XFi-1wFH0UEZo5GoYz6egZWGBFw79M0njOAm7_o_Tzg8lC1L55caLGPvgM7LKmBd390E1LNO5k7YnpsEis&lib=MKRtSNsMvzxg3R8tEy8_u9K2SpajOThe6';
+        const response = await fetch(API_URL + '&action=getProdutos');
+        const data = await response.json();
+        
+        if (data.status === 200 && data.data.produtos) {
+          produtos = data.data.produtos;
+          console.log('Produtos carregados do Google Sheets:', produtos);
+        } else {
+          throw new Error('API não retornou dados válidos');
         }
-
-        // Atualiza estoque ao clicar em salvar
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.btn-salvar')) {
-                const idx = e.target.closest('.btn-salvar').dataset.idx;
-                const input = document.querySelector(`.estoque-input[data-idx="${idx}"]`);
-                let novoEstoque = parseInt(input.value);
-                if (isNaN(novoEstoque) || novoEstoque < 0) novoEstoque = 0;
-                produtos[idx].estoque = novoEstoque;
-                renderProdutos();
-            }
-        });
-
-        // Inicializa a tabela
-        renderProdutos();
-    </script>
+      } catch (error) {
+        console.log('Erro ao carregar do Google Sheets, usando localStorage:', error.message);
+        
+        // Fallback para localStorage
+        try {
+          const produtosLocal = JSON.parse(localStorage.getItem('produtos') || '[]');
+          if (produtosLocal.length > 0) {
+            produtos = produtosLocal;
+            console.log('Produtos carregados do localStorage:', produtos);
+          }
+        } catch (localError) {
+          console.error('Erro ao carregar do localStorage:', localError);
+        }
+      }
+      
+      renderProductCards(produtos, 'products-grid');
+      updateProductStats(produtos);
+    }
+  </script>
 </body>
 </html> 

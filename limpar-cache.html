@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpar Cache - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .danger:hover {
+            background: #c82333;
+        }
+        .success {
+            background: #28a745;
+        }
+        .success:hover {
+            background: #218838;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .success-result {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Limpar Cache e Service Worker</h1>
+        <p>Esta página ajuda a resolver problemas com o Service Worker e cache.</p>
+        
+        <div class="result info">
+            <strong>Status atual:</strong>
+            <div id="status">Verificando...</div>
+        </div>
+
+        <h3>Ações disponíveis:</h3>
+        
+        <button onclick="limparCache()">🗑️ Limpar Cache</button>
+        <button onclick="desabilitarSW()" class="danger">ℹ️ PWA Removido</button>
+        <button onclick="recarregarPagina()" class="success">🔄 Recarregar Página</button>
+        <button onclick="testarAPI()">🧪 Testar API</button>
+        
+        <div id="resultado" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Verificar status do sistema
+        async function verificarStatus() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '✅ Sistema funcionando normalmente (PWA removido)';
+        }
+
+        // Limpar cache
+        async function limparCache() {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.className = 'result info';
+            resultadoDiv.textContent = 'Limpando cache...';
+
+            try {
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                    resultadoDiv.className = 'result success-result';
+                    resultadoDiv.textContent = `✅ Cache limpo! ${cacheNames.length} caches removidos.`;
+                } else {
+                    resultadoDiv.className = 'result error';
+                    resultadoDiv.textContent = '❌ Cache API não suportada';
+                }
+            } catch (error) {
+                resultadoDiv.className = 'result error';
+                resultadoDiv.textContent = `❌ Erro ao limpar cache: ${error.message}`;
+            }
+        }
+
+        // Função não mais necessária
+        async function desabilitarSW() {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.className = 'result info';
+            resultadoDiv.textContent = 'ℹ️ PWA já foi removido do projeto.';
+        }
+
+        // Recarregar página
+        function recarregarPagina() {
+            window.location.reload();
+        }
+
+        // Testar API
+        async function testarAPI() {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.className = 'result info';
+            resultadoDiv.textContent = 'Testando API...';
+
+            try {
+                const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjOzdKuyr_7vvk9rSb6P_vYr6tuijBFgwAV0bahksIXOpVXsVnPB8Yh0R9knE292gI09EtNssuKrW0BCglXdDp3NukHdkWjr8gZnDNzl65oPUXScTsFSGAUhey_QKUoswdSeIyz-0FehZ0jBb_E4eWtJLGOpLNPuJWVvHpS-OSvnmQc4xofRQrPwkoUQLeRtla_2YeNLIVX585r6oG9CYp9NGklwjXXrguY37sknx_04pk9oc1Fgfq11MM_CxkLb630aeNzAUsimPpXGLRhQTqJsJ4GqNZvgP-5f5WXQzrEPATlFL8&lib=MKRtSNsMvzxg3R8tEy8_u9K2SpajOThe6';
+                
+                const response = await fetch(API_URL + '&action=teste');
+                const data = await response.json();
+                
+                resultadoDiv.className = 'result success-result';
+                resultadoDiv.textContent = `✅ API funcionando!\nResposta: ${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultadoDiv.className = 'result error';
+                resultadoDiv.textContent = `❌ Erro na API: ${error.message}`;
+            }
+        }
+
+        // Verificar status ao carregar
+        window.onload = verificarStatus;
+    </script>
+</body>
+</html> 

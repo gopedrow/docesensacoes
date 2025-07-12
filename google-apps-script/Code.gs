@@ -21,11 +21,12 @@ function doOptions(e) {
 function handleRequest(e) {
   try {
     let action = null;
+    let postData = null;
     
     if (e.parameter && e.parameter.action) {
       action = e.parameter.action;
     } else if (e.postData && e.postData.contents) {
-      const postData = JSON.parse(e.postData.contents);
+      postData = JSON.parse(e.postData.contents);
       action = postData.action;
     }
     
@@ -34,6 +35,10 @@ function handleRequest(e) {
     }
     
     switch (action) {
+      case 'teste':
+        return createResponse(200, { message: 'Conexão OK' });
+      case 'cadastrarProduto':
+        return cadastrarProduto(postData.produto);
       case 'getProdutos':
         return getProdutos();
       case 'getProduto':
@@ -44,6 +49,66 @@ function handleRequest(e) {
     }
   } catch (error) {
     return createResponse(500, { error: 'Erro interno: ' + error.toString() });
+  }
+}
+
+// Função para cadastrar produto
+function cadastrarProduto(produto) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Produtos');
+    
+    if (!sheet) {
+      // Criar aba se não existir
+      const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const newSheet = spreadsheet.insertSheet('Produtos');
+      
+      // Adicionar cabeçalhos
+      newSheet.getRange(1, 1, 1, 8).setValues([
+        ['ID', 'Nome', 'Descrição', 'Preço', 'Categoria', 'Imagem', 'Ativo', 'Data Cadastro']
+      ]);
+      
+      // Formatar cabeçalhos
+      newSheet.getRange(1, 1, 1, 8).setFontWeight('bold').setBackground('#f0f0f0');
+      
+      return cadastrarProduto(produto); // Tentar novamente
+    }
+    
+    // Validar dados obrigatórios
+    if (!produto.nome || !produto.descricao || !produto.preco || !produto.categoria) {
+      return createResponse(400, { error: 'Dados obrigatórios não fornecidos' });
+    }
+    
+    // Preparar dados para inserção
+    const rowData = [
+      produto.id || Math.floor(Math.random() * 9000) + 1000,
+      produto.nome,
+      produto.descricao,
+      produto.preco,
+      produto.categoria,
+      produto.imagem || '',
+      produto.status === 'ativo' ? true : false,
+      produto.dataCadastro || new Date().toISOString()
+    ];
+    
+    // Inserir na planilha
+    sheet.appendRow(rowData);
+    
+    return createResponse(200, { 
+      message: 'Produto cadastrado com sucesso',
+      produto: {
+        id: rowData[0],
+        nome: rowData[1],
+        descricao: rowData[2],
+        preco: rowData[3],
+        categoria: rowData[4],
+        imagem: rowData[5],
+        ativo: rowData[6],
+        dataCadastro: rowData[7]
+      }
+    });
+    
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao cadastrar produto: ' + error.toString() });
   }
 }
 

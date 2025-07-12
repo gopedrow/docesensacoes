@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teste do Sistema de Cadastro - Doce Sensações</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #86868b;
+      font-size: 1.1rem;
+    }
+
+    .test-section {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .test-section h3 {
+      color: #007aff;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .test-button {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .test-button:hover {
+      background: #0056cc;
+      transform: translateY(-2px);
+    }
+
+    .test-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    .status.success {
+      background: rgba(52, 199, 89, 0.1);
+      color: #34c759;
+      border: 1px solid rgba(52, 199, 89, 0.2);
+    }
+
+    .status.error {
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+      border: 1px solid rgba(255, 59, 48, 0.2);
+    }
+
+    .status.info {
+      background: rgba(0, 122, 255, 0.1);
+      color: #007aff;
+      border: 1px solid rgba(0, 122, 255, 0.2);
+    }
+
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .form-test {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .form-test input, .form-test select {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .form-test button {
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 Teste do Sistema de Cadastro</h1>
+      <p>Verificando integração com Google Sheets</p>
+    </div>
+
+    <!-- Teste de Conexão -->
+    <div class="test-section">
+      <h3><i class="fas fa-wifi"></i> Teste de Conexão</h3>
+      <p>Verifica se o Google Apps Script está acessível</p>
+      <button class="test-button" onclick="testarConexao()">
+        <i class="fas fa-plug"></i> Testar Conexão
+      </button>
+      <div id="status-conexao"></div>
+    </div>
+
+    <!-- Teste de Cadastro -->
+    <div class="test-section">
+      <h3><i class="fas fa-plus-circle"></i> Teste de Cadastro</h3>
+      <p>Testa o envio de dados para o Google Sheets</p>
+      
+      <div class="form-test">
+        <input type="text" id="test-nome" placeholder="Nome do produto" value="Produto Teste">
+        <input type="number" id="test-preco" placeholder="Preço" value="9.99" step="0.01">
+        <select id="test-categoria">
+          <option value="Doce/Recheado">Doce/Recheado</option>
+          <option value="Doce/Bolo">Doce/Bolo</option>
+          <option value="Doce/Torta">Doce/Torta</option>
+        </select>
+        <select id="test-status">
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+          <option value="pendente">Pendente</option>
+        </select>
+        <button class="test-button" onclick="testarCadastro()">
+          <i class="fas fa-paper-plane"></i> Enviar Produto de Teste
+        </button>
+      </div>
+      
+      <div id="status-cadastro"></div>
+    </div>
+
+    <!-- Log de Atividades -->
+    <div class="test-section">
+      <h3><i class="fas fa-terminal"></i> Log de Atividades</h3>
+      <div id="log" class="log"></div>
+      <button class="test-button" onclick="limparLog()">
+        <i class="fas fa-trash"></i> Limpar Log
+      </button>
+    </div>
+
+    <!-- Instruções -->
+    <div class="test-section">
+      <h3><i class="fas fa-info-circle"></i> Instruções</h3>
+      <ol>
+        <li>Primeiro, configure o Google Apps Script seguindo o arquivo <code>INSTRUCOES_CADASTRO_GOOGLE_SHEETS.md</code></li>
+        <li>Atualize a URL no arquivo <code>src/javascript/cadastro-produto.js</code></li>
+        <li>Execute os testes acima para verificar se está funcionando</li>
+        <li>Verifique no Google Sheets se os dados foram inseridos</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    // URL do Google Apps Script (CONFIGURADA)
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJhQz8atIfB8F4H-JlHpUrr9KsVQwzevBEqnAOsLbh2sx1yKWw8z-LxnBcCBLp6aDlaw/exec';
+
+    // Função para adicionar log
+    function adicionarLog(mensagem, tipo = 'info') {
+      const log = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${mensagem}`;
+      log.appendChild(logEntry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Função para limpar log
+    function limparLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    // Função para mostrar status
+    function mostrarStatus(elementId, mensagem, tipo) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `<div class="status ${tipo}">${mensagem}</div>`;
+    }
+
+    // Teste de conexão
+    async function testarConexao() {
+      adicionarLog('🔍 Testando conexão com Google Apps Script...');
+      
+      try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL + '?action=teste');
+        const resultado = await response.json();
+        
+        if (resultado.status === 200) {
+          adicionarLog('✅ Conexão estabelecida com sucesso!');
+          mostrarStatus('status-conexao', '✅ Conexão OK - Google Apps Script acessível', 'success');
+        } else {
+          throw new Error(resultado.error || 'Resposta inválida');
+        }
+      } catch (error) {
+        adicionarLog(`❌ Erro na conexão: ${error.message}`);
+        mostrarStatus('status-conexao', `❌ Erro: ${error.message}`, 'error');
+      }
+    }
+
+    // Teste de cadastro
+    async function testarCadastro() {
+      adicionarLog('📝 Iniciando teste de cadastro...');
+      
+      // Coletar dados do formulário de teste
+      const dadosTeste = {
+        id: Math.floor(Math.random() * (99999 - 1000 + 1)) + 1000,
+        nome: document.getElementById('test-nome').value,
+        descricao: 'Produto de teste criado automaticamente para verificar o sistema.',
+        preco: parseFloat(document.getElementById('test-preco').value),
+        categoria: document.getElementById('test-categoria').value,
+        modalidade: ['pronta_entrega', 'encomendas'],
+        desconto: 0,
+        status: document.getElementById('test-status').value,
+        imagem: null,
+        dataCadastro: new Date().toISOString()
+      };
+
+      adicionarLog(`📋 Dados do produto: ${dadosTeste.nome} - R$ ${dadosTeste.preco}`);
+      
+      try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'cadastrarProduto',
+            produto: dadosTeste
+          })
+        });
+
+        const resultado = await response.json();
+        
+        if (resultado.status === 200) {
+          adicionarLog('✅ Produto cadastrado com sucesso!');
+          adicionarLog(`📊 ID: ${resultado.data.produtoId} - Linha: ${resultado.data.linha}`);
+          mostrarStatus('status-cadastro', '✅ Produto cadastrado com sucesso! Verifique no Google Sheets.', 'success');
+        } else {
+          throw new Error(resultado.error || 'Erro desconhecido');
+        }
+      } catch (error) {
+        adicionarLog(`❌ Erro no cadastro: ${error.message}`);
+        mostrarStatus('status-cadastro', `❌ Erro: ${error.message}`, 'error');
+      }
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      adicionarLog('🚀 Sistema de teste inicializado');
+      adicionarLog('⚠️ Lembre-se de atualizar a URL do Google Apps Script!');
+      
+      if (GOOGLE_APPS_SCRIPT_URL.includes('YOUR_SCRIPT_ID')) {
+        mostrarStatus('status-conexao', '⚠️ URL do Google Apps Script não configurada!', 'error');
+      }
+    });
+  </script>
+</body>
+</html> 

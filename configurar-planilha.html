@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configurar Planilha - Doce Sensações</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #86868b;
+      font-size: 1.1rem;
+    }
+
+    .config-section {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .config-section h3 {
+      color: #007aff;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .config-button {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .config-button:hover {
+      background: #0056cc;
+      transform: translateY(-2px);
+    }
+
+    .config-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    .status.success {
+      background: rgba(52, 199, 89, 0.1);
+      color: #34c759;
+      border: 1px solid rgba(52, 199, 89, 0.2);
+    }
+
+    .status.error {
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+      border: 1px solid rgba(255, 59, 48, 0.2);
+    }
+
+    .status.info {
+      background: rgba(0, 122, 255, 0.1);
+      color: #007aff;
+      border: 1px solid rgba(0, 122, 255, 0.2);
+    }
+
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .steps {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .steps ol {
+      margin: 0;
+      padding-left: 1.5rem;
+    }
+
+    .steps li {
+      margin-bottom: 0.75rem;
+      color: #1d1d1f;
+    }
+
+    .steps li strong {
+      color: #007aff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚙️ Configurar Planilha</h1>
+      <p>Configuração automática da planilha Google Sheets</p>
+    </div>
+
+    <!-- Configuração de Cabeçalhos -->
+    <div class="config-section">
+      <h3><i class="fas fa-table"></i> Configurar Cabeçalhos da Planilha</h3>
+      <p>Esta ação irá criar a aba "Produtos" e configurar os cabeçalhos automaticamente.</p>
+      
+      <button class="config-button" onclick="configurarCabecalhos()">
+        <i class="fas fa-magic"></i> Configurar Cabeçalhos
+      </button>
+      
+      <div id="status-cabecalhos"></div>
+    </div>
+
+    <!-- Teste de Conexão -->
+    <div class="config-section">
+      <h3><i class="fas fa-wifi"></i> Teste de Conexão</h3>
+      <p>Verifica se o Google Apps Script está funcionando corretamente.</p>
+      
+      <button class="config-button" onclick="testarConexao()">
+        <i class="fas fa-plug"></i> Testar Conexão
+      </button>
+      
+      <div id="status-conexao"></div>
+    </div>
+
+    <!-- Log de Atividades -->
+    <div class="config-section">
+      <h3><i class="fas fa-terminal"></i> Log de Atividades</h3>
+      <div id="log" class="log"></div>
+      <button class="config-button" onclick="limparLog()">
+        <i class="fas fa-trash"></i> Limpar Log
+      </button>
+    </div>
+
+    <!-- Próximos Passos -->
+    <div class="config-section">
+      <h3><i class="fas fa-arrow-right"></i> Próximos Passos</h3>
+      <div class="steps">
+        <ol>
+          <li><strong>1.</strong> Clique em "Configurar Cabeçalhos" para preparar a planilha</li>
+          <li><strong>2.</strong> Clique em "Testar Conexão" para verificar se está funcionando</li>
+          <li><strong>3.</strong> Abra <code>teste-cadastro.html</code> para testar o cadastro completo</li>
+          <li><strong>4.</strong> Use o formulário de cadastro em <code>src/pages/admin-cadastro-produto.html</code></li>
+          <li><strong>5.</strong> Verifique os dados na sua planilha Google Sheets</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL do Google Apps Script
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJhQz8atIfB8F4H-JlHpUrr9KsVQwzevBEqnAOsLbh2sx1yKWw8z-LxnBcCBLp6aDlaw/exec';
+
+    // Função para adicionar log
+    function adicionarLog(mensagem, tipo = 'info') {
+      const log = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${mensagem}`;
+      log.appendChild(logEntry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Função para limpar log
+    function limparLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    // Função para mostrar status
+    function mostrarStatus(elementId, mensagem, tipo) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `<div class="status ${tipo}">${mensagem}</div>`;
+    }
+
+    // Função para configurar cabeçalhos
+    async function configurarCabecalhos() {
+      adicionarLog('🔧 Iniciando configuração dos cabeçalhos...');
+      
+      try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'configurarCabecalhos'
+          })
+        });
+
+        const resultado = await response.json();
+        
+        if (resultado.status === 200) {
+          adicionarLog('✅ Cabeçalhos configurados com sucesso!');
+          adicionarLog('📊 Aba "Produtos" criada e formatada');
+          mostrarStatus('status-cabecalhos', '✅ Cabeçalhos configurados! Verifique sua planilha.', 'success');
+        } else {
+          throw new Error(resultado.error || 'Erro desconhecido');
+        }
+      } catch (error) {
+        adicionarLog(`❌ Erro na configuração: ${error.message}`);
+        mostrarStatus('status-cabecalhos', `❌ Erro: ${error.message}`, 'error');
+      }
+    }
+
+    // Função para testar conexão
+    async function testarConexao() {
+      adicionarLog('🔍 Testando conexão com Google Apps Script...');
+      
+      try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL + '?action=teste');
+        const resultado = await response.json();
+        
+        if (resultado.status === 200) {
+          adicionarLog('✅ Conexão estabelecida com sucesso!');
+          mostrarStatus('status-conexao', '✅ Conexão OK - Sistema funcionando!', 'success');
+        } else {
+          throw new Error(resultado.error || 'Resposta inválida');
+        }
+      } catch (error) {
+        adicionarLog(`❌ Erro na conexão: ${error.message}`);
+        mostrarStatus('status-conexao', `❌ Erro: ${error.message}`, 'error');
+      }
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      adicionarLog('🚀 Sistema de configuração inicializado');
+      adicionarLog('📋 URL do Google Apps Script configurada');
+      adicionarLog('💡 Clique em "Configurar Cabeçalhos" para começar');
+    });
+  </script>
+</body>
+</html> 

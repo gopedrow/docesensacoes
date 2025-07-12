@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teste do Componente Product Stock Card</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Incluir componente -->
+  <script src="src/componentes/product-stock-card.html"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: #86868b;
+      font-size: 1.1rem;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .test-info {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .test-info h3 {
+      color: #007aff;
+      margin-bottom: 1rem;
+    }
+
+    .test-info ul {
+      margin: 0;
+      padding-left: 1.5rem;
+    }
+
+    .test-info li {
+      margin-bottom: 0.5rem;
+      color: #1d1d1f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Teste do Componente</h1>
+      <p>Verificando se o componente Product Stock Card está funcionando</p>
+    </div>
+
+    <div class="test-info">
+      <h3>✅ Componente carregado com sucesso!</h3>
+      <ul>
+        <li>Estilos CSS incluídos automaticamente</li>
+        <li>Funções JavaScript disponíveis globalmente</li>
+        <li>Callbacks configurados para editar/excluir</li>
+        <li>Cards renderizados com dados de exemplo</li>
+      </ul>
+    </div>
+
+    <div class="products-grid" id="test-products-grid">
+      <!-- Cards serão renderizados aqui -->
+    </div>
+  </div>
+
+  <script>
+    // Dados de teste
+    const produtosTeste = [
+      {
+        id: 1001,
+        nome: "Brigadeiro Gourmet",
+        descricao: "Brigadeiro tradicional com chocolate belga de alta qualidade, decorado com granulado dourado.",
+        preco: 3.50,
+        categoria: "Doce/Recheado",
+        modalidade: ["pronta_entrega", "encomendas"],
+        desconto: 10,
+        status: "ativo",
+        imagem: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 1002,
+        nome: "Cupcake Red Velvet",
+        descricao: "Cupcake macio com massa de red velvet e cobertura de cream cheese suave.",
+        preco: 7.00,
+        categoria: "Doce/Bolo",
+        modalidade: ["pronta_entrega", "sob_demanda"],
+        desconto: 0,
+        status: "ativo",
+        imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 1003,
+        nome: "Alfajor Argentino",
+        descricao: "Alfajor recheado com doce de leite artesanal e coberto com chocolate belga.",
+        preco: 6.00,
+        categoria: "Doce/Biscoito",
+        modalidade: ["importado"],
+        desconto: 15,
+        status: "pendente",
+        imagem: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80"
+      }
+    ];
+
+    // Definir callbacks de teste
+    window.onEditProduct = function(productId) {
+      alert(`🖊️ Teste: Editar produto ID ${productId}`);
+      console.log('Função onEditProduct chamada com ID:', productId);
+    };
+
+    window.onDeleteProduct = function(productId) {
+      if (confirm(`🗑️ Teste: Excluir produto ID ${productId}?`)) {
+        alert('Produto excluído (simulação)');
+        console.log('Função onDeleteProduct chamada com ID:', productId);
+      }
+    };
+
+    // Renderizar cards após carregamento
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM carregado, renderizando cards...');
+      
+      // Aguardar um pouco para garantir que o componente foi carregado
+      setTimeout(() => {
+        if (typeof renderProductCards === 'function') {
+          renderProductCards(produtosTeste, 'test-products-grid');
+          console.log('✅ Cards renderizados com sucesso!');
+        } else {
+          console.error('❌ Função renderProductCards não encontrada');
+          document.getElementById('test-products-grid').innerHTML = 
+            '<p style="color: red;">Erro: Componente não carregado corretamente</p>';
+        }
+      }, 500);
+    });
+
+    // Verificar se as funções estão disponíveis
+    console.log('Verificando funções do componente:');
+    console.log('renderProductCard:', typeof renderProductCard);
+    console.log('renderProductCards:', typeof renderProductCards);
+    console.log('updateProductStats:', typeof updateProductStats);
+  </script>
+</body>
+</html> 

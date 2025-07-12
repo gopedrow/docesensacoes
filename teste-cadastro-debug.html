@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Cadastro - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .step {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug do Cadastro de Produtos</h1>
+        
+        <div class="step">
+            <strong>Passo 1:</strong> Preencha os dados básicos do produto
+        </div>
+
+        <form id="debug-form">
+            <div class="form-group">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" id="nome" name="nome" value="Brigadeiro Gourmet" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" rows="3" required>Brigadeiro tradicional com chocolate belga de alta qualidade</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="preco">Preço:</label>
+                <input type="number" id="preco" name="preco" step="0.01" value="3.50" required>
+            </div>
+
+            <div class="form-group">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="Doce">Doce</option>
+                    <option value="Bolo">Bolo</option>
+                    <option value="Torta">Torta</option>
+                    <option value="Trufa">Trufa</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                    <option value="pendente">Pendente</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="step">
+            <strong>Passo 2:</strong> Teste cada etapa do processo
+        </div>
+
+        <button onclick="testarValidacao()">1. Testar Validação</button>
+        <button onclick="testarColetaDados()">2. Testar Coleta de Dados</button>
+        <button onclick="testarAPI()">3. Testar API</button>
+        <button onclick="testarCadastroCompleto()">4. Testar Cadastro Completo</button>
+        <button onclick="limparResultados()">Limpar Resultados</button>
+
+        <div id="resultado" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHv5DIdmKIkCQU8NBfyZqNRCAbXyCxs0cUTGUMl3dEhX8BGz5QelTUh1nOcAYrW2VCxHAa7bPDx9_K9pztiQtx20WK3qjpwSpanmiNqQBb9sF5eMB9apVxjpjLpTeHqqTLaY-SF7002qgHxRfxzvSkXD8Jwl3Sv4w5XExBzYBo2ErHt4JwhJlaK_Mq4hC5zi-U_P-ntYf6-NDHuNregusFqIav51nV3XFi-1wFH0UEZo5GoYz6egZWGBFw79M0njOAm7_o_Tzg8lC1L55caLGPvgM7LKmBd390E1LNO5k7YnpsEis&lib=MKRtSNsMvzxg3R8tEy8_u9K2SpajOThe6';
+
+        function mostrarResultado(tipo, titulo, conteudo) {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.className = `result ${tipo}`;
+            resultadoDiv.innerHTML = `<strong>${titulo}</strong>\n\n${conteudo}`;
+        }
+
+        function testarValidacao() {
+            const dados = coletarDadosFormulario();
+            const erros = validarFormulario(dados);
+            
+            if (erros.length === 0) {
+                mostrarResultado('success', '✅ Validação OK', 
+                    'Dados válidos:\n' + JSON.stringify(dados, null, 2));
+            } else {
+                mostrarResultado('error', '❌ Erros de Validação', 
+                    'Erros encontrados:\n' + erros.join('\n'));
+            }
+        }
+
+        function testarColetaDados() {
+            const dados = coletarDadosFormulario();
+            mostrarResultado('info', '📋 Dados Coletados', 
+                JSON.stringify(dados, null, 2));
+        }
+
+        async function testarAPI() {
+            mostrarResultado('info', '🔄 Testando API...', 'Fazendo requisição...');
+
+            try {
+                const response = await fetch(API_URL + '&action=teste');
+                const data = await response.json();
+                
+                mostrarResultado('success', '✅ API Funcionando', 
+                    'Resposta da API:\n' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                mostrarResultado('error', '❌ Erro na API', 
+                    'Erro: ' + error.message + '\n\nDetalhes:\n' + error.stack);
+            }
+        }
+
+        async function testarCadastroCompleto() {
+            mostrarResultado('info', '🔄 Testando Cadastro Completo...', 'Iniciando processo...');
+
+            try {
+                // 1. Coletar dados
+                const dados = coletarDadosFormulario();
+                mostrarResultado('info', '📋 Passo 1: Dados Coletados', 
+                    JSON.stringify(dados, null, 2));
+
+                // 2. Validar dados
+                const erros = validarFormulario(dados);
+                if (erros.length > 0) {
+                    mostrarResultado('error', '❌ Passo 2: Validação Falhou', 
+                        'Erros:\n' + erros.join('\n'));
+                    return;
+                }
+
+                // 3. Enviar para API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'cadastrarProduto',
+                        produto: dados
+                    })
+                });
+
+                const resultado = await response.json();
+                
+                if (resultado.status === 200) {
+                    mostrarResultado('success', '✅ Cadastro Realizado com Sucesso!', 
+                        'Produto cadastrado:\n' + JSON.stringify(resultado.data, null, 2));
+                } else {
+                    mostrarResultado('error', '❌ Erro no Cadastro', 
+                        'Resposta da API:\n' + JSON.stringify(resultado, null, 2));
+                }
+
+            } catch (error) {
+                mostrarResultado('error', '❌ Erro no Processo', 
+                    'Erro: ' + error.message + '\n\nStack:\n' + error.stack);
+            }
+        }
+
+        function coletarDadosFormulario() {
+            const form = document.getElementById('debug-form');
+            const formData = new FormData(form);
+
+            return {
+                id: Math.floor(Math.random() * 9000) + 1000,
+                nome: formData.get('nome').trim(),
+                descricao: formData.get('descricao').trim(),
+                preco: parseFloat(formData.get('preco')),
+                categoria: formData.get('categoria'),
+                modalidade: ['pronta_entrega'],
+                desconto: 0,
+                status: formData.get('status'),
+                imagem: null,
+                dataCadastro: new Date().toISOString()
+            };
+        }
+
+        function validarFormulario(dados) {
+            const erros = [];
+
+            if (!dados.nome || dados.nome.trim().length < 3) {
+                erros.push('Nome deve ter pelo menos 3 caracteres');
+            }
+
+            if (!dados.descricao || dados.descricao.trim().length < 10) {
+                erros.push('Descrição deve ter pelo menos 10 caracteres');
+            }
+
+            if (!dados.preco || dados.preco <= 0) {
+                erros.push('Preço deve ser maior que zero');
+            }
+
+            if (!dados.categoria) {
+                erros.push('Categoria é obrigatória');
+            }
+
+            if (!dados.status) {
+                erros.push('Status é obrigatório');
+            }
+
+            return erros;
+        }
+
+        function limparResultados() {
+            document.getElementById('resultado').style.display = 'none';
+        }
+    </script>
+</body>
+</html> 
