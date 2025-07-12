@@ -1,0 +1,28 @@
+{
+  "name": "doce-sensacoes-pwa",
+  "version": "1.0.0",
+  "description": "PWA para Doce Sensações - Especializada em delícias por delivery",
+  "main": "index.html",
+  "scripts": {
+    "generate-icons": "node generate-icons.js",
+    "convert-icons": "node convert-svg-to-png.js",
+    "setup-pwa": "npm run generate-icons && npm run convert-icons",
+    "dev": "python3 -m http.server 8000",
+    "serve": "npx http-server -p 8000 -c-1"
+  },
+  "keywords": [
+    "pwa",
+    "food",
+    "delivery",
+    "cake",
+    "dessert"
+  ],
+  "author": "Ligia Sthefany",
+  "license": "MIT",
+  "devDependencies": {
+    "sharp": "^0.32.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
