@@ -17,6 +17,120 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <script src="src/javascript/config.js"></script>
+    <script>
+        // Função para adicionar produtos ao carrinho
+        function addToCart(productId) {
+            // Dados dos produtos em destaque
+            const produtos = {
+                1001: {
+                    id: 1001,
+                    nome: "Brigadeiro Gourmet",
+                    descricao: "Brigadeiro tradicional com chocolate belga de alta qualidade, decorado com granulado dourado.",
+                    preco: 3.50,
+                    categoria: "Doce/Recheado",
+                    imagem: "src/images/dish.png"
+                },
+                1002: {
+                    id: 1002,
+                    nome: "Cupcake Red Velvet",
+                    descricao: "Cupcake macio com massa de red velvet e cobertura de cream cheese suave.",
+                    preco: 7.00,
+                    categoria: "Doce/Bolo",
+                    imagem: "src/images/dish2.png"
+                },
+                1003: {
+                    id: 1003,
+                    nome: "Alfajor Argentino",
+                    descricao: "Alfajor recheado com doce de leite artesanal e coberto com chocolate belga.",
+                    preco: 6.00,
+                    categoria: "Doce/Biscoito",
+                    imagem: "src/images/dish3.png"
+                },
+                1004: {
+                    id: 1004,
+                    nome: "Torta de Chocolate",
+                    descricao: "Torta de chocolate com recheio cremoso e cobertura de ganache.",
+                    preco: 25.00,
+                    categoria: "Doce/Torta",
+                    imagem: "src/images/dish4.png"
+                }
+            };
+
+            const produto = produtos[productId];
+            if (!produto) {
+                alert('Produto não encontrado!');
+                return;
+            }
+
+            // Adicionar ao carrinho usando o cartService do config.js
+            if (typeof cartService !== 'undefined') {
+                cartService.addToCart(produto);
+                showNotification('Produto adicionado ao carrinho!', 'success');
+            } else {
+                // Fallback se cartService não estiver disponível
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const existingItem = cart.find(item => item.id === produto.id);
+                
+                if (existingItem) {
+                    existingItem.quantidade += 1;
+                } else {
+                    cart.push({
+                        ...produto,
+                        quantidade: 1
+                    });
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                showNotification('Produto adicionado ao carrinho!', 'success');
+            }
+        }
+
+        // Função para mostrar notificações
+        function showNotification(message, type = 'info') {
+            // Criar elemento de notificação
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : '#2196F3'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+                max-width: 300px;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            // Adicionar CSS para animação
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
     <title>Doce Sensações</title>
 </head>
 <body>
@@ -38,6 +152,10 @@
                 </li>
             </ul>
 
+            <a href="src/pages/carrinho.html" class="btn-default" style="text-decoration: none; color: inherit; margin-right: 10px;">
+                <i class="fa-solid fa-shopping-cart"></i>
+                Carrinho
+            </a>
             <button class="btn-default">
                 Login
             </button>
@@ -123,14 +241,14 @@
                         <i class="fa-solid fa-heart"></i>
                     </div>
 
-                    <img src="src/images/dish.png" class="dish-image" alt="">
+                    <img src="src/images/dish.png" class="dish-image" alt="Brigadeiro Gourmet">
 
                     <h3 class="dish-title">
-                        Lorem Ipsum
+                        Brigadeiro Gourmet
                     </h3>
 
                     <span class="dish-description">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Brigadeiro tradicional com chocolate belga de alta qualidade, decorado com granulado dourado.
                     </span>
 
                     <div class="dish-rate">
@@ -139,12 +257,12 @@
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
-                        <span>(500+)</span>
+                        <span>(150+)</span>
                     </div>
 
                     <div class="dish-price">
-                        <h4>R$20,00</h4>
-                        <button class="btn-default">
+                        <h4>R$3,50</h4>
+                        <button class="btn-default" onclick="addToCart(1001)">
                             <i class="fa-solid fa-basket-shopping"></i>
                         </button>
                     </div>
@@ -155,14 +273,14 @@
                         <i class="fa-solid fa-heart"></i>
                     </div>
 
-                    <img src="src/images/dish2.png" class="dish-image" alt="">
+                    <img src="src/images/dish2.png" class="dish-image" alt="Cupcake Red Velvet">
 
                     <h3 class="dish-title">
-                        Lorem Ipsum
+                        Cupcake Red Velvet
                     </h3>
 
                     <span class="dish-description">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Cupcake macio com massa de red velvet e cobertura de cream cheese suave.
                     </span>
 
                     <div class="dish-rate">
@@ -171,12 +289,12 @@
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
-                        <span>(500+)</span>
+                        <span>(200+)</span>
                     </div>
 
                     <div class="dish-price">
-                        <h4>R$20,00</h4>
-                        <button class="btn-default">
+                        <h4>R$7,00</h4>
+                        <button class="btn-default" onclick="addToCart(1002)">
                             <i class="fa-solid fa-basket-shopping"></i>
                         </button>
                     </div>
@@ -187,14 +305,14 @@
                         <i class="fa-solid fa-heart"></i>
                     </div>
 
-                    <img src="src/images/dish3.png" class="dish-image" alt="">
+                    <img src="src/images/dish3.png" class="dish-image" alt="Alfajor Argentino">
 
                     <h3 class="dish-title">
-                        Lorem Ipsum
+                        Alfajor Argentino
                     </h3>
 
                     <span class="dish-description">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Alfajor recheado com doce de leite artesanal e coberto com chocolate belga.
                     </span>
 
                     <div class="dish-rate">
@@ -203,12 +321,12 @@
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
-                        <span>(500+)</span>
+                        <span>(120+)</span>
                     </div>
 
                     <div class="dish-price">
-                        <h4>R$20,00</h4>
-                        <button class="btn-default">
+                        <h4>R$6,00</h4>
+                        <button class="btn-default" onclick="addToCart(1003)">
                             <i class="fa-solid fa-basket-shopping"></i>
                         </button>
                     </div>
@@ -219,14 +337,14 @@
                         <i class="fa-solid fa-heart"></i>
                     </div>
 
-                    <img src="src/images/dish4.png" class="dish-image" alt="">
+                    <img src="src/images/dish4.png" class="dish-image" alt="Torta de Chocolate">
 
                     <h3 class="dish-title">
-                        Lorem Ipsum
+                        Torta de Chocolate
                     </h3>
 
                     <span class="dish-description">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Torta de chocolate com recheio cremoso e cobertura de ganache.
                     </span>
 
                     <div class="dish-rate">
@@ -235,12 +353,12 @@
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
                         <i class="fa-solid fa-star"></i>
-                        <span>(500+)</span>
+                        <span>(80+)</span>
                     </div>
 
                     <div class="dish-price">
-                        <h4>R$20,00</h4>
-                        <button class="btn-default">
+                        <h4>R$25,00</h4>
+                        <button class="btn-default" onclick="addToCart(1004)">
                             <i class="fa-solid fa-basket-shopping"></i>
                         </button>
                     </div>

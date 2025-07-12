@@ -437,9 +437,8 @@
                 setLoading(true);
                 
                 try {
-                    // Por enquanto, vamos usar apenas o email para compatibilidade
-                    // Em uma implementação real, você enviaria email e senha
-                    const response = await apiService.loginUsuario({ email });
+                    // Usar o sistema de autenticação atualizado
+                    const response = await authService.login({ email, senha: password });
                     
                     if (response && response.usuario) {
                         // Login bem-sucedido
@@ -454,7 +453,11 @@
                     }
                 } catch (error) {
                     console.error('Erro no login:', error);
-                    showError('Erro ao fazer login. Tente novamente.');
+                    if (error.message && error.message.includes('401')) {
+                        showError('Email ou senha incorretos. Verifique suas credenciais.');
+                    } else {
+                        showError('Erro ao fazer login. Tente novamente.');
+                    }
                 } finally {
                     setLoading(false);
                 }

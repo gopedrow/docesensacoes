@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Pedidos - Doce Sensações</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="../javascript/config.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: #86868b;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--color-primary-6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary-6);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #86868b;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .orders-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .order-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .order-item:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .order-id {
+            font-weight: 700;
+            color: var(--color-primary-6);
+            font-size: 1.1rem;
+        }
+
+        .order-date {
+            color: #86868b;
+            font-size: 0.9rem;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pendente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-preparando {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-pronto {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-entregue {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-cancelado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .order-products {
+            margin-bottom: 1rem;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--color-primary-1);
+        }
+
+        .product-details h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-details p {
+            color: #86868b;
+            font-size: 0.9rem;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: var(--color-primary-6);
+        }
+
+        .order-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .order-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--color-primary-6);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--color-primary-6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #86868b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--color-primary-3);
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #86868b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .order-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+    </a>
+
+    <div class="container">
+        <div class="header">
+            <h1>Meus Pedidos</h1>
+            <p>Acompanhe todos os seus pedidos</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-pedidos">0</div>
+                <div class="stat-label">Total de Pedidos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pedidos-pendentes">0</div>
+                <div class="stat-label">Pendentes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pedidos-prontos">0</div>
+                <div class="stat-label">Prontos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="valor-total">R$ 0</div>
+                <div class="stat-label">Valor Total</div>
+            </div>
+        </div>
+
+        <div class="orders-container" id="orders-container">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Carregando seus pedidos...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticação
+        if (!authService.isLoggedIn()) {
+            window.location.href = 'login.html';
+        }
+
+        // Carregar pedidos do usuário
+        async function loadUserOrders() {
+            try {
+                const user = authService.getCurrentUser();
+                const response = await apiService.getPedidos(user.id);
+                
+                if (response && response.pedidos) {
+                    displayOrders(response.pedidos);
+                    updateStats(response.pedidos);
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+                showEmptyState();
+            }
+        }
+
+        // Exibir pedidos
+        function displayOrders(pedidos) {
+            const container = document.getElementById('orders-container');
+            
+            if (pedidos.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            pedidos.forEach(pedido => {
+                const orderElement = createOrderElement(pedido);
+                container.appendChild(orderElement);
+            });
+        }
+
+        // Criar elemento de pedido
+        function createOrderElement(pedido) {
+            const div = document.createElement('div');
+            div.className = 'order-item';
+            
+            const orderDate = new Date(pedido.dataPedido).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            div.innerHTML = `
+                <div class="order-header">
+                    <div>
+                        <div class="order-id">Pedido #${pedido.id}</div>
+                        <div class="order-date">${orderDate}</div>
+                    </div>
+                    <div class="order-status status-${pedido.status}">${getStatusText(pedido.status)}</div>
+                </div>
+                
+                <div class="order-products">
+                    ${pedido.produtos.map(produto => `
+                        <div class="product-item">
+                            <div class="product-info">
+                                <img src="${produto.imagem || '../images/dish.png'}" alt="${produto.nome}" class="product-image" onerror="this.src='../images/dish.png'">
+                                <div class="product-details">
+                                    <h4>${produto.nome}</h4>
+                                    <p>Quantidade: ${produto.quantidade}</p>
+                                </div>
+                            </div>
+                            <div class="product-price">R$ ${(parseFloat(produto.preco) * produto.quantidade).toFixed(2)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="order-summary">
+                    <div class="order-total">Total: R$ ${parseFloat(pedido.total).toFixed(2)}</div>
+                    <div class="order-actions">
+                        <button class="action-btn btn-secondary" onclick="viewOrderDetails(${pedido.id})">
+                            <i class="fas fa-eye"></i> Detalhes
+                        </button>
+                        ${pedido.status === 'pendente' ? `
+                            <button class="action-btn btn-primary" onclick="cancelOrder(${pedido.id})">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Obter texto do status
+        function getStatusText(status) {
+            const statusMap = {
+                'pendente': 'Pendente',
+                'preparando': 'Preparando',
+                'pronto': 'Pronto',
+                'entregue': 'Entregue',
+                'cancelado': 'Cancelado'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Atualizar estatísticas
+        function updateStats(pedidos) {
+            const total = pedidos.length;
+            const pendentes = pedidos.filter(p => p.status === 'pendente').length;
+            const prontos = pedidos.filter(p => p.status === 'pronto').length;
+            const valorTotal = pedidos.reduce((sum, p) => sum + parseFloat(p.total), 0);
+
+            document.getElementById('total-pedidos').textContent = total;
+            document.getElementById('pedidos-pendentes').textContent = pendentes;
+            document.getElementById('pedidos-prontos').textContent = prontos;
+            document.getElementById('valor-total').textContent = `R$ ${valorTotal.toFixed(2)}`;
+        }
+
+        // Mostrar estado vazio
+        function showEmptyState() {
+            const container = document.getElementById('orders-container');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h3>Nenhum pedido encontrado</h3>
+                    <p>Você ainda não fez nenhum pedido. Que tal experimentar nossos deliciosos produtos?</p>
+                    <a href="../pages/cardapio.html" class="action-btn btn-primary" style="margin-top: 1rem; text-decoration: none;">
+                        <i class="fas fa-utensils"></i> Ver Cardápio
+                    </a>
+                </div>
+            `;
+        }
+
+        // Ver detalhes do pedido
+        function viewOrderDetails(orderId) {
+            // Implementar modal ou página de detalhes
+            alert(`Detalhes do pedido #${orderId} - Funcionalidade em desenvolvimento`);
+        }
+
+        // Cancelar pedido
+        async function cancelOrder(orderId) {
+            if (confirm('Tem certeza que deseja cancelar este pedido?')) {
+                try {
+                    // Implementar cancelamento via API
+                    alert('Funcionalidade de cancelamento em desenvolvimento');
+                } catch (error) {
+                    console.error('Erro ao cancelar pedido:', error);
+                    alert('Erro ao cancelar pedido. Tente novamente.');
+                }
+            }
+        }
+
+        // Carregar pedidos quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserOrders();
+        });
+    </script>
+</body>
+</html> 

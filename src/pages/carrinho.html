@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carrinho</title>
+  <title>Carrinho - Doce Sensações</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="../javascript/config.js"></script>
   <style>
     :root {
       --color-primary-1: #FFF0F5;
@@ -31,6 +33,26 @@
       color: var(--color-neutral-1);
     }
 
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .back-btn {
+      background: var(--color-primary-6);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     h1 {
       font-size: 2rem;
       margin-bottom: 2rem;
@@ -39,6 +61,18 @@
     .cart-container {
       max-width: 1000px;
       margin: 0 auto;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #666;
+    }
+
+    .empty-cart i {
+      font-size: 4rem;
+      color: var(--color-primary-3);
+      margin-bottom: 1rem;
     }
 
     .cart-item {
@@ -55,7 +89,8 @@
     .cart-item img {
       width: 80px;
       height: 80px;
-      object-fit: contain;
+      object-fit: cover;
+      border-radius: 8px;
       margin-right: 1.5rem;
     }
 
@@ -77,6 +112,7 @@
       font-weight: 700;
       margin-left: 1.5rem;
       white-space: nowrap;
+      color: var(--color-primary-6);
     }
 
     .quantity-controls {
@@ -93,6 +129,20 @@
       border-radius: 32px;
       cursor: pointer;
       font-weight: 600;
+    }
+
+    .quantity-controls button:hover {
+      background-color: var(--color-primary-6);
+    }
+
+    .remove-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 1rem;
     }
 
     .delivery-options {
@@ -145,69 +195,229 @@
       border: none;
       border-radius: 32px;
       cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .checkout-button:hover {
+      background-color: var(--color-primary-6);
+    }
+
+    .checkout-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
   <div class="cart-container">
-    <h1>Meu Carrinho</h1>
-
-    <div class="cart-item">
-      <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="Produto 1">
-      <div class="item-info">
-        <div class="item-title">Xiaomi 365</div>
-        <div class="item-description">Cor: Branco // Extra Sport Tire + Bateria High 100</div>
-      </div>
-      <div class="quantity-controls">
-        <button>-</button>
-        <span>1</span>
-        <button>+</button>
-      </div>
-      <div class="item-price">484,99€</div>
+    <div class="header">
+      <a href="../index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Voltar ao Cardápio
+      </a>
+      <h1>Meu Carrinho</h1>
     </div>
 
-    <div class="cart-item">
-      <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png" alt="Produto 2">
-      <div class="item-info">
-        <div class="item-title">Ninebot ES2</div>
-        <div class="item-description">Cor: Preto // Extra Full Tire</div>
-      </div>
-      <div class="quantity-controls">
-        <button>-</button>
-        <span>3</span>
-        <button>+</button>
-      </div>
-      <div class="item-price">1469,97€</div>
+    <div id="cart-items">
+      <!-- Items do carrinho serão carregados dinamicamente -->
     </div>
 
-    <div class="delivery-options">
-      <h2>Escolha a forma de entrega</h2>
-      <div class="option">
-        <input type="radio" name="delivery" checked>
-        <label>Retirar na loja (até 20 min) - <strong>GRÁTIS</strong></label>
-      </div>
-      <div class="option">
-        <input type="radio" name="delivery">
-        <label>Entrega em domicílio (2 a 4 dias) - <strong>9,90€</strong></label>
+    <div id="cart-summary" style="display: none;">
+      <div class="delivery-options">
+        <h2>Escolha a forma de entrega</h2>
+        <div class="option">
+          <input type="radio" name="delivery" value="retirada" checked>
+          <label>Retirar na loja (até 20 min) - <strong>GRÁTIS</strong></label>
+        </div>
+        <div class="option">
+          <input type="radio" name="delivery" value="entrega">
+          <label>Entrega em domicílio (2 a 4 dias) - <strong>R$ 5,00</strong></label>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="subtotal">R$ 0,00</span>
+          </div>
+          <div class="summary-row">
+            <span>Entrega</span>
+            <span id="delivery-cost">GRÁTIS</span>
+          </div>
+          <div class="summary-row" style="font-weight: 700;">
+            <span>Total</span>
+            <span id="total">R$ 0,00</span>
+          </div>
+        </div>
       </div>
 
-      <div class="summary-card">
-        <div class="summary-row">
-          <span>Subtotal</span>
-          <span>1954,97€</span>
-        </div>
-        <div class="summary-row">
-          <span>Entrega</span>
-          <span>GRÁTIS</span>
-        </div>
-        <div class="summary-row" style="font-weight: 700;">
-          <span>Total</span>
-          <span>1954,97€</span>
-        </div>
-      </div>
+      <button class="checkout-button" onclick="finalizarCompra()">
+        <i class="fas fa-shopping-cart"></i>
+        Finalizar Compra
+      </button>
     </div>
-
-    <button class="checkout-button">Finalizar compra</button>
   </div>
+
+  <script>
+    // Carregar carrinho ao iniciar a página
+    document.addEventListener('DOMContentLoaded', function() {
+      loadCart();
+    });
+
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartItemsContainer = document.getElementById('cart-items');
+      const cartSummary = document.getElementById('cart-summary');
+
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = `
+          <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Seu carrinho está vazio</h3>
+            <p>Adicione alguns produtos deliciosos para começar!</p>
+            <a href="../pages/cardapio.html" class="back-btn" style="margin-top: 1rem;">
+              Ver Cardápio
+            </a>
+          </div>
+        `;
+        cartSummary.style.display = 'none';
+        return;
+      }
+
+      cartItemsContainer.innerHTML = '';
+      cart.forEach(item => {
+        const cartItem = createCartItemElement(item);
+        cartItemsContainer.appendChild(cartItem);
+      });
+
+      cartSummary.style.display = 'block';
+      updateCartSummary();
+    }
+
+    function createCartItemElement(item) {
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <img src="${item.imagem || '../images/dish.png'}" alt="${item.nome}" onerror="this.src='../images/dish.png'">
+        <div class="item-info">
+          <div class="item-title">${item.nome}</div>
+          <div class="item-description">${item.descricao || 'Produto da Doce Sensações'}</div>
+        </div>
+        <div class="quantity-controls">
+          <button onclick="updateQuantity(${item.id}, ${item.quantidade - 1})">-</button>
+          <span>${item.quantidade}</span>
+          <button onclick="updateQuantity(${item.id}, ${item.quantidade + 1})">+</button>
+        </div>
+        <div class="item-price">R$ ${(parseFloat(item.preco) * item.quantidade).toFixed(2)}</div>
+        <button class="remove-btn" onclick="removeFromCart(${item.id})">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+      return div;
+    }
+
+    function updateQuantity(productId, newQuantity) {
+      if (newQuantity < 1) {
+        removeFromCart(productId);
+        return;
+      }
+
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const itemIndex = cart.findIndex(item => item.id === productId);
+      
+      if (itemIndex !== -1) {
+        cart[itemIndex].quantidade = newQuantity;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        loadCart();
+      }
+    }
+
+    function removeFromCart(productId) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const updatedCart = cart.filter(item => item.id !== productId);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      loadCart();
+    }
+
+    function updateCartSummary() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const subtotal = cart.reduce((total, item) => {
+        return total + (parseFloat(item.preco) * item.quantidade);
+      }, 0);
+
+      const deliveryType = document.querySelector('input[name="delivery"]:checked').value;
+      const deliveryCost = deliveryType === 'entrega' ? 5.00 : 0;
+      const total = subtotal + deliveryCost;
+
+      document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+      document.getElementById('delivery-cost').textContent = deliveryCost === 0 ? 'GRÁTIS' : `R$ ${deliveryCost.toFixed(2)}`;
+      document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
+    }
+
+    async function finalizarCompra() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart.length === 0) {
+        alert('Seu carrinho está vazio!');
+        return;
+      }
+
+      // Verificar se usuário está logado
+      if (!authService.isLoggedIn()) {
+        alert('Você precisa estar logado para finalizar o pedido!');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const user = authService.getCurrentUser();
+      const deliveryType = document.querySelector('input[name="delivery"]:checked').value;
+      const total = parseFloat(document.getElementById('total').textContent.replace('R$ ', ''));
+
+      // Preparar dados do pedido
+      const pedidoData = {
+        usuarioId: user.id,
+        produtos: cart,
+        total: total.toFixed(2),
+        formaEntrega: deliveryType,
+        observacoes: ''
+      };
+
+      try {
+        // Mostrar loading
+        const btn = document.querySelector('.checkout-button');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+        // Criar pedido via API
+        const response = await apiService.createPedido(pedidoData);
+        
+        if (response && response.pedido) {
+          // Limpar carrinho
+          localStorage.removeItem('cart');
+          
+          // Mostrar sucesso
+          alert(`Pedido #${response.pedido.id} criado com sucesso! Você será redirecionado para acompanhar seu pedido.`);
+          
+          // Redirecionar para página de pedidos
+          window.location.href = 'meus-pedidos.html';
+        } else {
+          throw new Error('Erro ao criar pedido');
+        }
+      } catch (error) {
+        console.error('Erro ao finalizar pedido:', error);
+        alert('Erro ao finalizar pedido. Tente novamente ou entre em contato conosco.');
+      } finally {
+        // Restaurar botão
+        const btn = document.querySelector('.checkout-button');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Finalizar Compra';
+      }
+    }
+
+    // Atualizar resumo quando mudar forma de entrega
+    document.addEventListener('change', function(e) {
+      if (e.target.name === 'delivery') {
+        updateCartSummary();
+      }
+    });
+  </script>
 </body>
 </html>

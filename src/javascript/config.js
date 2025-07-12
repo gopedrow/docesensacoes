@@ -5,12 +5,23 @@ const API_CONFIG = {
     
     // Endpoints da API
     ENDPOINTS: {
+        // Produtos
         PRODUTOS: '?action=getProdutos',
         PRODUTO: '?action=getProduto',
+        CREATE_PRODUTO: '?action=cadastrarProduto',
+        
+        // Usuários
         CREATE_USUARIO: '?action=createUsuario',
         LOGIN_USUARIO: '?action=loginUsuario',
+        GET_USUARIO: '?action=getUsuario',
+        UPDATE_USUARIO: '?action=updateUsuario',
+        
+        // Pedidos
         CREATE_PEDIDO: '?action=createPedido',
         GET_PEDIDOS: '?action=getPedidos',
+        UPDATE_PEDIDO: '?action=updatePedido',
+        
+        // Avaliações
         CREATE_AVALIACAO: '?action=createAvaliacao',
         GET_AVALIACOES: '?action=getAvaliacoes'
     }
@@ -82,6 +93,11 @@ class APIService {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.PRODUTO + `&id=${id}`);
     }
 
+    // Criar novo produto
+    async createProduto(produtoData) {
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.CREATE_PRODUTO, 'POST', produtoData);
+    }
+
     // Criar novo usuário
     async createUsuario(usuarioData) {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.CREATE_USUARIO, 'POST', usuarioData);
@@ -92,6 +108,16 @@ class APIService {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.LOGIN_USUARIO, 'POST', loginData);
     }
 
+    // Buscar usuário específico
+    async getUsuario(id) {
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_USUARIO + `&id=${id}`);
+    }
+
+    // Atualizar usuário
+    async updateUsuario(usuarioData) {
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.UPDATE_USUARIO, 'POST', usuarioData);
+    }
+
     // Criar novo pedido
     async createPedido(pedidoData) {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.CREATE_PEDIDO, 'POST', pedidoData);
@@ -100,6 +126,11 @@ class APIService {
     // Buscar pedidos de um usuário
     async getPedidos(usuarioId) {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_PEDIDOS + `&usuarioId=${usuarioId}`);
+    }
+
+    // Atualizar pedido
+    async updatePedido(pedidoData) {
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.UPDATE_PEDIDO, 'POST', pedidoData);
     }
 
     // Criar nova avaliação
@@ -204,14 +235,31 @@ const cartService = new CartService();
 class AuthService {
     constructor() {
         this.user = JSON.parse(localStorage.getItem('user')) || null;
+        this.updateAuthUI();
     }
 
     // Fazer login
-    async login(email) {
+    async login(credentials) {
         try {
-            const response = await apiService.loginUsuario({ email });
+            const response = await apiService.loginUsuario(credentials);
             this.user = response.usuario;
             this.saveUser();
+            this.updateAuthUI();
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Registrar novo usuário
+    async register(usuarioData) {
+        try {
+            const response = await apiService.createUsuario(usuarioData);
+            // Após registro bem-sucedido, fazer login automaticamente
+            await this.login({
+                email: usuarioData.email,
+                senha: usuarioData.senha
+            });
             return response;
         } catch (error) {
             throw error;
@@ -223,11 +271,20 @@ class AuthService {
         this.user = null;
         localStorage.removeItem('user');
         this.updateAuthUI();
+        // Redirecionar para página inicial
+        if (window.location.pathname.includes('perfil') || window.location.pathname.includes('admin')) {
+            window.location.href = '/index.html';
+        }
     }
 
     // Verificar se está logado
     isLoggedIn() {
         return this.user !== null;
+    }
+
+    // Verificar se é administrador
+    isAdmin() {
+        return this.user && this.user.tipo === 'admin';
     }
 
     // Obter usuário atual
@@ -242,32 +299,143 @@ class AuthService {
 
     // Atualizar interface de autenticação
     updateAuthUI() {
-        const loginBtn = document.querySelector('.btn-default');
-        const userMenu = document.getElementById('user-menu');
+        const loginBtns = document.querySelectorAll('.btn-default');
         
-        if (this.isLoggedIn()) {
-            if (loginBtn) {
-                loginBtn.textContent = this.user.nome;
-                loginBtn.onclick = () => this.showUserMenu();
+        loginBtns.forEach(btn => {
+            if (btn.textContent.trim() === 'Login') {
+                if (this.isLoggedIn()) {
+                    btn.innerHTML = `
+                        <i class="fa-solid fa-user"></i>
+                        ${this.user.nome}
+                    `;
+                    btn.onclick = () => this.showUserMenu();
+                } else {
+                    btn.innerHTML = 'Login';
+                    btn.onclick = () => window.location.href = 'src/pages/login.html';
+                }
             }
-            if (userMenu) {
-                userMenu.style.display = 'block';
-            }
-        } else {
-            if (loginBtn) {
-                loginBtn.textContent = 'Login';
-                loginBtn.onclick = () => window.location.href = 'src/pages/login.html';
-            }
-            if (userMenu) {
-                userMenu.style.display = 'none';
-            }
+        });
+
+        // Atualizar menu do usuário se existir
+        const userMenu = document.getElementById('user-menu');
+        if (userMenu) {
+            userMenu.style.display = this.isLoggedIn() ? 'block' : 'none';
         }
     }
 
     // Mostrar menu do usuário
     showUserMenu() {
-        // Implementar menu dropdown do usuário
-        console.log('Menu do usuário:', this.user);
+        const menu = document.createElement('div');
+        menu.className = 'user-menu-dropdown';
+        menu.innerHTML = `
+            <div class="user-menu-content">
+                <div class="user-info">
+                    <i class="fa-solid fa-user"></i>
+                    <span>${this.user.nome}</span>
+                </div>
+                <div class="user-menu-options">
+                    <a href="src/pages/perfil.html">
+                        <i class="fa-solid fa-user-edit"></i>
+                        Meu Perfil
+                    </a>
+                    <a href="src/pages/meus-pedidos.html">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                        Meus Pedidos
+                    </a>
+                    ${this.isAdmin() ? `
+                        <a href="src/pages/admin-estoque-produtos.html">
+                            <i class="fa-solid fa-cog"></i>
+                            Administração
+                        </a>
+                    ` : ''}
+                    <a href="#" onclick="authService.logout()">
+                        <i class="fa-solid fa-sign-out-alt"></i>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        `;
+
+        // Adicionar estilos
+        const style = document.createElement('style');
+        style.textContent = `
+            .user-menu-dropdown {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .user-menu-content {
+                background: white;
+                border-radius: 12px;
+                padding: 1.5rem;
+                min-width: 300px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #eee;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+            .user-menu-options {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .user-menu-options a {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.75rem;
+                text-decoration: none;
+                color: #333;
+                border-radius: 8px;
+                transition: background-color 0.3s;
+            }
+            .user-menu-options a:hover {
+                background-color: #f5f5f5;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Fechar menu ao clicar fora
+        menu.onclick = (e) => {
+            if (e.target === menu) {
+                document.body.removeChild(menu);
+            }
+        };
+
+        document.body.appendChild(menu);
+    }
+
+    // Verificar autenticação em páginas protegidas
+    requireAuth() {
+        if (!this.isLoggedIn()) {
+            window.location.href = '/src/pages/login.html';
+            return false;
+        }
+        return true;
+    }
+
+    // Verificar se é admin em páginas administrativas
+    requireAdmin() {
+        if (!this.requireAuth()) return false;
+        if (!this.isAdmin()) {
+            alert('Acesso negado. Apenas administradores podem acessar esta página.');
+            window.location.href = '/index.html';
+            return false;
+        }
+        return true;
     }
 }
 
