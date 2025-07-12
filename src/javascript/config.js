@@ -1,29 +1,29 @@
-// Configuração da API do Google Apps Script
+// Configuração da API do Render
 const API_CONFIG = {
-    // URL da API do Google Apps Script
-    BASE_URL: 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLgxalsXT2eSDyjK3Spfw-9HTSk7PlEj9KB2hHIs13XlBAaTBOdXK6sYvDy0LRyxuIRu1buJwjfAkD8HVax_Ig1LzSBsX-HsQWZkMChDWPDa0c-VFNXb2Ja_ulgFdOyCtr_bsfgTRD3Lf7bGpe1aqYB4-0BHEUz1TJtLJbqWZl3STg_OX1WubeKJppB5XVmgCRZso6wkhSU4BPJlVqUkCzyj5PwAE9BCvOajnbowahOFzql544S4PKT1PnCRH_-Tbw08BtW68QlRyB26iwLsEDtWXYNJ6GenbFuZy4wuoXLTA5YFKnk&lib=MDIuHBhrQVj9xnYaRtC0wCa2SpajOThe6',
+    // URL da API do Render
+    BASE_URL: 'https://docesensacoes-2.onrender.com/api',
     
     // Endpoints da API
     ENDPOINTS: {
         // Produtos
-        PRODUTOS: '?action=getProdutos',
-        PRODUTO: '?action=getProduto',
-        CREATE_PRODUTO: '?action=cadastrarProduto',
+        PRODUTOS: '/products',
+        PRODUTO: '/products',
+        CREATE_PRODUTO: '/products',
         
         // Usuários
-        CREATE_USUARIO: '?action=createUsuario',
-        LOGIN_USUARIO: '?action=loginUsuario',
-        GET_USUARIO: '?action=getUsuario',
-        UPDATE_USUARIO: '?action=updateUsuario',
+        CREATE_USUARIO: '/users',
+        LOGIN_USUARIO: '/auth/login',
+        GET_USUARIO: '/users',
+        UPDATE_USUARIO: '/users',
         
         // Pedidos
-        CREATE_PEDIDO: '?action=createPedido',
-        GET_PEDIDOS: '?action=getPedidos',
-        UPDATE_PEDIDO: '?action=updatePedido',
+        CREATE_PEDIDO: '/orders',
+        GET_PEDIDOS: '/orders',
+        UPDATE_PEDIDO: '/orders',
         
         // Avaliações
-        CREATE_AVALIACAO: '?action=createAvaliacao',
-        GET_AVALIACOES: '?action=getAvaliacoes'
+        CREATE_AVALIACAO: '/reviews',
+        GET_AVALIACOES: '/reviews'
     }
 };
 
@@ -42,32 +42,34 @@ class APIService {
             const options = {
                 method: method,
                 headers: {
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 }
             };
 
+            // Adicionar token de autenticação se disponível
+            const token = localStorage.getItem('token');
+            if (token) {
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+
             if (data && method !== 'GET') {
                 options.body = JSON.stringify(data);
-                options.headers['Content-Type'] = 'application/json';
             }
 
             const response = await fetch(url, options);
             console.log('Status da resposta:', response.status);
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
             
             const result = await response.json();
             console.log('Resposta da API:', result);
 
-            // Verificar se há erro na resposta
-            if (result.status >= 200 && result.status < 300) {
-                // Retornar diretamente os dados, não o wrapper
-                return result.data;
-            } else {
-                throw new Error(result.data?.error || result.error || 'Erro na requisição');
-            }
+            // Retornar os dados da resposta
+            return result.data || result;
         } catch (error) {
             console.error('Erro na API:', error);
             throw error;
@@ -90,7 +92,7 @@ class APIService {
 
     // Buscar produto específico
     async getProduto(id) {
-        return await this.makeRequest(API_CONFIG.ENDPOINTS.PRODUTO + `&id=${id}`);
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.PRODUTO + `/${id}`);
     }
 
     // Criar novo produto
@@ -110,7 +112,7 @@ class APIService {
 
     // Buscar usuário específico
     async getUsuario(id) {
-        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_USUARIO + `&id=${id}`);
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_USUARIO + `/${id}`);
     }
 
     // Atualizar usuário
@@ -125,7 +127,7 @@ class APIService {
 
     // Buscar pedidos de um usuário
     async getPedidos(usuarioId) {
-        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_PEDIDOS + `&usuarioId=${usuarioId}`);
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_PEDIDOS + `?userId=${usuarioId}`);
     }
 
     // Atualizar pedido
@@ -140,7 +142,7 @@ class APIService {
 
     // Buscar avaliações de um produto
     async getAvaliacoes(produtoId) {
-        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_AVALIACOES + `&produtoId=${produtoId}`);
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_AVALIACOES + `?productId=${produtoId}`);
     }
 }
 
@@ -242,7 +244,11 @@ class AuthService {
     async login(credentials) {
         try {
             const response = await apiService.loginUsuario(credentials);
-            this.user = response.usuario;
+            this.user = response.user;
+            // Salvar token JWT
+            if (response.token) {
+                localStorage.setItem('token', response.token);
+            }
             this.saveUser();
             this.updateAuthUI();
             return response;
@@ -270,6 +276,7 @@ class AuthService {
     logout() {
         this.user = null;
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
         this.updateAuthUI();
         // Redirecionar para página inicial
         if (window.location.pathname.includes('perfil') || window.location.pathname.includes('admin')) {
