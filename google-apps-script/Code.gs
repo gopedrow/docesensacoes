@@ -562,13 +562,11 @@ function createResponse(statusCode, data) {
   };
   
   const output = ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
-  
-  // Adicionar headers CORS
-  output.addHeader('Access-Control-Allow-Origin', '*');
-  output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  output.addHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization');
-  output.addHeader('Access-Control-Max-Age', '86400');
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
+    .setHeader('Access-Control-Max-Age', '86400');
   
   return output;
 } 
