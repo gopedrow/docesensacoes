@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Estoque - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #28a745;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success-result {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste do Sistema de Estoque</h1>
+        
+        <div class="test-section">
+            <h3>1. Verificar Produtos no localStorage</h3>
+            <button onclick="verificarLocalStorage()">Verificar localStorage</button>
+            <button onclick="limparLocalStorage()" class="danger">Limpar localStorage</button>
+            <div id="result-localStorage" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Testar API do Google Sheets</h3>
+            <button onclick="testarAPI()">Testar API</button>
+            <div id="result-api" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Simular Produtos de Teste</h3>
+            <button onclick="adicionarProdutosTeste()" class="success">Adicionar Produtos Teste</button>
+            <div id="result-teste" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Visualizar Produtos</h3>
+            <button onclick="visualizarProdutos()">Visualizar</button>
+            <div id="products-display"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Navegação</h3>
+            <button onclick="window.location.href='src/pages/admin-estoque-produtos.html'">Ir para Estoque</button>
+            <button onclick="window.location.href='teste-cadastro.html'">Ir para Cadastro</button>
+            <button onclick="window.location.href='visualizar-produtos.html'">Visualizar Produtos</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHv5DIdmKIkCQU8NBfyZqNRCAbXyCxs0cUTGUMl3dEhX8BGz5QelTUh1nOcAYrW2VCxHAa7bPDx9_K9pztiQtx20WK3qjpwSpanmiNqQBb9sF5eMB9apVxjpjLpTeHqqTLaY-SF7002qgHxRfxzvSkXD8Jwl3Sv4w5XExBzYBo2ErHt4JwhJlaK_Mq4hC5zi-U_P-ntYf6-NDHuNregusFqIav51nV3XFi-1wFH0UEZo5GoYz6egZWGBFw79M0njOAm7_o_Tzg8lC1L55caLGPvgM7LKmBd390E1LNO5k7YnpsEis&lib=MKRtSNsMvzxg3R8tEy8_u9K2SpajOThe6';
+
+        function mostrarResultado(elementId, tipo, titulo, conteudo) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.className = `result ${tipo}`;
+            resultDiv.innerHTML = `<strong>${titulo}</strong>\n\n${conteudo}`;
+        }
+
+        function verificarLocalStorage() {
+            try {
+                const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+                const total = produtos.length;
+                
+                if (total > 0) {
+                    mostrarResultado('result-localStorage', 'success-result', 
+                        `✅ localStorage OK - ${total} produtos encontrados`, 
+                        JSON.stringify(produtos, null, 2));
+                } else {
+                    mostrarResultado('result-localStorage', 'info', 
+                        'ℹ️ localStorage vazio', 
+                        'Nenhum produto encontrado no localStorage');
+                }
+            } catch (error) {
+                mostrarResultado('result-localStorage', 'error', 
+                    '❌ Erro no localStorage', 
+                    error.message);
+            }
+        }
+
+        function limparLocalStorage() {
+            if (confirm('Tem certeza que deseja limpar todos os produtos?')) {
+                localStorage.removeItem('produtos');
+                mostrarResultado('result-localStorage', 'success-result', 
+                    '✅ localStorage limpo', 
+                    'Todos os produtos foram removidos');
+            }
+        }
+
+        async function testarAPI() {
+            mostrarResultado('result-api', 'info', '🔄 Testando API...', 'Fazendo requisição...');
+
+            try {
+                const response = await fetch(API_URL + '&action=getProdutos');
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    mostrarResultado('result-api', 'success-result', 
+                        '✅ API funcionando', 
+                        JSON.stringify(data, null, 2));
+                } else {
+                    mostrarResultado('result-api', 'error', 
+                        '❌ API retornou erro', 
+                        JSON.stringify(data, null, 2));
+                }
+            } catch (error) {
+                mostrarResultado('result-api', 'error', 
+                    '❌ Erro na API', 
+                    error.message);
+            }
+        }
+
+        function adicionarProdutosTeste() {
+            const produtosTeste = [
+                {
+                    id: 1001,
+                    nome: "Brigadeiro Gourmet",
+                    descricao: "Brigadeiro tradicional com chocolate belga de alta qualidade.",
+                    preco: 3.50,
+                    categoria: "Doce",
+                    modalidade: ["pronta_entrega", "encomendas"],
+                    desconto: 10,
+                    status: "ativo",
+                    dataCadastro: new Date().toISOString()
+                },
+                {
+                    id: 1002,
+                    nome: "Cupcake Red Velvet",
+                    descricao: "Cupcake macio com massa de red velvet e cobertura de cream cheese.",
+                    preco: 7.00,
+                    categoria: "Bolo",
+                    modalidade: ["pronta_entrega"],
+                    desconto: 0,
+                    status: "ativo",
+                    dataCadastro: new Date().toISOString()
+                },
+                {
+                    id: 1003,
+                    nome: "Alfajor Argentino",
+                    descricao: "Alfajor recheado com doce de leite artesanal.",
+                    preco: 6.00,
+                    categoria: "Biscoito",
+                    modalidade: ["importado"],
+                    desconto: 15,
+                    status: "pendente",
+                    dataCadastro: new Date().toISOString()
+                }
+            ];
+
+            try {
+                localStorage.setItem('produtos', JSON.stringify(produtosTeste));
+                mostrarResultado('result-teste', 'success-result', 
+                    '✅ Produtos de teste adicionados', 
+                    `${produtosTeste.length} produtos foram adicionados ao localStorage`);
+            } catch (error) {
+                mostrarResultado('result-teste', 'error', 
+                    '❌ Erro ao adicionar produtos', 
+                    error.message);
+            }
+        }
+
+        function visualizarProdutos() {
+            try {
+                const produtos = JSON.parse(localStorage.getItem('produtos') || '[]');
+                const displayDiv = document.getElementById('products-display');
+                
+                if (produtos.length === 0) {
+                    displayDiv.innerHTML = '<p style="color: #6c757d; text-align: center;">Nenhum produto encontrado</p>';
+                    return;
+                }
+
+                const produtosHTML = produtos.map(produto => `
+                    <div class="product-card">
+                        <h4>${produto.nome}</h4>
+                        <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
+                        <p><strong>Categoria:</strong> ${produto.categoria}</p>
+                        <p><strong>Status:</strong> <span style="color: ${produto.status === 'ativo' ? 'green' : produto.status === 'pendente' ? 'orange' : 'red'}">${produto.status}</span></p>
+                        <p><strong>Modalidades:</strong> ${produto.modalidade ? produto.modalidade.join(', ') : 'N/A'}</p>
+                    </div>
+                `).join('');
+
+                displayDiv.innerHTML = `
+                    <h4>Produtos encontrados: ${produtos.length}</h4>
+                    <div class="products-grid">
+                        ${produtosHTML}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('products-display').innerHTML = 
+                    `<p style="color: red;">Erro ao visualizar produtos: ${error.message}</p>`;
+            }
+        }
+
+        // Verificar localStorage ao carregar
+        window.onload = function() {
+            verificarLocalStorage();
+        };
+    </script>
+</body>
+</html> 

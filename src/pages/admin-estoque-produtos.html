@@ -139,6 +139,14 @@
     <div class="header">
       <h1>Gerenciar Produtos</h1>
       <p>Visualize e gerencie todos os produtos do seu catálogo</p>
+      <div style="margin-top: 1rem;">
+        <button onclick="loadProductsFromAPI()" style="background: #007aff; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin-right: 0.5rem;">
+          <i class="fas fa-sync-alt"></i> Recarregar
+        </button>
+        <button onclick="window.location.href='admin-cadastro-produto.html'" style="background: #34c759; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+          <i class="fas fa-plus"></i> Novo Produto
+        </button>
+      </div>
     </div>
 
     <div class="stats-grid">
@@ -242,14 +250,21 @@
       }
     };
 
-    // Simular carregamento
-    setTimeout(() => {
-      renderProductCards(produtos, 'products-grid');
-      updateProductStats(produtos);
-    }, 1000);
+    // Carregar produtos ao iniciar a página
+    window.onload = function() {
+      loadProductsFromAPI();
+    };
 
     // Integração com Google Sheets e localStorage
     async function loadProductsFromAPI() {
+      const loadingDiv = document.getElementById('products-grid');
+      loadingDiv.innerHTML = `
+        <div class="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Carregando produtos do Google Sheets...</p>
+        </div>
+      `;
+
       try {
         // Tentar carregar do Google Sheets
         const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHv5DIdmKIkCQU8NBfyZqNRCAbXyCxs0cUTGUMl3dEhX8BGz5QelTUh1nOcAYrW2VCxHAa7bPDx9_K9pztiQtx20WK3qjpwSpanmiNqQBb9sF5eMB9apVxjpjLpTeHqqTLaY-SF7002qgHxRfxzvSkXD8Jwl3Sv4w5XExBzYBo2ErHt4JwhJlaK_Mq4hC5zi-U_P-ntYf6-NDHuNregusFqIav51nV3XFi-1wFH0UEZo5GoYz6egZWGBFw79M0njOAm7_o_Tzg8lC1L55caLGPvgM7LKmBd390E1LNO5k7YnpsEis&lib=MKRtSNsMvzxg3R8tEy8_u9K2SpajOThe6';
@@ -258,27 +273,111 @@
         
         if (data.status === 200 && data.data.produtos) {
           produtos = data.data.produtos;
-          console.log('Produtos carregados do Google Sheets:', produtos);
+          console.log('✅ Produtos carregados do Google Sheets:', produtos);
+          renderProductCards(produtos, 'products-grid');
+          updateProductStats(produtos);
         } else {
           throw new Error('API não retornou dados válidos');
         }
       } catch (error) {
-        console.log('Erro ao carregar do Google Sheets, usando localStorage:', error.message);
+        console.log('❌ Erro ao carregar do Google Sheets, usando localStorage:', error.message);
         
         // Fallback para localStorage
         try {
           const produtosLocal = JSON.parse(localStorage.getItem('produtos') || '[]');
           if (produtosLocal.length > 0) {
             produtos = produtosLocal;
-            console.log('Produtos carregados do localStorage:', produtos);
+            console.log('✅ Produtos carregados do localStorage:', produtos);
+            renderProductCards(produtos, 'products-grid');
+            updateProductStats(produtos);
+          } else {
+            // Se não há produtos nem no Google Sheets nem no localStorage
+            loadingDiv.innerHTML = `
+              <div class="empty-state">
+                <h3>Nenhum produto encontrado</h3>
+                <p>Cadastre seu primeiro produto para começar!</p>
+                <button onclick="window.location.href='admin-cadastro-produto.html'" class="btn-default" style="margin-top: 1rem;">
+                  <i class="fas fa-plus"></i> Cadastrar Produto
+                </button>
+              </div>
+            `;
           }
         } catch (localError) {
-          console.error('Erro ao carregar do localStorage:', localError);
+          console.error('❌ Erro ao carregar do localStorage:', localError);
+          loadingDiv.innerHTML = `
+            <div class="empty-state">
+              <h3>Erro ao carregar produtos</h3>
+              <p>${localError.message}</p>
+            </div>
+          `;
         }
       }
+    }
+
+    // Função para renderizar os cards de produtos
+    function renderProductCards(produtos, containerId) {
+      const container = document.getElementById(containerId);
       
-      renderProductCards(produtos, 'products-grid');
-      updateProductStats(produtos);
+      if (!produtos || produtos.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>Nenhum produto encontrado</h3>
+            <p>Cadastre seu primeiro produto para começar!</p>
+            <button onclick="window.location.href='admin-cadastro-produto.html'" class="btn-default" style="margin-top: 1rem;">
+              <i class="fas fa-plus"></i> Cadastrar Produto
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const produtosHTML = produtos.map(produto => `
+        <div class="product-card" style="background: white; border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #1d1d1f; margin: 0;">${produto.nome}</h3>
+            <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; background: ${produto.status === 'ativo' ? '#34c759' : produto.status === 'pendente' ? '#ff9500' : '#ff3b30'}; color: white;">
+              ${produto.status}
+            </span>
+          </div>
+          
+          <p style="color: #86868b; margin-bottom: 1rem; line-height: 1.4;">${produto.descricao}</p>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="font-size: 1.1rem; font-weight: 600; color: #007aff;">R$ ${produto.preco.toFixed(2)}</span>
+            <span style="color: #86868b; font-size: 0.9rem;">${produto.categoria}</span>
+          </div>
+          
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            ${produto.modalidade ? produto.modalidade.map(m => 
+              `<span style="background: #f2f2f7; color: #1d1d1f; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${m}</span>`
+            ).join('') : ''}
+          </div>
+          
+          <div style="display: flex; gap: 0.5rem;">
+            <button onclick="onEditProduct(${produto.id})" style="background: #007aff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+            <button onclick="onDeleteProduct(${produto.id})" style="background: #ff3b30; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+              <i class="fas fa-trash"></i> Excluir
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = produtosHTML;
+    }
+
+    // Função para atualizar estatísticas
+    function updateProductStats(produtos) {
+      const total = produtos.length;
+      const ativos = produtos.filter(p => p.status === 'ativo').length;
+      const pendentes = produtos.filter(p => p.status === 'pendente').length;
+      const valorTotal = produtos.reduce((sum, p) => sum + p.preco, 0);
+
+      document.getElementById('total-produtos').textContent = total;
+      document.getElementById('produtos-ativos').textContent = ativos;
+      document.getElementById('produtos-pendentes').textContent = pendentes;
+      document.getElementById('valor-total').textContent = `R$ ${valorTotal.toFixed(2)}`;
     }
   </script>
 </body>
