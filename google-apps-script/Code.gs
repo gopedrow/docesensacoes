@@ -322,7 +322,7 @@ function getAvaliacoes(produtoId) {
   }
 }
 
-// Função para criar resposta HTTP
+// Função para criar resposta HTTP com CORS
 function createResponse(statusCode, data) {
   const response = {
     statusCode: statusCode,
@@ -330,19 +330,15 @@ function createResponse(statusCode, data) {
     timestamp: new Date().toISOString()
   };
   
-  // Usar ContentService para permitir CORS
-  return ContentService.createTextOutput(JSON.stringify(response))
+  // Usar HtmlService com configuração CORS
+  return HtmlService.createHtmlOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 // Função para lidar com requisições OPTIONS (CORS)
 function doOptions(e) {
-  return ContentService.createTextOutput('')
+  return HtmlService.createHtmlOutput('')
     .setMimeType(ContentService.MimeType.TEXT)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Origin');
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 } 
