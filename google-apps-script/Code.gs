@@ -14,11 +14,7 @@ function doPost(e) {
 // Função principal OPTIONS
 function doOptions(e) {
   return ContentService.createTextOutput('')
-    .setMimeType(ContentService.MimeType.TEXT)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
-    .setHeader('Access-Control-Max-Age', '86400');
+    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 // Função para tratar requisições
