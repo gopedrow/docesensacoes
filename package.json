@@ -4,7 +4,7 @@
   "description": "API para o sistema Doce Sensações",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node init-db-render.js && node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/init-db.js",
     "init-db-render": "node init-db-render.js",
