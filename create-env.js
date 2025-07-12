@@ -1,0 +1,1 @@
+DATABASE_URL=postgresql://doce_sensacoes_data_base_user:YU5FOerKRa0NBKdkovwDWQK80OcYPEfQ@dpg-d1pbsdjipnbc73ft075g-a.oregon-postgres.render.com/doce_sensacoes_data_base

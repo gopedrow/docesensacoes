@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Usuários e Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Usuários e Login</h1>
+    
+    <div class="test-section">
+        <h3>1. Verificar Usuários na Planilha</h3>
+        <button onclick="verificarUsuarios()">Verificar Usuários</button>
+        <div id="result-usuarios" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Teste de Login</h3>
+        <div>
+            <input type="email" id="email" placeholder="Email" value="teste@email.com">
+            <input type="text" id="telefone" placeholder="Telefone" value="(11) 99999-9999">
+            <button onclick="testarLogin()">Testar Login</button>
+        </div>
+        <div id="result-login" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Cadastrar Novo Usuário</h3>
+        <div>
+            <input type="text" id="nome" placeholder="Nome" value="Usuário Teste">
+            <input type="email" id="email-cadastro" placeholder="Email" value="novo@email.com">
+            <input type="text" id="telefone-cadastro" placeholder="Telefone" value="(11) 88888-8888">
+            <input type="text" id="endereco" placeholder="Endereço" value="Rua Teste, 123">
+        </div>
+        <button onclick="cadastrarUsuario()">Cadastrar Usuário</button>
+        <div id="result-cadastro" class="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLgxalsXT2eSDyjK3Spfw-9HTSk7PlEj9KB2hHIs13XlBAaTBOdXK6sYvDy0LRyxuIRu1buJwjfAkD8HVax_Ig1LzSBsX-HsQWZkMChDWPDa0c-VFNXb2Ja_ulgFdOyCtr_bsfgTRD3Lf7bGpe1aqYB4-0BHEUz1TJtLJbqWZl3STg_OX1WubeKJppB5XVmgCRZso6wkhSU4BPJlVqUkCzyj5PwAE9BCvOajnbowahOFzql544S4PKT1PnCRH_-Tbw08BtW68QlRyB26iwLsEDtWXYNJ6GenbFuZy4wuoXLTA5YFKnk&lib=MDIuHBhrQVj9xnYaRtC0wCa2SpajOThe6';
+
+        async function verificarUsuarios() {
+            const resultDiv = document.getElementById('result-usuarios');
+            resultDiv.textContent = 'Verificando usuários...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch(API_URL + '&action=getUsuarios');
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    const usuarios = data.data || [];
+                    if (usuarios.length === 0) {
+                        resultDiv.textContent = `⚠️ Nenhum usuário encontrado na planilha!\n\nPara testar o login, você precisa adicionar pelo menos um usuário na aba "Usuarios" da planilha.\n\nDados de exemplo:\n- Email: teste@email.com\n- Telefone: (11) 99999-9999`;
+                        resultDiv.className = 'result warning';
+                    } else {
+                        resultDiv.textContent = `✅ ${usuarios.length} usuário(s) encontrado(s):\n\n${usuarios.map(u => `- ${u.nome} (${u.email}) - ${u.telefone}`).join('\n')}`;
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.textContent = `❌ Erro ao buscar usuários: ${data.error || 'Erro desconhecido'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erro na requisição: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testarLogin() {
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const resultDiv = document.getElementById('result-login');
+            
+            resultDiv.textContent = 'Testando login...';
+            resultDiv.className = 'result';
+
+            if (!email || !telefone) {
+                resultDiv.textContent = '❌ Preencha email e telefone';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: email,
+                        telefone: telefone
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    resultDiv.textContent = `✅ Login realizado com sucesso!\n\nUsuário: ${data.data.nome}\nEmail: ${data.data.email}\nTelefone: ${data.data.telefone}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Erro no login: ${data.error || 'Credenciais inválidas'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erro na requisição: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function cadastrarUsuario() {
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email-cadastro').value;
+            const telefone = document.getElementById('telefone-cadastro').value;
+            const endereco = document.getElementById('endereco').value;
+            const resultDiv = document.getElementById('result-cadastro');
+            
+            resultDiv.textContent = 'Cadastrando usuário...';
+            resultDiv.className = 'result';
+
+            if (!nome || !email || !telefone) {
+                resultDiv.textContent = '❌ Preencha nome, email e telefone';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            const usuario = {
+                id: Math.floor(Math.random() * 9000) + 1000,
+                nome: nome,
+                email: email,
+                telefone: telefone,
+                endereco: endereco,
+                dataCadastro: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'cadastrarUsuario',
+                        usuario: usuario
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    resultDiv.textContent = `✅ Usuário cadastrado com sucesso!\n\nID: ${usuario.id}\nNome: ${usuario.nome}\nEmail: ${usuario.email}\nTelefone: ${usuario.telefone}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Erro no cadastro: ${data.error || 'Erro desconhecido'}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erro na requisição: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // Verificar usuários automaticamente ao carregar a página
+        window.onload = function() {
+            verificarUsuarios();
+        };
+    </script>
+</body>
+</html> 

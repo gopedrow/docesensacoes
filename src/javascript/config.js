@@ -1,7 +1,7 @@
 // Configuração da API do Google Apps Script
 const API_CONFIG = {
     // URL da API do Google Apps Script
-    BASE_URL: 'https://script.google.com/macros/s/AKfycbxqWYCVGdBzurYID6kfjCvAW7c8U_qBpHYH2e75xmk_T20grgBGBgW0vEtbeJCsGjIhfA/exec',
+    BASE_URL: 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLgxalsXT2eSDyjK3Spfw-9HTSk7PlEj9KB2hHIs13XlBAaTBOdXK6sYvDy0LRyxuIRu1buJwjfAkD8HVax_Ig1LzSBsX-HsQWZkMChDWPDa0c-VFNXb2Ja_ulgFdOyCtr_bsfgTRD3Lf7bGpe1aqYB4-0BHEUz1TJtLJbqWZl3STg_OX1WubeKJppB5XVmgCRZso6wkhSU4BPJlVqUkCzyj5PwAE9BCvOajnbowahOFzql544S4PKT1PnCRH_-Tbw08BtW68QlRyB26iwLsEDtWXYNJ6GenbFuZy4wuoXLTA5YFKnk&lib=MDIuHBhrQVj9xnYaRtC0wCa2SpajOThe6',
     
     // Endpoints da API
     ENDPOINTS: {

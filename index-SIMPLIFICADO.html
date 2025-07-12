@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doce Sensações - Versão Simplificada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-card .price {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍰 Doce Sensações</h1>
+            <p>Versão Simplificada - Teste de Funcionamento</p>
+        </div>
+
+        <div class="content">
+            <!-- Status da API -->
+            <div class="section">
+                <h2>🔧 Status da API</h2>
+                <button class="btn" onclick="testarAPI()">Testar Conexão com API</button>
+                <div id="api-status" class="result"></div>
+            </div>
+
+            <!-- Login -->
+            <div class="section">
+                <h2>🔐 Login</h2>
+                <div class="form-group">
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" value="teste@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-telefone">Telefone:</label>
+                    <input type="text" id="login-telefone" value="(11) 99999-9999">
+                </div>
+                <button class="btn" onclick="fazerLogin()">Fazer Login</button>
+                <div id="login-result" class="result"></div>
+            </div>
+
+            <!-- Cadastro de Usuário -->
+            <div class="section">
+                <h2>👤 Cadastrar Usuário</h2>
+                <div class="form-group">
+                    <label for="cadastro-nome">Nome:</label>
+                    <input type="text" id="cadastro-nome" value="Novo Usuário">
+                </div>
+                <div class="form-group">
+                    <label for="cadastro-email">Email:</label>
+                    <input type="email" id="cadastro-email" value="novo@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="cadastro-telefone">Telefone:</label>
+                    <input type="text" id="cadastro-telefone" value="(11) 88888-8888">
+                </div>
+                <div class="form-group">
+                    <label for="cadastro-endereco">Endereço:</label>
+                    <input type="text" id="cadastro-endereco" value="Rua Nova, 456">
+                </div>
+                <button class="btn" onclick="cadastrarUsuario()">Cadastrar Usuário</button>
+                <div id="cadastro-result" class="result"></div>
+            </div>
+
+            <!-- Listar Usuários -->
+            <div class="section">
+                <h2>👥 Usuários Cadastrados</h2>
+                <button class="btn" onclick="listarUsuarios()">Listar Usuários</button>
+                <div id="usuarios-result" class="result"></div>
+            </div>
+
+            <!-- Cadastro de Produto -->
+            <div class="section">
+                <h2>🍰 Cadastrar Produto</h2>
+                <div class="form-group">
+                    <label for="produto-nome">Nome:</label>
+                    <input type="text" id="produto-nome" value="Brigadeiro Especial">
+                </div>
+                <div class="form-group">
+                    <label for="produto-descricao">Descrição:</label>
+                    <input type="text" id="produto-descricao" value="Delicioso brigadeiro caseiro">
+                </div>
+                <div class="form-group">
+                    <label for="produto-preco">Preço:</label>
+                    <input type="number" id="produto-preco" value="5.50" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="produto-categoria">Categoria:</label>
+                    <select id="produto-categoria">
+                        <option value="Doces">Doces</option>
+                        <option value="Bolos">Bolos</option>
+                        <option value="Tortas">Tortas</option>
+                        <option value="Cupcakes">Cupcakes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="produto-imagem">Imagem:</label>
+                    <input type="text" id="produto-imagem" value="dish.png">
+                </div>
+                <button class="btn" onclick="cadastrarProduto()">Cadastrar Produto</button>
+                <div id="produto-result" class="result"></div>
+            </div>
+
+            <!-- Listar Produtos -->
+            <div class="section">
+                <h2>🍰 Produtos Cadastrados</h2>
+                <button class="btn" onclick="listarProdutos()">Listar Produtos</button>
+                <div id="produtos-result" class="result"></div>
+                <div id="produtos-grid" class="products-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL da API (será atualizada após você publicar o Google Apps Script)
+        const API_URL = 'SUA_URL_AQUI';
+
+        // Função para mostrar resultado
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+
+        // Função para mostrar loading
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '<div class="loading">Carregando...</div>';
+        }
+
+        // Testar conexão com API
+        async function testarAPI() {
+            showLoading('api-status');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=teste`);
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    showResult('api-status', `✅ API funcionando!\n\nResposta: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult('api-status', `❌ Erro na API: ${data.data?.error || 'Erro desconhecido'}`, 'error');
+                }
+            } catch (error) {
+                showResult('api-status', `❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        // Fazer login
+        async function fazerLogin() {
+            const email = document.getElementById('login-email').value;
+            const telefone = document.getElementById('login-telefone').value;
+            
+            if (!email || !telefone) {
+                showResult('login-result', '❌ Preencha email e telefone', 'error');
+                return;
+            }
+
+            showLoading('login-result');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: email,
+                        telefone: telefone
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    showResult('login-result', `✅ Login realizado com sucesso!\n\nUsuário: ${data.data.nome}\nEmail: ${data.data.email}\nTelefone: ${data.data.telefone}`, 'success');
+                } else {
+                    showResult('login-result', `❌ Erro no login: ${data.data?.error || 'Credenciais inválidas'}`, 'error');
+                }
+            } catch (error) {
+                showResult('login-result', `❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        // Cadastrar usuário
+        async function cadastrarUsuario() {
+            const nome = document.getElementById('cadastro-nome').value;
+            const email = document.getElementById('cadastro-email').value;
+            const telefone = document.getElementById('cadastro-telefone').value;
+            const endereco = document.getElementById('cadastro-endereco').value;
+            
+            if (!nome || !email || !telefone) {
+                showResult('cadastro-result', '❌ Preencha nome, email e telefone', 'error');
+                return;
+            }
+
+            showLoading('cadastro-result');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=cadastrarUsuario`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'cadastrarUsuario',
+                        usuario: {
+                            nome: nome,
+                            email: email,
+                            telefone: telefone,
+                            endereco: endereco
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    showResult('cadastro-result', `✅ Usuário cadastrado com sucesso!\n\nID: ${data.data.id}\nNome: ${data.data.nome}\nEmail: ${data.data.email}`, 'success');
+                } else {
+                    showResult('cadastro-result', `❌ Erro no cadastro: ${data.data?.error || 'Erro desconhecido'}`, 'error');
+                }
+            } catch (error) {
+                showResult('cadastro-result', `❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        // Listar usuários
+        async function listarUsuarios() {
+            showLoading('usuarios-result');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=getUsuarios`);
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    const usuarios = data.data.usuarios || [];
+                    if (usuarios.length === 0) {
+                        showResult('usuarios-result', '⚠️ Nenhum usuário encontrado na planilha', 'info');
+                    } else {
+                        const usuariosList = usuarios.map(u => `- ${u.nome} (${u.email}) - ${u.telefone}`).join('\n');
+                        showResult('usuarios-result', `✅ ${usuarios.length} usuário(s) encontrado(s):\n\n${usuariosList}`, 'success');
+                    }
+                } else {
+                    showResult('usuarios-result', `❌ Erro ao buscar usuários: ${data.data?.error || 'Erro desconhecido'}`, 'error');
+                }
+            } catch (error) {
+                showResult('usuarios-result', `❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        // Cadastrar produto
+        async function cadastrarProduto() {
+            const nome = document.getElementById('produto-nome').value;
+            const descricao = document.getElementById('produto-descricao').value;
+            const preco = document.getElementById('produto-preco').value;
+            const categoria = document.getElementById('produto-categoria').value;
+            const imagem = document.getElementById('produto-imagem').value;
+            
+            if (!nome || !descricao || !preco || !categoria) {
+                showResult('produto-result', '❌ Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            showLoading('produto-result');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=cadastrarProduto`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'cadastrarProduto',
+                        produto: {
+                            nome: nome,
+                            descricao: descricao,
+                            preco: parseFloat(preco),
+                            categoria: categoria,
+                            imagem: imagem
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    showResult('produto-result', `✅ Produto cadastrado com sucesso!\n\nID: ${data.data.id}\nNome: ${data.data.nome}\nPreço: R$ ${data.data.preco}`, 'success');
+                } else {
+                    showResult('produto-result', `❌ Erro no cadastro: ${data.data?.error || 'Erro desconhecido'}`, 'error');
+                }
+            } catch (error) {
+                showResult('produto-result', `❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        // Listar produtos
+        async function listarProdutos() {
+            showLoading('produtos-result');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=getProdutos`);
+                const data = await response.json();
+                
+                if (data.status === 200) {
+                    const produtos = data.data.produtos || [];
+                    if (produtos.length === 0) {
+                        showResult('produtos-result', '⚠️ Nenhum produto encontrado na planilha', 'info');
+                        document.getElementById('produtos-grid').innerHTML = '';
+                    } else {
+                        showResult('produtos-result', `✅ ${produtos.length} produto(s) encontrado(s)`, 'success');
+                        
+                        // Mostrar produtos em grid
+                        const grid = document.getElementById('produtos-grid');
+                        grid.innerHTML = produtos.map(produto => `
+                            <div class="product-card">
+                                <img src="src/images/${produto.imagem || 'dish.png'}" alt="${produto.nome}" onerror="this.src='src/images/dish.png'">
+                                <h3>${produto.nome}</h3>
+                                <p>${produto.descricao}</p>
+                                <div class="price">R$ ${produto.preco}</div>
+                                <small>Categoria: ${produto.categoria}</small>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    showResult('produtos-result', `❌ Erro ao buscar produtos: ${data.data?.error || 'Erro desconhecido'}`, 'error');
+                }
+            } catch (error) {
+                showResult('produtos-result', `❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        // Testar API automaticamente ao carregar a página
+        window.onload = function() {
+            if (API_URL === 'SUA_URL_AQUI') {
+                showResult('api-status', '⚠️ ATENÇÃO: Você precisa atualizar a URL da API no código!\n\n1. Copie o código do arquivo google-apps-script/Code-SIMPLIFICADO.gs\n2. Cole no seu Google Apps Script\n3. Publique como web app\n4. Substitua "SUA_URL_AQUI" pela URL real', 'error');
+            } else {
+                testarAPI();
+            }
+        };
+    </script>
+</body>
+</html> 

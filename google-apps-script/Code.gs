@@ -1,24 +1,34 @@
 // ID da planilha
-const SPREADSHEET_ID = '1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso';
+const SPREADSHEET_ID = '1WrEnjgZKOITTiYLXyahTRUQ8RuYTXD5qxUwDjXFysQc';
 
 // Função principal GET
 function doGet(e) {
+  if (e && e.parameter && e.parameter._method === 'OPTIONS') {
+    return createOptionsResponse();
+  }
   return handleRequest(e);
 }
 
 // Função principal POST
 function doPost(e) {
+  // Simula requisição OPTIONS
+  if (e && e.postData && e.postData.type === 'application/json') {
+    try {
+      const body = JSON.parse(e.postData.contents);
+      if (body._method === 'OPTIONS') {
+        return createOptionsResponse();
+      }
+    } catch (_) {
+      // ignora
+    }
+  }
   return handleRequest(e);
 }
 
-// Função principal OPTIONS
-function doOptions(e) {
+// Resposta para requisições OPTIONS (pré-flight)
+function createOptionsResponse() {
   return ContentService.createTextOutput('')
-    .setMimeType(ContentService.MimeType.TEXT)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
-    .setHeader('Access-Control-Max-Age', '86400');
+    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 // Função para tratar requisições
@@ -56,9 +66,13 @@ function handleRequest(e) {
         return createUsuario(postData.usuario);
       case 'loginUsuario':
         return loginUsuario(postData.credentials);
+      case 'login':
+        return login(postData);
       case 'getUsuario':
         const usuarioId = e.parameter ? e.parameter.id : null;
         return getUsuario(usuarioId);
+      case 'getUsuarios':
+        return getUsuarios();
       
       // Pedidos
       case 'createPedido':
@@ -551,6 +565,78 @@ function getAvaliacoes(produtoId) {
   }
 }
 
+// ===== FUNÇÕES ADICIONAIS DE USUÁRIOS =====
+
+// Função para buscar todos os usuários
+function getUsuarios() {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Usuarios');
+    
+    if (!sheet) {
+      return createResponse(404, { error: 'Aba Usuarios não encontrada' });
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const usuarios = [];
+    
+    // Pular cabeçalho (primeira linha)
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      
+      // Verificar se usuário está ativo (coluna 7)
+      if (row[7] === true || row[7] === 'TRUE' || row[7] === 1) {
+        usuarios.push({
+          id: row[0],
+          nome: row[1],
+          email: row[2],
+          telefone: row[3],
+          endereco: row[4],
+          dataCadastro: row[6]
+        });
+      }
+    }
+    
+    return createResponse(200, { usuarios: usuarios });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao buscar usuários: ' + error.toString() });
+  }
+}
+
+// Função para login simples (email e telefone)
+function login(loginData) {
+  try {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('Usuarios');
+    
+    if (!sheet) {
+      return createResponse(404, { error: 'Aba Usuarios não encontrada' });
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    
+    // Buscar usuário por email e telefone
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (row[2] === loginData.email && row[3] === loginData.telefone && row[7] === true) {
+        return createResponse(200, {
+          message: 'Login realizado com sucesso',
+          data: {
+            id: row[0],
+            nome: row[1],
+            email: row[2],
+            telefone: row[3],
+            endereco: row[4],
+            dataCadastro: row[6]
+          }
+        });
+      }
+    }
+    
+    return createResponse(401, { error: 'Email ou telefone incorretos' });
+  } catch (error) {
+    return createResponse(500, { error: 'Erro ao fazer login: ' + error.toString() });
+  }
+}
+
 // ===== FUNÇÃO UTILITÁRIA =====
 
 // Função para criar resposta com headers CORS
@@ -562,9 +648,5 @@ function createResponse(statusCode, data) {
   };
   
   return ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
-    .setHeader('Access-Control-Max-Age', '86400');
+    .setMimeType(ContentService.MimeType.JSON);
 } 
