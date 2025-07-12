@@ -561,14 +561,6 @@ function createResponse(statusCode, data) {
     timestamp: new Date().toISOString()
   };
   
-  const output = ContentService.createTextOutput(JSON.stringify(response))
+  return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON);
-  
-  // Adicionar headers CORS separadamente
-  output.addHeader('Access-Control-Allow-Origin', '*');
-  output.addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  output.addHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization');
-  output.addHeader('Access-Control-Max-Age', '86400');
-  
-  return output;
 } 
