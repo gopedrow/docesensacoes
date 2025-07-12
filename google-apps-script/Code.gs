@@ -14,7 +14,11 @@ function doPost(e) {
 // Função principal OPTIONS
 function doOptions(e) {
   return ContentService.createTextOutput('')
-    .setMimeType(ContentService.MimeType.TEXT);
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
+    .setHeader('Access-Control-Max-Age', '86400');
 }
 
 // Função para tratar requisições
@@ -558,5 +562,9 @@ function createResponse(statusCode, data) {
   };
   
   return ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON);
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
+    .setHeader('Access-Control-Max-Age', '86400');
 } 
