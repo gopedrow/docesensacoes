@@ -1,0 +1,6 @@
+ID,Nome,Descrição,Preço,Categoria,Imagem,Ativo,Data Cadastro
+1,Brigadeiro Gourmet,Brigadeiro tradicional com chocolate belga premium,5.50,Docinhos,dish.png,TRUE,2024-01-15T10:30:00.000Z
+2,Cupcake Red Velvet,Cupcake de red velvet com cream cheese frosting,8.00,Cupcakes,dish2.png,TRUE,2024-01-15T10:30:00.000Z
+3,Bolo de Chocolate,Bolo de chocolate com cobertura de ganache,25.00,Bolos,dish3.png,TRUE,2024-01-15T10:30:00.000Z
+4,Trufa de Chocolate,Trufa artesanal com chocolate 70% cacau,4.50,Docinhos,dish4.png,TRUE,2024-01-15T10:30:00.000Z
+5,Cheesecake,Cheesecake tradicional com calda de frutas vermelhas,18.00,Tortas,dish.png,TRUE,2024-01-15T10:30:00.000Z 
