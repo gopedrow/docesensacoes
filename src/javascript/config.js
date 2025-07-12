@@ -51,7 +51,7 @@ class APIService {
             console.log('Resposta da API:', result);
 
             // Verificar se há erro na resposta
-            if (result.statusCode >= 200 && result.statusCode < 300) {
+            if (result.status >= 200 && result.status < 300) {
                 // Retornar diretamente os dados, não o wrapper
                 return result.data;
             } else {

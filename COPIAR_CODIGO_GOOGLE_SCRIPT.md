@@ -1,3 +1,31 @@
+# 🚨 URGENTE: Copiar Código para Google Apps Script
+
+## ❌ Problema Atual
+A API ainda está retornando erro: `TypeError: output.addHeader is not a function`
+
+## ✅ Solução
+Você precisa copiar o código corrigido do arquivo `google-apps-script/Code.gs` para o Google Apps Script.
+
+## 📋 PASSOS DETALHADOS
+
+### 1. Abrir o Google Apps Script
+1. Vá para: https://script.google.com/
+2. Faça login com sua conta Google
+3. Procure pelo projeto: `AKfycbw2o3d6ytgBi91T6A8P8mhlUz_4c8hkxCEcbRrvTEWvSCtVswbJKmn8T6ydGC-Nz3LN`
+
+### 2. Abrir o Arquivo Code.gs
+1. Clique no arquivo `Code.gs` no painel esquerdo
+2. Você verá o código atual que está causando erro
+
+### 3. Substituir Todo o Código
+1. **Selecione TODO o conteúdo** (Ctrl+A ou Cmd+A)
+2. **Delete tudo** (Delete ou Backspace)
+3. **Cole o código corrigido** (Ctrl+V ou Cmd+V)
+
+### 4. Código para Copiar
+Copie **TODO** o conteúdo do arquivo `google-apps-script/Code.gs`:
+
+```javascript
 // ID da sua planilha
 const SPREADSHEET_ID = '1OuKriX9s3oFKDBXDUsZDlzjutPwVwwFKn-75QZuhTso';
 
@@ -312,4 +340,46 @@ function createResponse(statusCode, data) {
     .appendHeader("Access-Control-Allow-Origin", "*")
     .appendHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
     .appendHeader("Access-Control-Allow-Headers", "Content-Type");
-} 
+}
+```
+
+### 5. Salvar o Código
+1. Clique no **ícone de disquete** (Salvar) ou pressione Ctrl+S
+2. Aguarde a confirmação de que foi salvo
+
+### 6. Testar a API
+1. Abra: `http://localhost:8000/teste-api-simples.html`
+2. Clique em "Testar getProdutos"
+3. Verifique se retorna JSON válido
+
+## 🎯 Resultado Esperado
+Após atualizar, a API deve retornar algo como:
+```json
+{
+  "status": 200,
+  "data": {
+    "produtos": [
+      {
+        "id": "1",
+        "nome": "Cupcake de Chocolate",
+        "descricao": "Delicioso cupcake...",
+        "preco": 8.50,
+        "categoria": "Cupcakes",
+        "imagem": "cupcake.jpg",
+        "ativo": true
+      }
+    ]
+  },
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+## 🚨 IMPORTANTE
+- **NÃO** deixe nenhum código antigo no Google Apps Script
+- **COPIE TODO** o código fornecido acima
+- **SALVE** após colar o código
+- **TESTE** antes de continuar
+
+---
+
+**Após seguir estes passos, o erro "Failed to fetch" será resolvido!** 🎯 
