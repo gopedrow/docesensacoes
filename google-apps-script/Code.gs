@@ -322,7 +322,7 @@ function getAvaliacoes(produtoId) {
   }
 }
 
-// Função para criar resposta HTTP com CORS
+// Função para criar resposta HTTP - VERSÃO SIMPLIFICADA
 function createResponse(statusCode, data) {
   const response = {
     statusCode: statusCode,
@@ -330,15 +330,13 @@ function createResponse(statusCode, data) {
     timestamp: new Date().toISOString()
   };
   
-  // Usar HtmlService com configuração CORS
-  return HtmlService.createHtmlOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  // VERSÃO ULTRA-SIMPLES - Sem headers CORS
+  return ContentService.createTextOutput(JSON.stringify(response))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
-// Função para lidar com requisições OPTIONS (CORS)
+// Função para lidar com requisições OPTIONS - VERSÃO SIMPLIFICADA
 function doOptions(e) {
-  return HtmlService.createHtmlOutput('')
-    .setMimeType(ContentService.MimeType.TEXT)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return ContentService.createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
 } 
