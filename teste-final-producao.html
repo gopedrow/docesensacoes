@@ -6,548 +6,360 @@
     <title>Teste Final - Doce Sensações</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f5f5f5;
         }
         .container {
             background: white;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        .test-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .test-card {
+        .test-section {
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        .test-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .test-card.success { border-color: #4CAF50; background-color: #f1f8e9; }
-        .test-card.error { border-color: #f44336; background-color: #ffebee; }
-        .test-card.loading { border-color: #2196F3; background-color: #e3f2fd; }
-        .test-card.warning { border-color: #ff9800; background-color: #fff3e0; }
-        
-        .test-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .status-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .status-success { background: #4CAF50; }
-        .status-error { background: #f44336; }
-        .status-loading { background: #2196F3; }
-        .status-warning { background: #ff9800; }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px 20px;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
-            transition: transform 0.2s;
-        }
-        button:hover { transform: translateY(-2px); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .result {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 150px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        
-        .summary {
-            background: #f8f9fa;
             padding: 20px;
-            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
             margin-top: 20px;
         }
-        
-        .summary h3 {
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+        .product-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .product-card h4 {
+            margin: 10px 0 5px 0;
             color: #333;
+        }
+        .product-card p {
+            color: #666;
+            margin: 5px 0;
+        }
+        .price {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.2em;
+        }
+        .category {
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #c0392b;
+        }
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .form-group {
             margin-bottom: 15px;
         }
-        
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-            transition: width 0.3s ease;
-        }
-        
-        .action-buttons {
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .action-btn {
-            background: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: bold;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
         }
-        
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
-        
-        .action-btn.secondary {
-            background: #2196F3;
+        .checkbox-group {
+            margin: 10px 0;
         }
-        
-        .action-btn.secondary:hover {
-            box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);
+        .checkbox-group label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: normal;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🧪 Teste Final - Doce Sensações</h1>
-            <p>Verificando se o sistema está pronto para produção</p>
+        <h1>🧪 Teste Final - Doce Sensações</h1>
+        <p>Esta página testa todas as funcionalidades implementadas no sistema.</p>
+    </div>
+
+    <!-- Teste da API de Produtos -->
+    <div class="container">
+        <div class="test-section">
+            <h3>📦 Teste da API de Produtos</h3>
+            <button onclick="testProductsAPI()">Testar API de Produtos</button>
+            <div id="products-status"></div>
+            <div id="products-grid" class="product-grid"></div>
         </div>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+
+    <!-- Teste do Sistema LGPD -->
+    <div class="container">
+        <div class="test-section">
+            <h3>🔒 Teste do Sistema LGPD</h3>
+            <button onclick="testLGPDRegistration()">Testar Cadastro com LGPD</button>
+            <div id="lgpd-status"></div>
+            
+            <form id="lgpd-form" style="display: none;">
+                <div class="form-group">
+                    <label>Nome Completo:</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone:</label>
+                    <input type="tel" id="phone" placeholder="(11) 99999-9999" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="consent-privacy" required>
+                        Aceito a Política de Privacidade
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="consent-marketing">
+                        Aceito receber comunicações de marketing
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="consent-third-party">
+                        Aceito compartilhamento com terceiros
+                    </label>
+                </div>
+                <button type="submit">Cadastrar</button>
+            </form>
         </div>
-        
-        <div class="test-grid">
-            <div class="test-card" id="api-test">
-                <div class="test-title">
-                    <span class="status-icon status-loading"></span>
-                    🌐 API Backend
-                </div>
-                <p>Testando conectividade e endpoints da API</p>
-                <button onclick="testAPI()">Testar API</button>
-                <div class="result" id="api-result">Aguardando teste...</div>
-            </div>
-            
-            <div class="test-card" id="auth-test">
-                <div class="test-title">
-                    <span class="status-icon status-loading"></span>
-                    🔐 Autenticação
-                </div>
-                <p>Testando login e registro de usuários</p>
-                <button onclick="testAuth()">Testar Login</button>
-                <div class="result" id="auth-result">Aguardando teste...</div>
-            </div>
-            
-            <div class="test-card" id="products-test">
-                <div class="test-title">
-                    <span class="status-icon status-loading"></span>
-                    🍰 Produtos
-                </div>
-                <p>Testando carregamento de produtos</p>
-                <button onclick="testProducts()">Testar Produtos</button>
-                <div class="result" id="products-result">Aguardando teste...</div>
-            </div>
-            
-            <div class="test-card" id="cors-test">
-                <div class="test-title">
-                    <span class="status-icon status-loading"></span>
-                    🔗 CORS
-                </div>
-                <p>Testando comunicação entre frontend e backend</p>
-                <button onclick="testCORS()">Testar CORS</button>
-                <div class="result" id="cors-result">Aguardando teste...</div>
-            </div>
-            
-            <div class="test-card" id="frontend-test">
-                <div class="test-title">
-                    <span class="status-icon status-loading"></span>
-                    🎨 Frontend
-                </div>
-                <p>Testando interface e responsividade</p>
-                <button onclick="testFrontend()">Testar Frontend</button>
-                <div class="result" id="frontend-result">Aguardando teste...</div>
-            </div>
-            
-            <div class="test-card" id="database-test">
-                <div class="test-title">
-                    <span class="status-icon status-loading"></span>
-                    💾 Banco de Dados
-                </div>
-                <p>Testando conexão e dados</p>
-                <button onclick="testDatabase()">Testar Banco</button>
-                <div class="result" id="database-result">Aguardando teste...</div>
-            </div>
+    </div>
+
+    <!-- Teste de Login -->
+    <div class="container">
+        <div class="test-section">
+            <h3>🔑 Teste de Login</h3>
+            <button onclick="testLogin()">Testar Login</button>
+            <div id="login-status"></div>
         </div>
-        
-        <div class="summary">
+    </div>
+
+    <!-- Resumo dos Testes -->
+    <div class="container">
+        <div class="test-section">
             <h3>📊 Resumo dos Testes</h3>
-            <div class="summary-item">
-                <span>API Backend:</span>
-                <span id="api-summary">⏳ Testando...</span>
-            </div>
-            <div class="summary-item">
-                <span>Autenticação:</span>
-                <span id="auth-summary">⏳ Testando...</span>
-            </div>
-            <div class="summary-item">
-                <span>Produtos:</span>
-                <span id="products-summary">⏳ Testando...</span>
-            </div>
-            <div class="summary-item">
-                <span>CORS:</span>
-                <span id="cors-summary">⏳ Testando...</span>
-            </div>
-            <div class="summary-item">
-                <span>Frontend:</span>
-                <span id="frontend-summary">⏳ Testando...</span>
-            </div>
-            <div class="summary-item">
-                <span>Banco de Dados:</span>
-                <span id="database-summary">⏳ Testando...</span>
-            </div>
-            <div class="summary-item" style="font-weight: bold; margin-top: 10px;">
-                <span>Status Geral:</span>
-                <span id="overall-status">⏳ Executando testes...</span>
-            </div>
-        </div>
-        
-        <div class="action-buttons">
-            <button class="action-btn" onclick="runAllTests()">🚀 Executar Todos os Testes</button>
-            <button class="action-btn secondary" onclick="openProductionSite()">🌐 Abrir Site de Produção</button>
-            <button class="action-btn secondary" onclick="generateReport()">📋 Gerar Relatório</button>
+            <div id="test-summary"></div>
         </div>
     </div>
 
     <script>
         const API_BASE = 'https://docesensacoes-2.onrender.com/api';
         let testResults = {};
-        let completedTests = 0;
-        const totalTests = 6;
-        
-        function updateProgress() {
-            const progress = (completedTests / totalTests) * 100;
-            document.getElementById('progress-fill').style.width = progress + '%';
-        }
-        
-        function updateTestCard(testId, status, message) {
-            const card = document.getElementById(testId);
-            const icon = card.querySelector('.status-icon');
-            const result = document.getElementById(testId.replace('-test', '-result'));
-            const summary = document.getElementById(testId.replace('-test', '-summary'));
-            
-            // Remover classes anteriores
-            card.className = 'test-card';
-            icon.className = 'status-icon';
-            
-            // Adicionar nova classe
-            card.classList.add(status);
-            icon.classList.add('status-' + status);
-            
-            // Atualizar resultado
-            result.textContent = message;
-            
-            // Atualizar resumo
-            const statusText = {
-                'success': '✅ Funcionando',
-                'error': '❌ Erro',
-                'warning': '⚠️ Atenção',
-                'loading': '⏳ Testando...'
-            };
-            summary.textContent = statusText[status];
-            
-            // Contar testes completos
-            if (status !== 'loading') {
-                completedTests++;
-                updateProgress();
-                updateOverallStatus();
-            }
-        }
-        
-        function updateOverallStatus() {
-            const statusElement = document.getElementById('overall-status');
-            const successCount = Object.values(testResults).filter(r => r === 'success').length;
-            const errorCount = Object.values(testResults).filter(r => r === 'error').length;
-            const warningCount = Object.values(testResults).filter(r => r === 'warning').length;
-            
-            if (completedTests === totalTests) {
-                if (errorCount === 0 && warningCount === 0) {
-                    statusElement.textContent = '🎉 PRONTO PARA PRODUÇÃO!';
-                    statusElement.style.color = '#4CAF50';
-                } else if (errorCount === 0) {
-                    statusElement.textContent = '✅ FUNCIONAL (com avisos)';
-                    statusElement.style.color = '#ff9800';
-                } else {
-                    statusElement.textContent = '❌ NECESSITA CORREÇÕES';
-                    statusElement.style.color = '#f44336';
-                }
-            }
-        }
-        
-        async function makeRequest(endpoint, method = 'GET', data = null) {
-            try {
-                const url = API_BASE + endpoint;
-                const options = {
-                    method: method,
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                };
 
-                if (data && method !== 'GET') {
-                    options.body = JSON.stringify(data);
-                }
-
-                const response = await fetch(url, options);
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-                }
-                
-                return await response.json();
-            } catch (error) {
-                throw error;
-            }
-        }
-        
-        async function testAPI() {
-            updateTestCard('api-test', 'loading', 'Testando API...');
+        // Teste da API de Produtos
+        async function testProductsAPI() {
+            const statusDiv = document.getElementById('products-status');
+            const gridDiv = document.getElementById('products-grid');
+            
+            statusDiv.innerHTML = '<div class="status info">🔄 Testando API de produtos...</div>';
             
             try {
-                const data = await makeRequest('/test');
-                testResults.api = 'success';
-                updateTestCard('api-test', 'success', 
-                    `✅ API funcionando!\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}`
-                );
-            } catch (error) {
-                testResults.api = 'error';
-                updateTestCard('api-test', 'error', `❌ Erro na API: ${error.message}`);
-            }
-        }
-        
-        async function testAuth() {
-            updateTestCard('auth-test', 'loading', 'Testando autenticação...');
-            
-            try {
-                const data = await makeRequest('/auth/login', 'POST', {
-                    email: 'admin@docesensacoes.com',
-                    password: 'admin123'
-                });
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
                 
-                testResults.auth = 'success';
-                updateTestCard('auth-test', 'success', 
-                    `✅ Login funcionando!\nUsuário: ${data.data.user.name}\nEmail: ${data.data.user.email}\nToken: ${data.data.token ? 'Recebido' : 'Não recebido'}`
-                );
-            } catch (error) {
-                testResults.auth = 'error';
-                updateTestCard('auth-test', 'error', `❌ Erro na autenticação: ${error.message}`);
-            }
-        }
-        
-        async function testProducts() {
-            updateTestCard('products-test', 'loading', 'Carregando produtos...');
-            
-            try {
-                const data = await makeRequest('/products');
-                const products = data.data || data;
-                
-                if (products && products.length > 0) {
+                if (response.ok && data.status === 200) {
+                    statusDiv.innerHTML = `<div class="status success">✅ API funcionando! ${data.count} produtos encontrados</div>`;
+                    
+                    // Exibir produtos
+                    gridDiv.innerHTML = '';
+                    data.data.slice(0, 6).forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        card.innerHTML = `
+                            <img src="src/images/${product.image}" alt="${product.name}" onerror="this.src='src/images/dish.png'">
+                            <h4>${product.name}</h4>
+                            <p>${product.description}</p>
+                            <p class="price">R$ ${product.price}</p>
+                            <span class="category">${product.category}</span>
+                            <p><small>Estoque: ${product.stock}</small></p>
+                        `;
+                        gridDiv.appendChild(card);
+                    });
+                    
                     testResults.products = 'success';
-                    updateTestCard('products-test', 'success', 
-                        `✅ Produtos carregados!\nQuantidade: ${products.length}\nPrimeiros produtos:\n${products.slice(0, 3).map(p => `- ${p.name}: R$ ${p.price}`).join('\n')}`
-                    );
                 } else {
-                    testResults.products = 'warning';
-                    updateTestCard('products-test', 'warning', '⚠️ API respondeu, mas não há produtos cadastrados');
+                    throw new Error('Resposta inválida da API');
                 }
             } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Erro na API: ${error.message}</div>`;
                 testResults.products = 'error';
-                updateTestCard('products-test', 'error', `❌ Erro ao carregar produtos: ${error.message}`);
             }
+            
+            updateTestSummary();
         }
-        
-        async function testCORS() {
-            updateTestCard('cors-test', 'loading', 'Testando CORS...');
+
+        // Teste do Sistema LGPD
+        function testLGPDRegistration() {
+            const statusDiv = document.getElementById('lgpd-status');
+            const form = document.getElementById('lgpd-form');
+            
+            statusDiv.innerHTML = '<div class="status info">📝 Formulário LGPD carregado</div>';
+            form.style.display = 'block';
+            
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    password: document.getElementById('password').value,
+                    consent_privacy: document.getElementById('consent-privacy').checked,
+                    consent_marketing: document.getElementById('consent-marketing').checked,
+                    consent_third_party: document.getElementById('consent-third-party').checked
+                };
+                
+                statusDiv.innerHTML = '<div class="status info">🔄 Enviando cadastro...</div>';
+                
+                try {
+                    const response = await fetch(`${API_BASE}/auth/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        statusDiv.innerHTML = `<div class="status success">✅ Cadastro realizado com sucesso! ID: ${data.user.id}</div>`;
+                        testResults.lgpd = 'success';
+                    } else {
+                        statusDiv.innerHTML = `<div class="status error">❌ Erro no cadastro: ${data.message || 'Erro desconhecido'}</div>`;
+                        testResults.lgpd = 'error';
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<div class="status error">❌ Erro de conexão: ${error.message}</div>`;
+                    testResults.lgpd = 'error';
+                }
+                
+                updateTestSummary();
+            };
+        }
+
+        // Teste de Login
+        async function testLogin() {
+            const statusDiv = document.getElementById('login-status');
+            
+            statusDiv.innerHTML = '<div class="status info">🔄 Testando login...</div>';
             
             try {
-                const response = await fetch(`${API_BASE}/test`, {
-                    method: 'OPTIONS',
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
                     headers: {
-                        'Origin': window.location.origin,
-                        'Access-Control-Request-Method': 'GET',
-                        'Access-Control-Request-Headers': 'Content-Type'
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'teste@lgpd.com',
+                        password: 'Senha123!'
+                    })
                 });
                 
-                testResults.cors = 'success';
-                updateTestCard('cors-test', 'success', 
-                    `✅ CORS configurado!\nStatus: ${response.status}\nOrigin permitido: ${window.location.origin}`
-                );
-            } catch (error) {
-                testResults.cors = 'error';
-                updateTestCard('cors-test', 'error', `❌ Erro no CORS: ${error.message}`);
-            }
-        }
-        
-        function testFrontend() {
-            updateTestCard('frontend-test', 'loading', 'Testando frontend...');
-            
-            // Simular teste de frontend
-            setTimeout(() => {
-                const isVercel = window.location.origin.includes('vercel.app');
-                const isLocal = window.location.origin.includes('localhost');
+                const data = await response.json();
                 
-                if (isVercel || isLocal) {
-                    testResults.frontend = 'success';
-                    updateTestCard('frontend-test', 'success', 
-                        `✅ Frontend funcionando!\nURL: ${window.location.origin}\nPlataforma: ${isVercel ? 'Vercel' : 'Local'}\nResponsivo: Sim`
-                    );
+                if (response.ok) {
+                    statusDiv.innerHTML = `<div class="status success">✅ Login funcionando! Token recebido</div>`;
+                    testResults.login = 'success';
                 } else {
-                    testResults.frontend = 'warning';
-                    updateTestCard('frontend-test', 'warning', 
-                        `⚠️ Frontend em ambiente desconhecido\nURL: ${window.location.origin}`
-                    );
+                    statusDiv.innerHTML = `<div class="status warning">⚠️ Login falhou: ${data.message || 'Usuário não encontrado'}</div>`;
+                    testResults.login = 'warning';
                 }
-            }, 1000);
-        }
-        
-        async function testDatabase() {
-            updateTestCard('database-test', 'loading', 'Testando banco de dados...');
-            
-            try {
-                const data = await makeRequest('/products');
-                const products = data.data || data;
-                
-                testResults.database = 'success';
-                updateTestCard('database-test', 'success', 
-                    `✅ Banco conectado!\nProdutos: ${products.length}\nStatus: Ativo\nTipo: PostgreSQL`
-                );
             } catch (error) {
-                testResults.database = 'error';
-                updateTestCard('database-test', 'error', `❌ Erro no banco: ${error.message}`);
+                statusDiv.innerHTML = `<div class="status error">❌ Erro de conexão: ${error.message}</div>`;
+                testResults.login = 'error';
             }
-        }
-        
-        async function runAllTests() {
-            completedTests = 0;
-            updateProgress();
             
-            // Executar todos os testes em sequência
-            await testAPI();
-            await testAuth();
-            await testProducts();
-            await testCORS();
-            testFrontend();
-            await testDatabase();
+            updateTestSummary();
         }
-        
-        function openProductionSite() {
-            window.open('https://docesensacoessite.vercel.app', '_blank');
-        }
-        
-        function generateReport() {
-            const report = {
-                timestamp: new Date().toISOString(),
-                url: window.location.origin,
-                results: testResults,
-                summary: {
-                    total: totalTests,
-                    completed: completedTests,
-                    success: Object.values(testResults).filter(r => r === 'success').length,
-                    error: Object.values(testResults).filter(r => r === 'error').length,
-                    warning: Object.values(testResults).filter(r => r === 'warning').length
-                }
-            };
+
+        // Atualizar resumo dos testes
+        function updateTestSummary() {
+            const summaryDiv = document.getElementById('test-summary');
+            const results = Object.values(testResults);
+            const successCount = results.filter(r => r === 'success').length;
+            const totalCount = results.length;
             
-            const reportText = `RELATÓRIO DE TESTE - DOCE SENSÇÕES\n` +
-                `Data: ${new Date().toLocaleString('pt-BR')}\n` +
-                `URL: ${window.location.origin}\n\n` +
-                `RESULTADOS:\n` +
-                `- API Backend: ${testResults.api || 'Não testado'}\n` +
-                `- Autenticação: ${testResults.auth || 'Não testado'}\n` +
-                `- Produtos: ${testResults.products || 'Não testado'}\n` +
-                `- CORS: ${testResults.cors || 'Não testado'}\n` +
-                `- Frontend: ${testResults.frontend || 'Não testado'}\n` +
-                `- Banco de Dados: ${testResults.database || 'Não testado'}\n\n` +
-                `RESUMO:\n` +
-                `- Total de testes: ${totalTests}\n` +
-                `- Completados: ${completedTests}\n` +
-                `- Sucessos: ${Object.values(testResults).filter(r => r === 'success').length}\n` +
-                `- Erros: ${Object.values(testResults).filter(r => r === 'error').length}\n` +
-                `- Avisos: ${Object.values(testResults).filter(r => r === 'warning').length}`;
+            let summaryHTML = `
+                <h4>Resultados dos Testes:</h4>
+                <p><strong>Produtos:</strong> ${testResults.products === 'success' ? '✅ Funcionando' : '❌ Erro'}</p>
+                <p><strong>LGPD:</strong> ${testResults.lgpd === 'success' ? '✅ Funcionando' : '❌ Erro'}</p>
+                <p><strong>Login:</strong> ${testResults.login === 'success' ? '✅ Funcionando' : testResults.login === 'warning' ? '⚠️ Parcial' : '❌ Erro'}</p>
+                <p><strong>Total:</strong> ${successCount}/${totalCount} testes passaram</p>
+            `;
             
-            // Criar arquivo de download
-            const blob = new Blob([reportText], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `teste-doce-sensacoes-${new Date().toISOString().split('T')[0]}.txt`;
-            a.click();
-            window.URL.revokeObjectURL(url);
+            if (successCount === totalCount && totalCount > 0) {
+                summaryHTML += '<div class="status success">🎉 Todos os testes principais passaram!</div>';
+            } else if (totalCount > 0) {
+                summaryHTML += '<div class="status warning">⚠️ Alguns testes falharam. Verifique os detalhes acima.</div>';
+            }
+            
+            summaryDiv.innerHTML = summaryHTML;
         }
-        
-        // Executar testes automáticos ao carregar
+
+        // Executar testes automáticos ao carregar a página
         window.onload = function() {
-            setTimeout(runAllTests, 1000);
+            setTimeout(() => {
+                testProductsAPI();
+            }, 1000);
         };
     </script>
 </body>
