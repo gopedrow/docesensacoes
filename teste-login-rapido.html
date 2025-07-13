@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Rápido - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Teste Rápido - Sistema de Login</h1>
+        
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email" value="admin@docesensacoes.com">
+        </div>
+        
+        <div class="form-group">
+            <label>Senha:</label>
+            <input type="password" id="password" value="admin123">
+        </div>
+        
+        <button onclick="testLogin()">🔑 Testar Login</button>
+        <button onclick="testRegister()">📝 Testar Registro</button>
+        <button onclick="testAPI()">🌐 Testar API</button>
+        
+        <div id="result" class="result info">
+            Clique em um botão para testar...
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com/api';
+        
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+        }
+        
+        async function makeRequest(endpoint, method = 'GET', data = null) {
+            try {
+                const url = API_BASE + endpoint;
+                console.log(`Fazendo requisição ${method} para: ${url}`);
+                
+                const options = {
+                    method: method,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (data && method !== 'GET') {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(url, options);
+                console.log(`Resposta: ${response.status} ${response.statusText}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                throw error;
+            }
+        }
+        
+        async function testAPI() {
+            showResult('Testando API...', 'info');
+            
+            try {
+                const data = await makeRequest('/test');
+                showResult(`✅ API funcionando!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}\nAmbiente: ${data.environment}`, 'success');
+            } catch (error) {
+                showResult(`❌ Erro na API: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            showResult('Fazendo login...', 'info');
+            
+            try {
+                const data = await makeRequest('/auth/login', 'POST', { 
+                    email: email, 
+                    password: password 
+                });
+                
+                if (data && data.user) {
+                    showResult(`✅ Login bem-sucedido!\n\nUsuário: ${data.user.name}\nEmail: ${data.user.email}\nToken: ${data.token ? 'Recebido' : 'Não recebido'}\n\nDados completos:\n${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult(`⚠️ Resposta inesperada:\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                if (error.message.includes('401')) {
+                    showResult(`❌ Credenciais inválidas\n\nErro: ${error.message}\n\nTente com:\nEmail: admin@docesensacoes.com\nSenha: admin123`, 'error');
+                } else {
+                    showResult(`❌ Erro no login: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testRegister() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            showResult('Registrando usuário...', 'info');
+            
+            try {
+                const data = await makeRequest('/users', 'POST', { 
+                    name: 'Usuário Teste',
+                    email: email, 
+                    password: password 
+                });
+                
+                showResult(`✅ Usuário registrado!\n\nID: ${data.id}\nNome: ${data.name}\nEmail: ${data.email}\n\nDados completos:\n${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                if (error.message.includes('duplicate') || error.message.includes('already exists')) {
+                    showResult(`⚠️ Usuário já existe\n\nErro: ${error.message}\n\nTente fazer login em vez de registrar.`, 'error');
+                } else {
+                    showResult(`❌ Erro no registro: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Teste automático da API ao carregar
+        window.onload = function() {
+            setTimeout(testAPI, 1000);
+        };
+    </script>
+</body>
+</html> 
