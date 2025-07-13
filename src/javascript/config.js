@@ -130,6 +130,11 @@ class APIService {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_PEDIDOS + `?userId=${usuarioId}`);
     }
 
+    // Buscar todos os usuários (admin)
+    async getUsers() {
+        return await this.makeRequest(API_CONFIG.ENDPOINTS.GET_USUARIO);
+    }
+
     // Atualizar pedido
     async updatePedido(pedidoData) {
         return await this.makeRequest(API_CONFIG.ENDPOINTS.UPDATE_PEDIDO, 'POST', pedidoData);
@@ -297,7 +302,7 @@ class AuthService {
 
     // Verificar se é administrador
     isAdmin() {
-        return this.user && this.user.tipo === 'admin';
+        return this.user && (this.user.isAdmin === true || this.user.tipo === 'admin');
     }
 
     // Obter usuário atual
@@ -319,7 +324,7 @@ class AuthService {
                 if (this.isLoggedIn()) {
                     btn.innerHTML = `
                         <i class="fa-solid fa-user"></i>
-                        ${this.user.nome}
+                        ${this.user.name || this.user.nome || 'Usuário'}
                     `;
                     btn.onclick = () => this.showUserMenu();
                 } else {
@@ -344,7 +349,7 @@ class AuthService {
             <div class="user-menu-content">
                 <div class="user-info">
                     <i class="fa-solid fa-user"></i>
-                    <span>${this.user.nome}</span>
+                    <span>${this.user.name || this.user.nome || 'Usuário'}</span>
                 </div>
                 <div class="user-menu-options">
                     <a href="src/pages/perfil.html">

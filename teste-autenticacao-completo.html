@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Completo de Autenticação - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Completo de Autenticação - Doce Sensações</h1>
+        <p>Testando login, cadastro e funcionalidades de perfil</p>
+        
+        <div class="test-section">
+            <h3>
+                <span class="status-indicator status-online"></span>
+                Status do Sistema
+            </h3>
+            <div id="system-status" class="result info">
+                Verificando status do sistema...
+            </div>
+        </div>
+        
+        <div class="grid">
+            <!-- Teste de Login -->
+            <div class="test-section">
+                <h3>🔐 Teste de Login</h3>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="login-email" value="admin@docesensacoes.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha:</label>
+                    <input type="password" id="login-password" value="admin123">
+                </div>
+                <button onclick="testLogin()">Testar Login</button>
+                <button onclick="testLoginInvalid()">Testar Login Inválido</button>
+                <div id="login-result" class="result info">
+                    Clique em um botão para testar...
+                </div>
+            </div>
+            
+            <!-- Teste de Cadastro -->
+            <div class="test-section">
+                <h3>📝 Teste de Cadastro</h3>
+                <div class="form-group">
+                    <label>Nome:</label>
+                    <input type="text" id="register-name" value="Usuário Teste">
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="register-email" value="teste@exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Telefone:</label>
+                    <input type="tel" id="register-phone" value="(11) 99999-9999">
+                </div>
+                <div class="form-group">
+                    <label>Endereço:</label>
+                    <input type="text" id="register-address" value="Rua Teste, 123">
+                </div>
+                <div class="form-group">
+                    <label>Senha:</label>
+                    <input type="password" id="register-password" value="123456">
+                </div>
+                <button onclick="testRegister()">Testar Cadastro</button>
+                <button onclick="testRegisterDuplicate()">Testar Email Duplicado</button>
+                <div id="register-result" class="result info">
+                    Clique em um botão para testar...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Teste de Perfil -->
+        <div class="test-section">
+            <h3>👤 Teste de Perfil</h3>
+            <div class="form-group">
+                <label>Nome Atualizado:</label>
+                <input type="text" id="profile-name" value="Nome Atualizado">
+            </div>
+            <div class="form-group">
+                <label>Telefone Atualizado:</label>
+                <input type="tel" id="profile-phone" value="(11) 88888-8888">
+            </div>
+            <div class="form-group">
+                <label>Endereço Atualizado:</label>
+                <input type="text" id="profile-address" value="Nova Rua, 456">
+            </div>
+            <button onclick="testUpdateProfile()">Atualizar Perfil</button>
+            <button onclick="testGetProfile()">Buscar Perfil</button>
+            <div id="profile-result" class="result info">
+                Clique em um botão para testar...
+            </div>
+        </div>
+        
+        <!-- Teste de Autenticação -->
+        <div class="test-section">
+            <h3>🔒 Teste de Autenticação</h3>
+            <button onclick="testAuthStatus()">Verificar Status de Login</button>
+            <button onclick="testLogout()">Testar Logout</button>
+            <button onclick="testProtectedRoute()">Testar Rota Protegida</button>
+            <div id="auth-result" class="result info">
+                Clique em um botão para testar...
+            </div>
+        </div>
+        
+        <!-- Log de Atividades -->
+        <div class="test-section">
+            <h3>📋 Log de Atividades</h3>
+            <button onclick="clearLog()" style="background: #dc3545;">Limpar Log</button>
+            <div id="activity-log" class="result info">
+                Sistema iniciado...
+            </div>
+        </div>
+    </div>
+
+    <script src="src/javascript/config.js"></script>
+    <script>
+        let activityLog = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            activityLog.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            updateLogDisplay();
+        }
+        
+        function updateLogDisplay() {
+            const logDiv = document.getElementById('activity-log');
+            logDiv.textContent = activityLog.join('\n');
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            activityLog = [];
+            updateLogDisplay();
+        }
+        
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+        }
+        
+        async function testSystemStatus() {
+            try {
+                const response = await fetch('https://docesensacoes-2.onrender.com/api/test');
+                const data = await response.json();
+                
+                showResult('system-status', 
+                    `✅ Sistema Online!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}\nAmbiente: ${data.environment}`,
+                    'success'
+                );
+                log('Sistema verificado - Online', 'success');
+            } catch (error) {
+                showResult('system-status', 
+                    `❌ Erro no sistema: ${error.message}`,
+                    'error'
+                );
+                log(`Erro no sistema: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            log(`Tentando login com: ${email}`, 'info');
+            
+            try {
+                const response = await authService.login({ email, password });
+                
+                if (response && response.user) {
+                    showResult('login-result', 
+                        `✅ Login bem-sucedido!\n\nUsuário: ${response.user.name}\nEmail: ${response.user.email}\nAdmin: ${response.user.isAdmin ? 'Sim' : 'Não'}\nToken: ${response.token ? 'Recebido' : 'Não recebido'}`,
+                        'success'
+                    );
+                    log(`Login bem-sucedido: ${response.user.name}`, 'success');
+                } else {
+                    showResult('login-result', 
+                        `⚠️ Resposta inesperada:\n${JSON.stringify(response, null, 2)}`,
+                        'warning'
+                    );
+                    log('Login - resposta inesperada', 'warning');
+                }
+            } catch (error) {
+                showResult('login-result', 
+                    `❌ Erro no login: ${error.message}`,
+                    'error'
+                );
+                log(`Erro no login: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLoginInvalid() {
+            log('Testando login com credenciais inválidas', 'info');
+            
+            try {
+                await authService.login({ email: 'invalido@teste.com', password: 'senhaerrada' });
+                showResult('login-result', '❌ Login deveria ter falhado!', 'error');
+                log('Login inválido - deveria ter falhado', 'error');
+            } catch (error) {
+                showResult('login-result', 
+                    `✅ Login inválido rejeitado corretamente:\n${error.message}`,
+                    'success'
+                );
+                log('Login inválido rejeitado corretamente', 'success');
+            }
+        }
+        
+        async function testRegister() {
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const phone = document.getElementById('register-phone').value;
+            const address = document.getElementById('register-address').value;
+            const password = document.getElementById('register-password').value;
+            
+            log(`Tentando cadastro: ${email}`, 'info');
+            
+            try {
+                const userData = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    address: address,
+                    password: password
+                };
+                
+                const response = await apiService.createUsuario(userData);
+                
+                showResult('register-result', 
+                    `✅ Usuário cadastrado!\n\nID: ${response.id}\nNome: ${response.name}\nEmail: ${response.email}`,
+                    'success'
+                );
+                log(`Usuário cadastrado: ${response.name}`, 'success');
+                
+                // Tentar login automático
+                setTimeout(async () => {
+                    try {
+                        await authService.login({ email, password });
+                        log('Login automático após cadastro realizado', 'success');
+                    } catch (error) {
+                        log(`Erro no login automático: ${error.message}`, 'error');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                showResult('register-result', 
+                    `❌ Erro no cadastro: ${error.message}`,
+                    'error'
+                );
+                log(`Erro no cadastro: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testRegisterDuplicate() {
+            log('Testando cadastro com email duplicado', 'info');
+            
+            try {
+                const userData = {
+                    name: 'Usuário Duplicado',
+                    email: 'admin@docesensacoes.com', // Email já existente
+                    phone: '(11) 99999-9999',
+                    address: 'Rua Duplicada, 123',
+                    password: '123456'
+                };
+                
+                await apiService.createUsuario(userData);
+                showResult('register-result', '❌ Cadastro duplicado deveria ter falhado!', 'error');
+                log('Cadastro duplicado - deveria ter falhado', 'error');
+            } catch (error) {
+                showResult('register-result', 
+                    `✅ Cadastro duplicado rejeitado corretamente:\n${error.message}`,
+                    'success'
+                );
+                log('Cadastro duplicado rejeitado corretamente', 'success');
+            }
+        }
+        
+        async function testUpdateProfile() {
+            if (!authService.isLoggedIn()) {
+                showResult('profile-result', '❌ Usuário não está logado', 'error');
+                log('Tentativa de atualizar perfil sem estar logado', 'error');
+                return;
+            }
+            
+            const name = document.getElementById('profile-name').value;
+            const phone = document.getElementById('profile-phone').value;
+            const address = document.getElementById('profile-address').value;
+            
+            log('Atualizando perfil do usuário', 'info');
+            
+            try {
+                const userData = {
+                    name: name,
+                    phone: phone,
+                    address: address
+                };
+                
+                const response = await apiService.updateUsuario(userData);
+                
+                showResult('profile-result', 
+                    `✅ Perfil atualizado!\n\nNome: ${response.name}\nTelefone: ${response.phone}\nEndereço: ${response.address}`,
+                    'success'
+                );
+                log('Perfil atualizado com sucesso', 'success');
+                
+                // Atualizar dados locais
+                authService.user = { ...authService.user, ...userData };
+                authService.saveUser();
+                
+            } catch (error) {
+                showResult('profile-result', 
+                    `❌ Erro ao atualizar perfil: ${error.message}`,
+                    'error'
+                );
+                log(`Erro ao atualizar perfil: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testGetProfile() {
+            if (!authService.isLoggedIn()) {
+                showResult('profile-result', '❌ Usuário não está logado', 'error');
+                log('Tentativa de buscar perfil sem estar logado', 'error');
+                return;
+            }
+            
+            const user = authService.getCurrentUser();
+            
+            showResult('profile-result', 
+                `📋 Dados do perfil:\n\nID: ${user.id}\nNome: ${user.name}\nEmail: ${user.email}\nTelefone: ${user.phone || 'Não informado'}\nEndereço: ${user.address || 'Não informado'}\nAdmin: ${user.isAdmin ? 'Sim' : 'Não'}`,
+                'info'
+            );
+            log('Dados do perfil exibidos', 'info');
+        }
+        
+        function testAuthStatus() {
+            const isLoggedIn = authService.isLoggedIn();
+            const user = authService.getCurrentUser();
+            const isAdmin = authService.isAdmin();
+            
+            showResult('auth-result', 
+                `🔒 Status de Autenticação:\n\nLogado: ${isLoggedIn ? 'Sim' : 'Não'}\nUsuário: ${user ? user.name : 'Nenhum'}\nAdmin: ${isAdmin ? 'Sim' : 'Não'}\nToken: ${localStorage.getItem('token') ? 'Presente' : 'Ausente'}`,
+                isLoggedIn ? 'success' : 'warning'
+            );
+            log(`Status de autenticação verificado - Logado: ${isLoggedIn}`, 'info');
+        }
+        
+        function testLogout() {
+            if (!authService.isLoggedIn()) {
+                showResult('auth-result', '❌ Usuário não está logado', 'error');
+                log('Tentativa de logout sem estar logado', 'error');
+                return;
+            }
+            
+            const userName = authService.getCurrentUser().name;
+            authService.logout();
+            
+            showResult('auth-result', 
+                `✅ Logout realizado!\n\nUsuário ${userName} desconectado com sucesso.`,
+                'success'
+            );
+            log(`Logout realizado: ${userName}`, 'success');
+        }
+        
+        function testProtectedRoute() {
+            const isLoggedIn = authService.isLoggedIn();
+            
+            if (isLoggedIn) {
+                showResult('auth-result', 
+                    `✅ Acesso permitido!\n\nUsuário logado pode acessar rotas protegidas.`,
+                    'success'
+                );
+                log('Rota protegida - acesso permitido', 'success');
+            } else {
+                showResult('auth-result', 
+                    `❌ Acesso negado!\n\nUsuário não logado não pode acessar rotas protegidas.`,
+                    'error'
+                );
+                log('Rota protegida - acesso negado', 'error');
+            }
+        }
+        
+        // Inicializar testes
+        window.onload = function() {
+            log('Sistema de teste de autenticação iniciado', 'info');
+            setTimeout(testSystemStatus, 1000);
+        };
+    </script>
+</body>
+</html> 

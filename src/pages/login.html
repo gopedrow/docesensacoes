@@ -438,9 +438,9 @@
                 
                 try {
                     // Usar o sistema de autenticação atualizado
-                    const response = await authService.login({ email, senha: password });
+                    const response = await authService.login({ email, password: password });
                     
-                    if (response && response.usuario) {
+                    if (response && response.user) {
                         // Login bem-sucedido
                         showSuccess('Login realizado com sucesso!');
                         
@@ -455,6 +455,8 @@
                     console.error('Erro no login:', error);
                     if (error.message && error.message.includes('401')) {
                         showError('Email ou senha incorretos. Verifique suas credenciais.');
+                    } else if (error.message.includes('404')) {
+                        showError('Usuário não encontrado. Verifique seu email.');
                     } else {
                         showError('Erro ao fazer login. Tente novamente.');
                     }

@@ -449,15 +449,21 @@
             try {
                 const formData = new FormData(this);
                 const usuarioData = {
-                    nome: formData.get('nome'),
+                    name: formData.get('nome'),
                     email: formData.get('email'),
-                    telefone: formData.get('telefone'),
-                    endereco: formData.get('endereco'),
-                    senha: formData.get('senha')
+                    phone: formData.get('telefone'),
+                    address: formData.get('endereco'),
+                    password: formData.get('senha')
                 };
 
                 // Registrar usuário
-                await authService.register(usuarioData);
+                const response = await apiService.createUsuario(usuarioData);
+                
+                // Fazer login automático após registro
+                await authService.login({
+                    email: usuarioData.email,
+                    password: usuarioData.password
+                });
                 
                 showNotification('Conta criada com sucesso! Redirecionando...', 'success');
                 
@@ -470,8 +476,10 @@
                 console.error('Erro no cadastro:', error);
                 let errorMessage = 'Erro ao criar conta. Tente novamente.';
                 
-                if (error.message.includes('Email já cadastrado')) {
+                if (error.message.includes('duplicate') || error.message.includes('already exists')) {
                     errorMessage = 'Este e-mail já está cadastrado. Tente fazer login.';
+                } else if (error.message.includes('validation')) {
+                    errorMessage = 'Dados inválidos. Verifique as informações.';
                 }
                 
                 showNotification(errorMessage, 'error');

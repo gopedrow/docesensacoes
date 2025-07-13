@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Integração Vercel + Render</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { border-color: #4CAF50; background-color: #f1f8e9; }
+        .error { border-color: #f44336; background-color: #ffebee; }
+        .loading { border-color: #2196F3; background-color: #e3f2fd; }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Integração Vercel + Render</h1>
+        <p>Testando a comunicação entre o frontend (Vercel) e backend (Render)</p>
+        
+        <div class="test-section">
+            <h3>1. Teste de Conectividade da API</h3>
+            <button onclick="testAPI()">Testar API</button>
+            <div id="api-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Teste de Produtos</h3>
+            <button onclick="testProducts()">Carregar Produtos</button>
+            <div id="products-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Teste de CORS</h3>
+            <button onclick="testCORS()">Testar CORS</button>
+            <div id="cors-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Status dos Serviços</h3>
+            <div id="status-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com/api';
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.textContent = 'Testando...';
+            resultDiv.parentElement.className = 'test-section loading';
+            
+            try {
+                const response = await fetch(`${API_BASE}/test`);
+                const data = await response.json();
+                
+                resultDiv.textContent = `✅ API funcionando!\nStatus: ${response.status}\nResposta: ${JSON.stringify(data, null, 2)}`;
+                resultDiv.parentElement.className = 'test-section success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Erro na API: ${error.message}`;
+                resultDiv.parentElement.className = 'test-section error';
+            }
+        }
+        
+        async function testProducts() {
+            const resultDiv = document.getElementById('products-result');
+            resultDiv.textContent = 'Carregando produtos...';
+            resultDiv.parentElement.className = 'test-section loading';
+            
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    resultDiv.textContent = `✅ Produtos carregados!\nQuantidade: ${data.length}\nPrimeiro produto: ${data[0].nome}`;
+                    resultDiv.parentElement.className = 'test-section success';
+                } else {
+                    resultDiv.textContent = '⚠️ API respondeu, mas não há produtos cadastrados';
+                    resultDiv.parentElement.className = 'test-section loading';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erro ao carregar produtos: ${error.message}`;
+                resultDiv.parentElement.className = 'test-section error';
+            }
+        }
+        
+        async function testCORS() {
+            const resultDiv = document.getElementById('cors-result');
+            resultDiv.textContent = 'Testando CORS...';
+            resultDiv.parentElement.className = 'test-section loading';
+            
+            try {
+                const response = await fetch(`${API_BASE}/test`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                resultDiv.textContent = `✅ CORS configurado!\nHeaders: ${JSON.stringify(corsHeaders, null, 2)}`;
+                resultDiv.parentElement.className = 'test-section success';
+            } catch (error) {
+                resultDiv.textContent = `❌ Erro no CORS: ${error.message}`;
+                resultDiv.parentElement.className = 'test-section error';
+            }
+        }
+        
+        function updateStatus() {
+            const resultDiv = document.getElementById('status-result');
+            const currentOrigin = window.location.origin;
+            const isVercel = currentOrigin.includes('vercel.app');
+            
+            resultDiv.textContent = `🌐 Frontend: ${currentOrigin}\n${isVercel ? '✅' : '⚠️'} ${isVercel ? 'Deployado no Vercel' : 'Executando localmente'}\n🔗 Backend: ${API_BASE}\n📅 Data/Hora: ${new Date().toLocaleString('pt-BR')}`;
+        }
+        
+        // Executar testes automáticos
+        window.onload = function() {
+            updateStatus();
+            setTimeout(testAPI, 1000);
+            setTimeout(testProducts, 2000);
+            setTimeout(testCORS, 3000);
+        };
+    </script>
+</body>
+</html> 
