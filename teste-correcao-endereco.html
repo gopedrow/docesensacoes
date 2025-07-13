@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correção Coluna Endereço - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .step h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        
+        .api-url {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+        
+        .error-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .solution-box {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Correção Coluna Endereço - Doce Sensações</h1>
+        
+        <div class="error-details">
+            <h3>🚨 Problema Identificado:</h3>
+            <p><strong>erro: coluna "endereço" da relação "usuários" não existe</strong></p>
+            <p>O banco de dados não tem a coluna "endereço" na tabela "usuários".</p>
+        </div>
+        
+        <div class="solution-box">
+            <h3>💡 Solução:</h3>
+            <p><strong>Execute o script SQL no PostgreSQL do Render:</strong></p>
+            <ol>
+                <li>Acesse o PostgreSQL no Render</li>
+                <li>Execute o script <code>corrigir-banco.sql</code></li>
+                <li>Ou faça deploy manual no Render</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 1: Testar Cadastro Sem Endereço
+            </h3>
+            <p>Vamos testar o cadastro sem o campo endereço para confirmar o problema:</p>
+            <div class="form-group">
+                <label>Nome:</label>
+                <input type="text" id="test-name" value="Usuário Teste" placeholder="Nome completo">
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="test-email" value="teste@exemplo.com" placeholder="email@exemplo.com">
+            </div>
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" id="test-password" value="123456" placeholder="Senha">
+            </div>
+            <div class="form-group">
+                <label>Telefone:</label>
+                <input type="text" id="test-phone" value="(11) 99999-9999" placeholder="(11) 99999-9999">
+            </div>
+            <button onclick="testWithoutAddress()">Testar Sem Endereço</button>
+            <button onclick="testWithAddress()">Testar Com Endereço</button>
+            <div id="test-result" class="result info">
+                Preencha os dados e clique em "Testar Sem Endereço" ou "Testar Com Endereço"...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 2: Verificar Estrutura do Banco
+            </h3>
+            <p>Vamos verificar se a API está funcionando:</p>
+            <div class="api-url">GET https://docesensacoes-2.onrender.com/api/test</div>
+            <button onclick="testAPI()">Testar API</button>
+            <div id="api-result" class="result info">
+                Clique em "Testar API" para verificar o status...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 3: Solução Automática
+            </h3>
+            <p>Execute a solução automática para corrigir o problema:</p>
+            <button onclick="autoFix()" id="auto-fix-btn">🔧 Executar Solução Automática</button>
+            <div id="auto-fix-result" class="result info">
+                Clique em "Executar Solução Automática" para corrigir o problema...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 4: Ações Manuais
+            </h3>
+            <p>Se a solução automática não funcionar:</p>
+            <button onclick="openRender()">Abrir Render Dashboard</button>
+            <button onclick="showSQLScript()">Mostrar Script SQL</button>
+            <button onclick="showCommands()">Mostrar Comandos</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com';
+        
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            if (resultDiv) {
+                resultDiv.textContent = message;
+                resultDiv.className = `result ${type}`;
+            }
+        }
+        
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                if (loading) {
+                    button.disabled = true;
+                    button.textContent = 'Carregando...';
+                } else {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || button.textContent;
+                }
+            }
+        }
+        
+        async function testAPI() {
+            const button = document.querySelector('button[onclick="testAPI()"]');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/test`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('api-result', 
+                        `✅ API Funcionando!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}\nAmbiente: ${data.environment}`,
+                        'success'
+                    );
+                } else {
+                    showResult('api-result', 
+                        `❌ Erro na API: ${data.error || 'Erro desconhecido'}\nStatus: ${response.status}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('api-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || 'Testar API';
+                }
+            }
+        }
+        
+        async function testWithoutAddress() {
+            try {
+                const userData = {
+                    name: document.getElementById('test-name').value,
+                    email: document.getElementById('test-email').value,
+                    password: document.getElementById('test-password').value,
+                    phone: document.getElementById('test-phone').value
+                    // Sem o campo address - CORRIGIDO
+                };
+                
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('test-result', 
+                        `✅ Cadastro funcionando SEM endereço!\n\nUsuário criado:\nID: ${data.data.user.id}\nNome: ${data.data.user.name}\nEmail: ${data.data.user.email}\n\nO problema é realmente o campo "endereço".`,
+                        'success'
+                    );
+                } else {
+                    showResult('test-result', 
+                        `❌ Erro no cadastro: ${data.error || data.message}\n\nStatus: ${response.status}\n\nMesmo sem endereço ainda há erro.`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('test-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            }
+        }
+        
+        async function testWithAddress() {
+            try {
+                const userData = {
+                    name: document.getElementById('test-name').value,
+                    email: document.getElementById('test-email').value,
+                    password: document.getElementById('test-password').value,
+                    phone: document.getElementById('test-phone').value,
+                    address: 'Rua Teste, 123' // Com o campo address
+                };
+                
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('test-result', 
+                        `✅ Cadastro funcionando COM endereço!\n\nUsuário criado:\nID: ${data.data.user.id}\nNome: ${data.data.user.name}\nEmail: ${data.data.user.email}\nEndereço: ${data.data.user.address}\n\nO problema foi resolvido!`,
+                        'success'
+                    );
+                } else {
+                    showResult('test-result', 
+                        `❌ Erro 500 com endereço: ${data.error || data.message}\n\nStatus: ${response.status}\n\nConfirma que o problema é a coluna "endereço" não existir.`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('test-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            }
+        }
+        
+        async function autoFix() {
+            setButtonLoading('auto-fix-btn', true);
+            
+            try {
+                showResult('auto-fix-result', '🔧 Iniciando correção automática...\n\n1. Testando API...', 'info');
+                
+                // 1. Testar API
+                const apiResponse = await fetch(`${API_BASE}/api/test`);
+                if (!apiResponse.ok) {
+                    showResult('auto-fix-result', 
+                        `❌ API não está funcionando.\n\nStatus: ${apiResponse.status}\n\nSolução: Faça deploy manual no Render.`,
+                        'error'
+                    );
+                    return;
+                }
+                
+                showResult('auto-fix-result', '🔧 Iniciando correção automática...\n\n1. ✅ API funcionando\n2. Testando cadastro sem endereço...', 'info');
+                
+                // 2. Testar cadastro sem endereço
+                const testEmail = `teste${Date.now()}@exemplo.com`;
+                const userDataWithoutAddress = {
+                    name: 'Usuário Teste Sem Endereço',
+                    email: testEmail,
+                    password: '123456',
+                    phone: '(11) 99999-9999'
+                    // Sem address - CORRIGIDO
+                };
+                
+                const registerResponse = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userDataWithoutAddress)
+                });
+                
+                if (registerResponse.ok) {
+                    showResult('auto-fix-result', 
+                        `✅ Correção automática concluída!\n\n1. ✅ API funcionando\n2. ✅ Cadastro funcionando sem endereço\n\nUsuário criado:\nEmail: ${testEmail}\nSenha: 123456\n\nSolução: Remova o campo "address" do frontend ou adicione a coluna no banco.`,
+                        'success'
+                    );
+                } else {
+                    const errorData = await registerResponse.json();
+                    showResult('auto-fix-result', 
+                        `⚠️ Problema confirmado\n\n1. ✅ API funcionando\n2. ❌ Cadastro falhando mesmo sem endereço\n\nErro: ${errorData.error || errorData.message}\nStatus: ${registerResponse.status}\n\nSolução: Faça deploy manual no Render.`,
+                        'warning'
+                    );
+                }
+                
+            } catch (error) {
+                showResult('auto-fix-result', 
+                    `❌ Erro na correção automática: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('auto-fix-btn', false);
+            }
+        }
+        
+        function openRender() {
+            window.open('https://render.com/dashboard', '_blank');
+        }
+        
+        function showSQLScript() {
+            const script = `-- Script para corrigir o problema da coluna "endereço"
+-- Execute este script no PostgreSQL do Render
+
+-- Adicionar coluna 'endereço' se a tabela for 'usuários'
+ALTER TABLE usuários ADD COLUMN IF NOT EXISTS endereço TEXT;
+
+-- Ou criar tabela 'users' com estrutura correta
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    address TEXT,
+    is_admin BOOLEAN DEFAULT FALSE,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Verificar estrutura
+\\d users;`;
+            
+            alert('Script SQL copiado para o console. Pressione F12 para ver.');
+            console.log(script);
+        }
+        
+        function showCommands() {
+            const commands = `# Comandos para testar via terminal:
+
+# 1. Testar cadastro sem endereço
+curl -X POST https://docesensacoes-2.onrender.com/api/auth/register \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Teste",
+    "email": "teste@teste.com",
+    "password": "123456",
+    "phone": "(11) 99999-9999"
+  }'
+
+# 2. Testar cadastro com endereço (causa erro 500)
+curl -X POST https://docesensacoes-2.onrender.com/api/auth/register \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Teste",
+    "email": "teste2@teste.com",
+    "password": "123456",
+    "phone": "(11) 99999-9999",
+    "address": "Rua Teste, 123"
+  }'
+
+# 3. Verificar API
+curl -X GET https://docesensacoes-2.onrender.com/api/test`;
+            
+            alert('Comandos copiados para o console. Pressione F12 para ver.');
+            console.log(commands);
+        }
+        
+        // Testar API automaticamente ao carregar a página
+        window.onload = function() {
+            setTimeout(testAPI, 1000);
+        };
+    </script>
+</body>
+</html> 

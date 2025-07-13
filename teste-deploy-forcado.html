@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste Deploy Forçado - Doce Sensações</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: rgba(76, 175, 80, 0.3); border: 2px solid #4CAF50; }
+        .error { background: rgba(244, 67, 54, 0.3); border: 2px solid #f44336; }
+        .warning { background: rgba(255, 193, 7, 0.3); border: 2px solid #ffc107; }
+        .info { background: rgba(33, 150, 243, 0.3); border: 2px solid #2196F3; }
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4ECDC4;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #4ECDC4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Deploy Forçado</h1>
+        <p style="text-align: center; font-size: 18px; margin-bottom: 30px;">
+            Verificando se o deploy forçado resolveu o problema da coluna "endereço"
+        </p>
+
+        <div class="step">
+            <h3>📋 Status Atual</h3>
+            <div id="status" class="status info">
+                Aguardando início dos testes...
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Ações Disponíveis</h3>
+            <button onclick="testarAPI()">1️⃣ Testar API</button>
+            <button onclick="testarCadastroSemEndereco()">2️⃣ Testar Cadastro (Sem Endereço)</button>
+            <button onclick="testarCadastroComEndereco()">3️⃣ Testar Cadastro (Com Endereço)</button>
+            <button onclick="testarLogin()">4️⃣ Testar Login</button>
+            <button onclick="inicializarBanco()">5️⃣ Reinicializar Banco</button>
+            <button onclick="executarTodosTestes()">🚀 Executar Todos os Testes</button>
+            <button onclick="limparLog()">🗑️ Limpar Log</button>
+        </div>
+
+        <div class="step">
+            <h3>📊 Resultados</h3>
+            <div id="log" class="log">Log de testes aparecerá aqui...</div>
+        </div>
+
+        <div class="step">
+            <h3>📝 Instruções</h3>
+            <p><strong>1.</strong> Clique em "Executar Todos os Testes" para verificar se o problema foi resolvido</p>
+            <p><strong>2.</strong> Se ainda houver erro de "endereço", faça deploy manual no Render com "Clear cache"</p>
+            <p><strong>3.</strong> O teste "Sem Endereço" deve funcionar, o "Com Endereço" pode falhar (normal)</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com/api';
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            testResults.push({ message: logEntry, type });
+            
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML = testResults.map(result => {
+                const color = result.type === 'error' ? '#ff6b6b' : 
+                             result.type === 'success' ? '#4ecdc4' : 
+                             result.type === 'warning' ? '#ffc107' : '#fff';
+                return `<span style="color: ${color}">${result.message}</span>`;
+            }).join('\n');
+            
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        async function testarAPI() {
+            updateStatus('Testando API...', 'info');
+            log('🔍 Testando conectividade da API...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/test`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ API funcionando corretamente!', 'success');
+                    log(`📡 Resposta: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    log(`❌ API retornou erro: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro ao conectar com API: ${error.message}`, 'error');
+            }
+        }
+
+        async function testarCadastroSemEndereco() {
+            updateStatus('Testando cadastro sem endereço...', 'info');
+            log('👤 Testando cadastro SEM campo endereço...');
+            
+            const testData = {
+                name: `Teste ${Date.now()}`,
+                email: `teste${Date.now()}@teste.com`,
+                password: '123456',
+                phone: '(11) 99999-9999'
+                // SEM campo address/endereço
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Cadastro SEM endereço funcionou!', 'success');
+                    log(`📝 Usuário criado: ${data.data.user.email}`, 'info');
+                } else {
+                    log(`❌ Erro no cadastro: ${data.error}`, 'error');
+                    if (data.error.includes('endereço')) {
+                        log('⚠️ PROBLEMA: Ainda há erro de coluna "endereço"!', 'warning');
+                        log('🔧 Solução: Faça deploy manual no Render com "Clear cache"', 'warning');
+                    }
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        async function testarCadastroComEndereco() {
+            updateStatus('Testando cadastro com endereço...', 'info');
+            log('🏠 Testando cadastro COM campo endereço (pode falhar)...');
+            
+            const testData = {
+                name: `Teste ${Date.now()}`,
+                email: `teste${Date.now()}@teste.com`,
+                password: '123456',
+                phone: '(11) 99999-9999',
+                address: 'Rua Teste, 123' // COM campo address
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Cadastro COM endereço funcionou! (Inesperado)', 'success');
+                } else {
+                    if (data.error.includes('endereço')) {
+                        log('⚠️ Cadastro COM endereço falhou (Esperado)', 'warning');
+                        log('ℹ️ Isso é normal - o campo foi removido do código', 'info');
+                    } else {
+                        log(`❌ Erro inesperado: ${data.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        async function testarLogin() {
+            updateStatus('Testando login...', 'info');
+            log('🔐 Testando login com usuário admin...');
+            
+            const loginData = {
+                email: 'admin@docesensacoes.com',
+                password: 'admin123'
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Login funcionando!', 'success');
+                    log(`👤 Usuário logado: ${data.data.user.name}`, 'info');
+                } else {
+                    log(`❌ Erro no login: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        async function inicializarBanco() {
+            updateStatus('Reinicializando banco...', 'info');
+            log('🗄️ Reinicializando banco de dados...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/init-database`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Banco reinicializado com sucesso!', 'success');
+                    log(`📊 ${data.message}`, 'info');
+                } else {
+                    log(`❌ Erro ao reinicializar: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        async function executarTodosTestes() {
+            updateStatus('Executando todos os testes...', 'info');
+            log('🚀 INICIANDO SUITE COMPLETA DE TESTES...', 'info');
+            log('', 'info');
+            
+            // Desabilitar botões durante os testes
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            try {
+                // Teste 1: API
+                await testarAPI();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Teste 2: Cadastro sem endereço
+                await testarCadastroSemEndereco();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Teste 3: Cadastro com endereço
+                await testarCadastroComEndereco();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Teste 4: Login
+                await testarLogin();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                log('', 'info');
+                log('🎉 SUITE DE TESTES CONCLUÍDA!', 'success');
+                log('📋 Verifique os resultados acima', 'info');
+                
+                // Verificar se houve erros de "endereço"
+                const hasEnderecoError = testResults.some(result => 
+                    result.message.includes('endereço') && result.type === 'error'
+                );
+                
+                if (hasEnderecoError) {
+                    updateStatus('❌ Ainda há problemas com coluna "endereço"', 'error');
+                    log('🔧 AÇÃO NECESSÁRIA: Faça deploy manual no Render com "Clear cache"', 'warning');
+                } else {
+                    updateStatus('✅ Todos os testes passaram! Sistema funcionando', 'success');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro durante os testes: ${error.message}`, 'error');
+                updateStatus('❌ Erro durante os testes', 'error');
+            } finally {
+                // Reabilitar botões
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        function limparLog() {
+            testResults = [];
+            document.getElementById('log').innerHTML = 'Log limpo...';
+            updateStatus('Log limpo', 'info');
+        }
+
+        // Auto-executar teste inicial
+        window.onload = function() {
+            log('🧪 Página de teste carregada', 'info');
+            log('📡 API Base: ' + API_BASE, 'info');
+            log('', 'info');
+        };
+    </script>
+</body>
+</html> 

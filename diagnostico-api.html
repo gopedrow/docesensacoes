@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico API - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .step h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        
+        .api-url {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+        
+        .error-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .solution-box {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico API - Doce Sensações</h1>
+        
+        <div class="error-details">
+            <h3>🚨 Erros Identificados:</h3>
+            <ul>
+                <li><strong>404:</strong> /api/init-database - Rota não encontrada</li>
+                <li><strong>500:</strong> /api/auth/register - Erro interno do servidor</li>
+                <li><strong>404:</strong> favicon.ico - Ícone não encontrado (normal)</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 1: Verificar Status da API
+            </h3>
+            <p>Primeiro, vamos verificar se a API está funcionando:</p>
+            <div class="api-url">GET https://docesensacoes-2.onrender.com/api/test</div>
+            <button onclick="testAPI()">Testar API</button>
+            <div id="api-result" class="result info">
+                Clique em "Testar API" para verificar o status...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 2: Verificar Rotas Disponíveis
+            </h3>
+            <p>Vamos verificar quais rotas estão disponíveis:</p>
+            <div class="api-url">GET https://docesensacoes-2.onrender.com/</div>
+            <button onclick="checkRoutes()">Verificar Rotas</button>
+            <div id="routes-result" class="result info">
+                Clique em "Verificar Rotas" para ver as rotas disponíveis...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 3: Testar Cadastro Direto
+            </h3>
+            <p>Vamos testar o cadastro sem inicializar o banco:</p>
+            <div class="api-url">POST https://docesensacoes-2.onrender.com/api/auth/register</div>
+            <button onclick="testDirectRegister()">Testar Cadastro Direto</button>
+            <div id="direct-register-result" class="result info">
+                Clique em "Testar Cadastro Direto" para verificar...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 4: Solução Automática
+            </h3>
+            <p>Execute a solução automática para resolver os problemas:</p>
+            <button onclick="autoDiagnose()" id="auto-diagnose-btn">🔧 Diagnóstico Automático</button>
+            <div id="auto-diagnose-result" class="result info">
+                Clique em "Diagnóstico Automático" para resolver problemas...
+            </div>
+        </div>
+        
+        <div class="solution-box">
+            <h3>💡 Soluções Recomendadas:</h3>
+            <ol>
+                <li><strong>Se API não responde:</strong> Faça deploy manual no Render</li>
+                <li><strong>Se cadastro falha:</strong> O banco pode não estar inicializado</li>
+                <li><strong>Se rota 404:</strong> A rota pode não existir no servidor atual</li>
+                <li><strong>Se erro 500:</strong> Verifique logs do Render</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 5: Ações Manuais
+            </h3>
+            <p>Se os testes falharem, execute estas ações:</p>
+            <button onclick="openRender()">Abrir Render Dashboard</button>
+            <button onclick="openSite()">Abrir Site Principal</button>
+            <button onclick="showCommands()">Mostrar Comandos Curl</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com';
+        
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            if (resultDiv) {
+                resultDiv.textContent = message;
+                resultDiv.className = `result ${type}`;
+            }
+        }
+        
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                if (loading) {
+                    button.disabled = true;
+                    button.textContent = 'Carregando...';
+                } else {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || button.textContent;
+                }
+            }
+        }
+        
+        async function testAPI() {
+            const button = document.querySelector('button[onclick="testAPI()"]');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/test`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('api-result', 
+                        `✅ API Funcionando!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}\nAmbiente: ${data.environment}`,
+                        'success'
+                    );
+                } else {
+                    showResult('api-result', 
+                        `❌ Erro na API: ${data.error || 'Erro desconhecido'}\nStatus: ${response.status}\n\nSolução: Faça deploy manual no Render.`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('api-result', 
+                    `❌ Erro de conexão: ${error.message}\n\nA API pode estar offline. Verifique o deploy no Render.`,
+                    'error'
+                );
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || 'Testar API';
+                }
+            }
+        }
+        
+        async function checkRoutes() {
+            const button = document.querySelector('button[onclick="checkRoutes()"]');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('routes-result', 
+                        `✅ Rotas disponíveis:\n\n${JSON.stringify(data, null, 2)}`,
+                        'success'
+                    );
+                } else {
+                    showResult('routes-result', 
+                        `❌ Erro ao verificar rotas: ${response.status}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('routes-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || 'Verificar Rotas';
+                }
+            }
+        }
+        
+        async function testDirectRegister() {
+            const button = document.querySelector('button[onclick="testDirectRegister()"]');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            }
+            
+            try {
+                const testEmail = `teste${Date.now()}@exemplo.com`;
+                const userData = {
+                    name: 'Usuário Teste Diagnóstico',
+                    email: testEmail,
+                    password: '123456',
+                    phone: '(11) 99999-9999',
+                    address: 'Rua Teste, 123'
+                };
+                
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('direct-register-result', 
+                        `✅ Cadastro funcionando!\n\nUsuário criado:\nEmail: ${testEmail}\nSenha: 123456\n\nO banco está funcionando corretamente.`,
+                        'success'
+                    );
+                } else {
+                    showResult('direct-register-result', 
+                        `❌ Erro no cadastro: ${data.error || data.message}\n\nStatus: ${response.status}\n\nProblema: ${response.status === 500 ? 'Erro interno do servidor (banco não inicializado)' : 'Erro desconhecido'}\n\nSolução: Faça deploy manual no Render.`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('direct-register-result', 
+                    `❌ Erro de conexão: ${error.message}\n\nVerifique se a API está online.`,
+                    'error'
+                );
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || 'Testar Cadastro Direto';
+                }
+            }
+        }
+        
+        async function autoDiagnose() {
+            const button = document.getElementById('auto-diagnose-btn');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            }
+            
+            try {
+                showResult('auto-diagnose-result', '🔍 Iniciando diagnóstico automático...\n\n1. Testando API...', 'info');
+                
+                // 1. Testar API
+                const apiResponse = await fetch(`${API_BASE}/api/test`);
+                if (!apiResponse.ok) {
+                    showResult('auto-diagnose-result', 
+                        `❌ Diagnóstico: API não está funcionando\n\nStatus: ${apiResponse.status}\n\nSolução: Faça deploy manual no Render.`,
+                        'error'
+                    );
+                    return;
+                }
+                
+                showResult('auto-diagnose-result', '🔍 Iniciando diagnóstico automático...\n\n1. ✅ API funcionando\n2. Testando cadastro...', 'info');
+                
+                // 2. Testar cadastro
+                const testEmail = `teste${Date.now()}@exemplo.com`;
+                const userData = {
+                    name: 'Usuário Teste Auto',
+                    email: testEmail,
+                    password: '123456',
+                    phone: '(11) 99999-9999',
+                    address: 'Rua Teste, 123'
+                };
+                
+                const registerResponse = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (registerResponse.ok) {
+                    showResult('auto-diagnose-result', 
+                        `✅ Diagnóstico concluído com sucesso!\n\n1. ✅ API funcionando\n2. ✅ Cadastro funcionando\n\nUsuário de teste criado:\nEmail: ${testEmail}\nSenha: 123456\n\nO sistema está funcionando corretamente!`,
+                        'success'
+                    );
+                } else {
+                    let errorMessage = 'Erro desconhecido';
+                    try {
+                        const errorData = await registerResponse.json();
+                        errorMessage = errorData.error || errorData.message || 'Erro desconhecido';
+                    } catch (parseError) {
+                        errorMessage = `Erro ${registerResponse.status}: ${registerResponse.statusText}`;
+                    }
+                    
+                    showResult('auto-diagnose-result', 
+                        `⚠️ Diagnóstico: Problema identificado\n\n1. ✅ API funcionando\n2. ❌ Cadastro falhando\n\nErro: ${errorMessage}\nStatus: ${registerResponse.status}\n\nSolução: Faça deploy manual no Render para reinicializar o banco.`,
+                        'warning'
+                    );
+                }
+                
+            } catch (error) {
+                showResult('auto-diagnose-result', 
+                    `❌ Erro no diagnóstico: ${error.message}\n\nVerifique se a API está online.`,
+                    'error'
+                );
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || '🔧 Diagnóstico Automático';
+                }
+            }
+        }
+        
+        function openRender() {
+            window.open('https://render.com/dashboard', '_blank');
+        }
+        
+        function openSite() {
+            window.open('https://docesensacoes.vercel.app', '_blank');
+        }
+        
+        function showCommands() {
+            const commands = `# Comandos para testar via terminal:
+
+# 1. Testar API
+curl -X GET https://docesensacoes-2.onrender.com/api/test
+
+# 2. Testar cadastro
+curl -X POST https://docesensacoes-2.onrender.com/api/auth/register \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Teste",
+    "email": "teste@teste.com",
+    "password": "123456",
+    "phone": "(11) 99999-9999",
+    "address": "Rua Teste, 123"
+  }'
+
+# 3. Testar login
+curl -X POST https://docesensacoes-2.onrender.com/api/auth/login \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "email": "admin@docesensacoes.com",
+    "password": "admin123"
+  }'`;
+            
+            alert('Comandos copiados para o console. Pressione F12 para ver.');
+            console.log(commands);
+        }
+        
+        // Testar API automaticamente ao carregar a página
+        window.onload = function() {
+            setTimeout(testAPI, 1000);
+        };
+    </script>
+</body>
+</html> 

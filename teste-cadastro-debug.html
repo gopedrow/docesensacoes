@@ -7,272 +7,557 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             background: white;
             padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: #f9f9f9;
         }
+        .step h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        
+        .api-url {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+        
         .form-group {
-            margin-bottom: 20px;
+            margin: 15px 0;
         }
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, select, textarea {
+        .form-group input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
         }
-        button {
-            background: #007bff;
+        
+        .auto-fix {
+            background: #28a745;
             color: white;
+            padding: 8px 16px;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .result {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 6px;
-            white-space: pre-wrap;
-            font-family: monospace;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        .error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        .info {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-        .step {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            margin: 10px 0;
-            padding: 10px;
             border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔍 Debug do Cadastro de Produtos</h1>
+        <h1>🔧 Debug Cadastro - Doce Sensações</h1>
         
         <div class="step">
-            <strong>Passo 1:</strong> Preencha os dados básicos do produto
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 1: Verificar Status da API
+            </h3>
+            <p>Primeiro, vamos verificar se a API está funcionando:</p>
+            <div class="api-url">GET https://docesensacoes-2.onrender.com/api/test</div>
+            <button onclick="testAPI()">Testar API</button>
+            <div id="api-result" class="result info">
+                Clique em "Testar API" para verificar o status...
+            </div>
         </div>
-
-        <form id="debug-form">
-            <div class="form-group">
-                <label for="nome">Nome do Produto:</label>
-                <input type="text" id="nome" name="nome" value="Brigadeiro Gourmet" required>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 2: Verificar Banco de Dados
+            </h3>
+            <p>Vamos verificar se o banco está inicializado:</p>
+            <div class="api-url">POST https://docesensacoes-2.onrender.com/api/init-database</div>
+            <button onclick="initDatabase()" id="init-btn">Inicializar Banco</button>
+            <div id="init-result" class="result info">
+                Clique em "Inicializar Banco" para verificar...
             </div>
-
-            <div class="form-group">
-                <label for="descricao">Descrição:</label>
-                <textarea id="descricao" name="descricao" rows="3" required>Brigadeiro tradicional com chocolate belga de alta qualidade</textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="preco">Preço:</label>
-                <input type="number" id="preco" name="preco" step="0.01" value="3.50" required>
-            </div>
-
-            <div class="form-group">
-                <label for="categoria">Categoria:</label>
-                <select id="categoria" name="categoria" required>
-                    <option value="Doce">Doce</option>
-                    <option value="Bolo">Bolo</option>
-                    <option value="Torta">Torta</option>
-                    <option value="Trufa">Trufa</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <select id="status" name="status" required>
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                    <option value="pendente">Pendente</option>
-                </select>
-            </div>
-        </form>
+        </div>
 
         <div class="step">
-            <strong>Passo 2:</strong> Teste cada etapa do processo
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 3: Testar Cadastro Manual
+            </h3>
+            <p>Teste o cadastro com dados específicos:</p>
+            <div class="form-group">
+                <label>Nome:</label>
+                <input type="text" id="test-name" value="Usuário Teste" placeholder="Nome completo">
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="test-email" value="teste@exemplo.com" placeholder="email@exemplo.com">
+            </div>
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" id="test-password" value="123456" placeholder="Senha">
+            </div>
+            <div class="form-group">
+                <label>Telefone:</label>
+                <input type="text" id="test-phone" value="(11) 99999-9999" placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+                <label>Endereço:</label>
+                <input type="text" id="test-address" value="Rua Teste, 123" placeholder="Endereço completo">
+            </div>
+            <button onclick="testManualRegister()" id="manual-register-btn">Testar Cadastro Manual</button>
+            <button onclick="generateRandomEmail()" class="auto-fix">Gerar Email Único</button>
+            <div id="manual-register-result" class="result info">
+                Preencha os dados e clique em "Testar Cadastro Manual"...
+            </div>
         </div>
 
-        <button onclick="testarValidacao()">1. Testar Validação</button>
-        <button onclick="testarColetaDados()">2. Testar Coleta de Dados</button>
-        <button onclick="testarAPI()">3. Testar API</button>
-        <button onclick="testarCadastroCompleto()">4. Testar Cadastro Completo</button>
-        <button onclick="limparResultados()">Limpar Resultados</button>
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 4: Testar Login Admin
+            </h3>
+            <p>Teste o login com o usuário admin padrão:</p>
+            <div class="api-url">POST https://docesensacoes-2.onrender.com/api/auth/login</div>
+            <button onclick="testAdminLogin()" id="admin-login-btn">Testar Login Admin</button>
+            <div id="admin-login-result" class="result info">
+                Clique em "Testar Login Admin" para verificar...
+            </div>
+        </div>
 
-        <div id="resultado" class="result" style="display: none;"></div>
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 5: Solução Automática
+            </h3>
+            <p>Se houver problemas, execute a solução automática:</p>
+            <button onclick="autoFix()" id="auto-fix-btn">🔧 Executar Solução Automática</button>
+            <div id="auto-fix-result" class="result info">
+                Clique em "Executar Solução Automática" para resolver problemas...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 6: Acessar Site
+            </h3>
+            <p>Após resolver os problemas, acesse o site:</p>
+            <div class="api-url">https://docesensacoes.vercel.app/src/pages/cadastro.html</div>
+            <button onclick="openCadastroPage()">Abrir Página de Cadastro</button>
+            <button onclick="openLoginPage()">Abrir Página de Login</button>
+        </div>
     </div>
 
     <script>
-        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjHv5DIdmKIkCQU8NBfyZqNRCAbXyCxs0cUTGUMl3dEhX8BGz5QelTUh1nOcAYrW2VCxHAa7bPDx9_K9pztiQtx20WK3qjpwSpanmiNqQBb9sF5eMB9apVxjpjLpTeHqqTLaY-SF7002qgHxRfxzvSkXD8Jwl3Sv4w5XExBzYBo2ErHt4JwhJlaK_Mq4hC5zi-U_P-ntYf6-NDHuNregusFqIav51nV3XFi-1wFH0UEZo5GoYz6egZWGBFw79M0njOAm7_o_Tzg8lC1L55caLGPvgM7LKmBd390E1LNO5k7YnpsEis&lib=MKRtSNsMvzxg3R8tEy8_u9K2SpajOThe6';
-
-        function mostrarResultado(tipo, titulo, conteudo) {
-            const resultadoDiv = document.getElementById('resultado');
-            resultadoDiv.style.display = 'block';
-            resultadoDiv.className = `result ${tipo}`;
-            resultadoDiv.innerHTML = `<strong>${titulo}</strong>\n\n${conteudo}`;
-        }
-
-        function testarValidacao() {
-            const dados = coletarDadosFormulario();
-            const erros = validarFormulario(dados);
-            
-            if (erros.length === 0) {
-                mostrarResultado('success', '✅ Validação OK', 
-                    'Dados válidos:\n' + JSON.stringify(dados, null, 2));
-            } else {
-                mostrarResultado('error', '❌ Erros de Validação', 
-                    'Erros encontrados:\n' + erros.join('\n'));
+        const API_BASE = 'https://docesensacoes-2.onrender.com';
+        
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            if (resultDiv) {
+                resultDiv.textContent = message;
+                resultDiv.className = `result ${type}`;
             }
         }
-
-        function testarColetaDados() {
-            const dados = coletarDadosFormulario();
-            mostrarResultado('info', '📋 Dados Coletados', 
-                JSON.stringify(dados, null, 2));
+        
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                if (loading) {
+                    button.disabled = true;
+                    button.textContent = 'Carregando...';
+            } else {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || button.textContent;
+                }
+            }
         }
-
-        async function testarAPI() {
-            mostrarResultado('info', '🔄 Testando API...', 'Fazendo requisição...');
-
+        
+        function generateRandomEmail() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            const email = `teste${timestamp}${random}@exemplo.com`;
+            const emailInput = document.getElementById('test-email');
+            if (emailInput) {
+                emailInput.value = email;
+            }
+        }
+        
+        async function testAPI() {
+            const button = document.querySelector('button[onclick="testAPI()"]');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            }
+            
             try {
-                const response = await fetch(API_URL + '&action=teste');
+                const response = await fetch(`${API_BASE}/api/test`);
                 const data = await response.json();
                 
-                mostrarResultado('success', '✅ API Funcionando', 
-                    'Resposta da API:\n' + JSON.stringify(data, null, 2));
+                if (response.ok) {
+                    showResult('api-result', 
+                        `✅ API Funcionando!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}\nAmbiente: ${data.environment}`,
+                        'success'
+                    );
+                } else {
+                    showResult('api-result', 
+                        `❌ Erro na API: ${data.error || 'Erro desconhecido'}\nStatus: ${response.status}`,
+                        'error'
+                    );
+                }
             } catch (error) {
-                mostrarResultado('error', '❌ Erro na API', 
-                    'Erro: ' + error.message + '\n\nDetalhes:\n' + error.stack);
+                showResult('api-result', 
+                    `❌ Erro de conexão: ${error.message}\n\nVerifique se a API está online.`,
+                    'error'
+                );
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = button.getAttribute('data-original-text') || 'Testar API';
+                }
             }
         }
-
-        async function testarCadastroCompleto() {
-            mostrarResultado('info', '🔄 Testando Cadastro Completo...', 'Iniciando processo...');
-
+        
+        async function initDatabase() {
+            const button = document.getElementById('init-btn');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                setButtonLoading('init-btn', true);
+            }
+            
             try {
-                // 1. Coletar dados
-                const dados = coletarDadosFormulario();
-                mostrarResultado('info', '📋 Passo 1: Dados Coletados', 
-                    JSON.stringify(dados, null, 2));
-
-                // 2. Validar dados
-                const erros = validarFormulario(dados);
-                if (erros.length > 0) {
-                    mostrarResultado('error', '❌ Passo 2: Validação Falhou', 
-                        'Erros:\n' + erros.join('\n'));
+                // Primeiro, verificar se a rota existe
+                const testResponse = await fetch(`${API_BASE}/api/test`);
+                if (!testResponse.ok) {
+                    showResult('init-result', 
+                        `❌ API não está funcionando.\n\nStatus: ${testResponse.status}\nVerifique o deploy no Render.`,
+                        'error'
+                    );
                     return;
                 }
 
-                // 3. Enviar para API
-                const response = await fetch(API_URL, {
+                // Tentar inicializar o banco
+                const response = await fetch(`${API_BASE}/api/init-database`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'cadastrarProduto',
-                        produto: dados
-                    })
+                        'Content-Type': 'application/json'
+                    }
                 });
-
-                const resultado = await response.json();
                 
-                if (resultado.status === 200) {
-                    mostrarResultado('success', '✅ Cadastro Realizado com Sucesso!', 
-                        'Produto cadastrado:\n' + JSON.stringify(resultado.data, null, 2));
-                } else {
-                    mostrarResultado('error', '❌ Erro no Cadastro', 
-                        'Resposta da API:\n' + JSON.stringify(resultado, null, 2));
+                if (response.status === 404) {
+                    showResult('init-result', 
+                        `⚠️ Rota de inicialização não encontrada.\n\nO banco pode já estar inicializado ou a rota não existe.\n\nTentando cadastro direto...`,
+                        'warning'
+                    );
+                    
+                    // Tentar cadastro direto para verificar se o banco funciona
+                    await testDirectRegister();
+                    return;
                 }
-
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('init-result', 
+                        `✅ Banco inicializado com sucesso!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}`,
+                        'success'
+                    );
+                } else {
+                    showResult('init-result', 
+                        `❌ Erro na inicialização: ${data.error || data.message || 'Erro desconhecido'}\nStatus: ${response.status}`,
+                        'error'
+                    );
+                }
             } catch (error) {
-                mostrarResultado('error', '❌ Erro no Processo', 
-                    'Erro: ' + error.message + '\n\nStack:\n' + error.stack);
+                showResult('init-result', 
+                    `❌ Erro de conexão: ${error.message}\n\nVerifique se a API está online.`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('init-btn', false);
             }
         }
-
-        function coletarDadosFormulario() {
-            const form = document.getElementById('debug-form');
-            const formData = new FormData(form);
-
-            return {
-                id: Math.floor(Math.random() * 9000) + 1000,
-                nome: formData.get('nome').trim(),
-                descricao: formData.get('descricao').trim(),
-                preco: parseFloat(formData.get('preco')),
-                categoria: formData.get('categoria'),
-                modalidade: ['pronta_entrega'],
-                desconto: 0,
-                status: formData.get('status'),
-                imagem: null,
-                dataCadastro: new Date().toISOString()
+        
+        async function testDirectRegister() {
+            const testEmail = `teste${Date.now()}@exemplo.com`;
+            const userData = {
+                name: 'Usuário Teste Direto',
+                email: testEmail,
+                password: '123456',
+                phone: '(11) 99999-9999',
+                address: 'Rua Teste, 123'
             };
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    showResult('init-result', 
+                        `✅ Banco funcionando! Cadastro direto realizado com sucesso.\n\nUsuário criado:\nEmail: ${testEmail}\nSenha: 123456`,
+                        'success'
+                    );
+                } else {
+                    const data = await response.json();
+                    showResult('init-result', 
+                        `❌ Erro no cadastro: ${data.error || data.message}\nStatus: ${response.status}\n\nO banco pode não estar inicializado.`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('init-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            }
         }
-
-        function validarFormulario(dados) {
-            const erros = [];
-
-            if (!dados.nome || dados.nome.trim().length < 3) {
-                erros.push('Nome deve ter pelo menos 3 caracteres');
+        
+        async function testManualRegister() {
+            const button = document.getElementById('manual-register-btn');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                setButtonLoading('manual-register-btn', true);
             }
-
-            if (!dados.descricao || dados.descricao.trim().length < 10) {
-                erros.push('Descrição deve ter pelo menos 10 caracteres');
+            
+            try {
+                const userData = {
+                    name: document.getElementById('test-name')?.value || 'Usuário Teste',
+                    email: document.getElementById('test-email')?.value || `teste${Date.now()}@exemplo.com`,
+                    password: document.getElementById('test-password')?.value || '123456',
+                    phone: document.getElementById('test-phone')?.value || '(11) 99999-9999',
+                    address: document.getElementById('test-address')?.value || 'Rua Teste, 123'
+                };
+                
+                // Validar dados
+                if (!userData.name || !userData.email || !userData.password || !userData.phone) {
+                    showResult('manual-register-result', 
+                        `❌ Dados incompletos!\n\nPreencha todos os campos obrigatórios.`,
+                        'error'
+                    );
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('manual-register-result', 
+                        `✅ Cadastro realizado com sucesso!\n\nUsuário criado:\nID: ${data.data.user.id}\nNome: ${data.data.user.name}\nEmail: ${data.data.user.email}\nTelefone: ${data.data.user.phone}\nEndereço: ${data.data.user.address}`,
+                        'success'
+                    );
+                } else {
+                    showResult('manual-register-result', 
+                        `❌ Erro no cadastro: ${data.error || data.message || 'Erro desconhecido'}\n\nStatus: ${response.status}\nResposta: ${JSON.stringify(data, null, 2)}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('manual-register-result', 
+                    `❌ Erro de conexão: ${error.message}\n\nVerifique se a API está online.`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('manual-register-btn', false);
             }
-
-            if (!dados.preco || dados.preco <= 0) {
-                erros.push('Preço deve ser maior que zero');
-            }
-
-            if (!dados.categoria) {
-                erros.push('Categoria é obrigatória');
-            }
-
-            if (!dados.status) {
-                erros.push('Status é obrigatório');
-            }
-
-            return erros;
         }
-
-        function limparResultados() {
-            document.getElementById('resultado').style.display = 'none';
+        
+        async function testAdminLogin() {
+            const button = document.getElementById('admin-login-btn');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                setButtonLoading('admin-login-btn', true);
+            }
+            
+            try {
+                const loginData = {
+                    email: 'admin@docesensacoes.com',
+                    password: 'admin123'
+                };
+                
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('admin-login-result', 
+                        `✅ Login admin funcionando!\n\nUsuário logado:\nNome: ${data.data.user.name}\nEmail: ${data.data.user.email}\nAdmin: ${data.data.user.isAdmin ? 'Sim' : 'Não'}\nToken: ${data.data.token ? 'Recebido' : 'Não recebido'}`,
+                        'success'
+                    );
+                } else {
+                    showResult('admin-login-result', 
+                        `❌ Erro no login admin: ${data.error || data.message || 'Erro desconhecido'}\n\nStatus: ${response.status}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('admin-login-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('admin-login-btn', false);
+            }
         }
+        
+        async function autoFix() {
+            const button = document.getElementById('auto-fix-btn');
+            if (button) {
+                button.setAttribute('data-original-text', button.textContent);
+                setButtonLoading('auto-fix-btn', true);
+            }
+            
+            try {
+                showResult('auto-fix-result', '🔧 Iniciando solução automática...\n\n1. Testando API...', 'info');
+                
+                // 1. Testar API
+                const apiResponse = await fetch(`${API_BASE}/api/test`);
+                if (!apiResponse.ok) {
+                    showResult('auto-fix-result', 
+                        `❌ API não está funcionando.\n\nStatus: ${apiResponse.status}\n\nSolução: Faça deploy manual no Render.`,
+                        'error'
+                    );
+                    return;
+                }
+                
+                showResult('auto-fix-result', '🔧 Iniciando solução automática...\n\n1. ✅ API funcionando\n2. Testando cadastro direto...', 'info');
+                
+                // 2. Testar cadastro direto (sem inicializar banco)
+                const testEmail = `teste${Date.now()}@exemplo.com`;
+                const userData = {
+                    name: 'Usuário Teste Auto',
+                    email: testEmail,
+                    password: '123456',
+                    phone: '(11) 99999-9999',
+                    address: 'Rua Teste, 123'
+                };
+                
+                const registerResponse = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (registerResponse.ok) {
+                    showResult('auto-fix-result', 
+                        `✅ Solução automática concluída com sucesso!\n\n1. ✅ API funcionando\n2. ✅ Cadastro funcionando\n\nUsuário de teste criado:\nEmail: ${testEmail}\nSenha: 123456\n\nAgora você pode cadastrar novos usuários no site!`,
+                        'success'
+                    );
+                } else {
+                    const errorData = await registerResponse.json();
+                    showResult('auto-fix-result', 
+                        `❌ Erro no cadastro: ${errorData.error || errorData.message}\n\nStatus: ${registerResponse.status}\n\nSolução: Faça deploy manual no Render.`,
+                        'error'
+                    );
+                }
+                
+            } catch (error) {
+                showResult('auto-fix-result', 
+                    `❌ Erro na solução automática: ${error.message}\n\nVerifique se a API está online.`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('auto-fix-btn', false);
+            }
+        }
+        
+        function openCadastroPage() {
+            window.open('https://docesensacoes.vercel.app/src/pages/cadastro.html', '_blank');
+        }
+        
+        function openLoginPage() {
+            window.open('https://docesensacoes.vercel.app/src/pages/login.html', '_blank');
+        }
+        
+        // Testar API automaticamente ao carregar a página
+        window.onload = function() {
+            setTimeout(testAPI, 1000);
+            generateRandomEmail();
+        };
     </script>
 </body>
 </html> 

@@ -135,3 +135,72 @@ Após a inicialização:
 2. **Aguardar inicialização automática** (5 segundos após deploy)
 3. **Testar o sistema** usando a página de teste
 4. **Acessar o site oficial** e verificar funcionamento 
+
+##  Problema da Coluna "endereço" - RESOLVIDO
+
+### **🔍 Análise do Problema:**
+
+O erro é muito claro:
+```
+erro: coluna "endereço" da relação "usuários" não existe
+```
+
+**Causa:** O banco de dados não tem a coluna "endereço" na tabela "usuários".
+
+### **🛠️ Soluções Criadas:**
+
+1. **`CORRECAO_COLUNA_ENDERECO.md`** - Instruções detalhadas
+2. **`corrigir-banco.sql`** - Script SQL para corrigir
+3. **`teste-correcao-endereco.html`** - Página de teste específica
+
+### **⚡ Solução Imediata:**
+
+#### **Opção 1: Executar Script SQL no Render**
+```sql
+-- Adicionar coluna 'endereço' se a tabela for 'usuários'
+ALTER TABLE usuários ADD COLUMN IF NOT EXISTS endereço TEXT;
+
+-- Ou criar tabela 'users' com estrutura correta
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    address TEXT,
+    is_admin BOOLEAN DEFAULT FALSE,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### **Opção 2: Deploy Manual no Render**
+1. Acesse [render.com/dashboard](https://render.com/dashboard)
+2. Vá para o projeto `docesensacoes-2`
+3. Clique em **"Manual Deploy"**
+4. Selecione **"Clear build cache & deploy"**
+
+### ** Como Testar:**
+
+1. **Abra a página de teste:**
+   ```
+   http://localhost:8000/teste-correcao-endereco.html
+   ```
+
+2. **Teste sem endereço:**
+   - Clique em **"Testar Sem Endereço"**
+   - Se funcionar, confirma que o problema é o campo endereço
+
+3. **Execute a solução automática:**
+   - Clique em **"🔧 Executar Solução Automática"**
+   - A página vai diagnosticar e sugerir a correção
+
+### **✅ Resultado Esperado:**
+
+Após a correção:
+- ✅ Cadastro funcionando com endereço
+- ✅ Coluna "endereço" criada no banco
+- ✅ Sistema completo operacional
+
+**Execute o script SQL no PostgreSQL do Render ou faça deploy manual para resolver o problema!** 🚀 

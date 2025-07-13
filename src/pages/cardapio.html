@@ -468,7 +468,6 @@
       try {
         console.log('=== DEBUG: Iniciando carregamento de produtos ===');
         console.log('apiService disponível:', typeof apiService !== 'undefined');
-        console.log('API_CONFIG:', typeof API_CONFIG !== 'undefined' ? API_CONFIG : 'não disponível');
         
         if (typeof apiService === 'undefined') {
           throw new Error('apiService não está disponível. Verifique se config.js foi carregado.');
@@ -480,15 +479,18 @@
         console.log('Tipo da resposta:', typeof response);
         console.log('É array?', Array.isArray(response));
         
-        if (response && response.produtos && Array.isArray(response.produtos) && response.produtos.length > 0) {
-          console.log('✅ Produtos encontrados:', response.produtos.length);
-          console.log('Primeiro produto:', response.produtos[0]);
-          displayProducts(response.produtos);
+        // A API retorna { status: 200, data: [...], count: ... }
+        if (response && Array.isArray(response) && response.length > 0) {
+          console.log('✅ Produtos encontrados:', response.length);
+          console.log('Primeiro produto:', response[0]);
+          displayProducts(response);
+        } else if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+          console.log('✅ Produtos encontrados (estrutura data):', response.data.length);
+          console.log('Primeiro produto:', response.data[0]);
+          displayProducts(response.data);
         } else {
           console.log('❌ Nenhum produto encontrado ou resposta inválida');
           console.log('Estrutura da resposta:', response);
-          console.log('response.produtos existe?', response && response.produtos);
-          console.log('response.produtos é array?', response && response.produtos && Array.isArray(response.produtos));
           showNoProducts();
         }
       } catch (error) {
@@ -519,6 +521,30 @@
 
     // Função para criar card de produto usando o template
     function createProductCardFromTemplate(produto) {
+      // Mapear campos do banco para o template
+      const mappedProduct = {
+        id: produto.id,
+        nome: produto.name || produto.nome,
+        descricao: produto.description || produto.descricao,
+        preco: produto.price || produto.preco,
+        categoria: produto.category || produto.categoria,
+        imagem: produto.image_url || produto.imagem || 'dish.png', // fallback
+        estoque: produto.stock_quantity || produto.estoque || 0,
+        desconto: produto.discount_percentage || produto.desconto || 0
+      };
+      
+      // Calcular preço com desconto
+      const precoOriginal = parseFloat(mappedProduct.preco);
+      const desconto = parseFloat(mappedProduct.desconto);
+      const precoFinal = desconto > 0 ? precoOriginal * (1 - desconto / 100) : precoOriginal;
+      
+      // Determinar se deve mostrar badge de promoção
+      const showPromoBadge = desconto > 0 ? 'block' : 'none';
+      const promoText = desconto > 0 ? `${desconto}% OFF` : '';
+      
+      // Determinar se deve mostrar preço original
+      const showOriginalPrice = desconto > 0 ? 'block' : 'none';
+      
       // Carregar o template
       const template = `
         <div class="product-card" data-product-id="{{PRODUCT_ID}}">
@@ -563,11 +589,11 @@
             
             <!-- Ações -->
             <div class="product-actions">
-              <button class="add-to-cart-btn" onclick="addToCart('{{PRODUCT_ID}}')" title="Adicionar ao carrinho">
+              <button class="add-to-cart-btn" onclick="addToCart('{{PRODUCT_ID}}')" title="Adicionar ao carrinho" ${mappedProduct.estoque <= 0 ? 'disabled' : ''}>
                 <i class="fa-solid fa-cart-plus"></i>
               </button>
-              <button class="buy-now-btn" onclick="buyNow('{{PRODUCT_ID}}')">
-                Comprar agora
+              <button class="buy-now-btn" onclick="buyNow('{{PRODUCT_ID}}')" ${mappedProduct.estoque <= 0 ? 'disabled' : ''}>
+                ${mappedProduct.estoque <= 0 ? 'Indisponível' : 'Comprar agora'}
               </button>
             </div>
           </div>
@@ -576,16 +602,16 @@
       
       // Substituir placeholders pelos dados do produto
       let productCard = template
-        .replace(/{{PRODUCT_ID}}/g, produto.id)
-        .replace(/{{PRODUCT_NAME}}/g, produto.nome)
-        .replace(/{{PRODUCT_DESCRIPTION}}/g, produto.descricao)
-        .replace(/{{PRODUCT_PRICE}}/g, parseFloat(produto.preco).toFixed(2).replace('.', ','))
-        .replace(/{{PRODUCT_CATEGORY}}/g, produto.categoria)
-        .replace(/{{PRODUCT_IMAGE}}/g, `../images/${produto.imagem}`)
-        .replace(/{{SHOW_PROMO_BADGE}}/g, 'none') // Por enquanto, sem promoções
-        .replace(/{{PROMO_TEXT}}/g, '')
-        .replace(/{{SHOW_ORIGINAL_PRICE}}/g, 'none') // Por enquanto, sem preços originais
-        .replace(/{{ORIGINAL_PRICE}}/g, '');
+        .replace(/{{PRODUCT_ID}}/g, mappedProduct.id)
+        .replace(/{{PRODUCT_NAME}}/g, mappedProduct.nome)
+        .replace(/{{PRODUCT_DESCRIPTION}}/g, mappedProduct.descricao || 'Descrição não disponível')
+        .replace(/{{PRODUCT_PRICE}}/g, precoFinal.toFixed(2).replace('.', ','))
+        .replace(/{{ORIGINAL_PRICE}}/g, precoOriginal.toFixed(2).replace('.', ','))
+        .replace(/{{PRODUCT_CATEGORY}}/g, mappedProduct.categoria || 'Sem categoria')
+        .replace(/{{PRODUCT_IMAGE}}/g, `../images/${mappedProduct.imagem}`)
+        .replace(/{{SHOW_PROMO_BADGE}}/g, showPromoBadge)
+        .replace(/{{PROMO_TEXT}}/g, promoText)
+        .replace(/{{SHOW_ORIGINAL_PRICE}}/g, showOriginalPrice);
       
       return productCard;
     }

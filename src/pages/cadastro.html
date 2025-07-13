@@ -33,7 +33,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             padding: 48px;
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             position: relative;
             overflow: hidden;
         }
@@ -141,6 +141,75 @@
 
         .password-toggle:hover {
             color: #667eea;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-weak { background: #e53e3e; }
+        .strength-medium { background: #d69e2e; }
+        .strength-strong { background: #38a169; }
+
+        .consent-section {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .consent-section h3 {
+            color: #2d3748;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .consent-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .consent-checkbox input[type="checkbox"] {
+            width: auto;
+            margin-top: 2px;
+        }
+
+        .consent-checkbox label {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .consent-checkbox a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .consent-checkbox a:hover {
+            text-decoration: underline;
         }
 
         .signup-btn {
@@ -262,6 +331,11 @@
         .signup-btn.loading {
             color: transparent;
         }
+
+        .required-field::after {
+            content: ' *';
+            color: #e53e3e;
+        }
     </style>
 </head>
 <body>
@@ -278,41 +352,48 @@
 
         <form id="signup-form">
             <div class="form-group">
-                <label for="nome">Nome Completo</label>
+                <label for="nome" class="required-field">Nome Completo</label>
                 <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required>
-                <div class="error-message">Nome é obrigatório</div>
+                <div class="error-message">Nome é obrigatório e deve ter pelo menos 2 caracteres</div>
             </div>
 
             <div class="form-group">
-                <label for="email">E-mail</label>
+                <label for="email" class="required-field">E-mail</label>
                 <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
                 <div class="error-message">E-mail válido é obrigatório</div>
             </div>
 
             <div class="form-group">
-                <label for="telefone">Telefone</label>
+                <label for="telefone" class="required-field">Telefone</label>
                 <input type="tel" id="telefone" name="telefone" placeholder="(62) 99999-9999" required>
                 <div class="error-message">Telefone é obrigatório</div>
             </div>
 
             <div class="form-group">
-                <label for="endereco">Endereço</label>
+                <label for="endereco">Endereço (Opcional)</label>
                 <input type="text" id="endereco" name="endereco" placeholder="Digite seu endereço completo">
+                <div class="error-message">Endereço inválido</div>
             </div>
 
             <div class="form-group">
-                <label for="senha">Senha</label>
+                <label for="senha" class="required-field">Senha</label>
                 <div class="input-wrapper">
                     <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
                     <button type="button" class="password-toggle" onclick="togglePassword('senha')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
-                <div class="error-message">Senha deve ter pelo menos 6 caracteres</div>
+                <div class="password-strength">
+                    <span id="strength-text">Força da senha</span>
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strength-fill"></div>
+                    </div>
+                </div>
+                <div class="error-message">Senha deve ter pelo menos 8 caracteres, incluindo letra maiúscula, minúscula e número</div>
             </div>
 
             <div class="form-group">
-                <label for="confirmar-senha">Confirmar Senha</label>
+                <label for="confirmar-senha" class="required-field">Confirmar Senha</label>
                 <div class="input-wrapper">
                     <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Confirme sua senha" required>
                     <button type="button" class="password-toggle" onclick="togglePassword('confirmar-senha')">
@@ -320,6 +401,34 @@
                     </button>
                 </div>
                 <div class="error-message">Senhas não coincidem</div>
+            </div>
+
+            <!-- Seção de Consentimento LGPD -->
+            <div class="consent-section">
+                <h3>Consentimento e Privacidade</h3>
+                
+                <div class="consent-checkbox">
+                    <input type="checkbox" id="consent-lgpd" name="consent-lgpd" required>
+                    <label for="consent-lgpd">
+                        Concordo com o processamento dos meus dados pessoais conforme a 
+                        <a href="#" onclick="showPrivacyPolicy()">Política de Privacidade</a> e 
+                        <a href="#" onclick="showTerms()">Termos de Uso</a>.
+                    </label>
+                </div>
+
+                <div class="consent-checkbox">
+                    <input type="checkbox" id="consent-marketing" name="consent-marketing">
+                    <label for="consent-marketing">
+                        Aceito receber comunicações promocionais e novidades por e-mail (opcional).
+                    </label>
+                </div>
+
+                <div class="consent-checkbox">
+                    <input type="checkbox" id="consent-third-party" name="consent-third-party">
+                    <label for="consent-third-party">
+                        Autorizo o compartilhamento dos meus dados com parceiros para melhorar a experiência (opcional).
+                    </label>
+                </div>
             </div>
 
             <button type="submit" class="signup-btn" id="signup-btn">
@@ -353,6 +462,50 @@
             }
         }
 
+        // Função para verificar força da senha
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const feedback = [];
+
+            if (password.length >= 8) strength += 1;
+            else feedback.push('Pelo menos 8 caracteres');
+
+            if (/[a-z]/.test(password)) strength += 1;
+            else feedback.push('Uma letra minúscula');
+
+            if (/[A-Z]/.test(password)) strength += 1;
+            else feedback.push('Uma letra maiúscula');
+
+            if (/[0-9]/.test(password)) strength += 1;
+            else feedback.push('Um número');
+
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            else feedback.push('Um caractere especial');
+
+            return { strength, feedback };
+        }
+
+        // Função para atualizar indicador de força da senha
+        function updatePasswordStrength(password) {
+            const { strength, feedback } = checkPasswordStrength(password);
+            const strengthFill = document.getElementById('strength-fill');
+            const strengthText = document.getElementById('strength-text');
+
+            strengthFill.style.width = (strength * 20) + '%';
+            strengthFill.className = 'strength-fill';
+
+            if (strength <= 2) {
+                strengthFill.classList.add('strength-weak');
+                strengthText.textContent = 'Senha fraca';
+            } else if (strength <= 3) {
+                strengthFill.classList.add('strength-medium');
+                strengthText.textContent = 'Senha média';
+            } else {
+                strengthFill.classList.add('strength-strong');
+                strengthText.textContent = 'Senha forte';
+            }
+        }
+
         // Função para validar formulário
         function validateForm() {
             let isValid = true;
@@ -365,7 +518,7 @@
 
             // Validar nome
             const nome = document.getElementById('nome');
-            if (!nome.value.trim()) {
+            if (!nome.value.trim() || nome.value.trim().length < 2) {
                 nome.parentElement.classList.add('error');
                 isValid = false;
             }
@@ -380,14 +533,16 @@
 
             // Validar telefone
             const telefone = document.getElementById('telefone');
-            if (!telefone.value.trim()) {
+            const phoneRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
+            if (!phoneRegex.test(telefone.value)) {
                 telefone.parentElement.classList.add('error');
                 isValid = false;
             }
 
             // Validar senha
             const senha = document.getElementById('senha');
-            if (senha.value.length < 6) {
+            const { strength } = checkPasswordStrength(senha.value);
+            if (strength < 3) {
                 senha.parentElement.classList.add('error');
                 isValid = false;
             }
@@ -396,6 +551,13 @@
             const confirmarSenha = document.getElementById('confirmar-senha');
             if (senha.value !== confirmarSenha.value) {
                 confirmarSenha.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            // Validar consentimento LGPD
+            const consentLgpd = document.getElementById('consent-lgpd');
+            if (!consentLgpd.checked) {
+                showNotification('É necessário aceitar a política de privacidade', 'error');
                 isValid = false;
             }
 
@@ -433,6 +595,20 @@
             }, 5000);
         }
 
+        // Funções para mostrar políticas
+        function showPrivacyPolicy() {
+            alert('Política de Privacidade:\n\n1. Coletamos apenas dados necessários para o funcionamento do serviço\n2. Seus dados são armazenados de forma segura\n3. Não compartilhamos seus dados sem consentimento\n4. Você pode solicitar exclusão dos seus dados a qualquer momento\n5. Utilizamos cookies para melhorar sua experiência');
+        }
+
+        function showTerms() {
+            alert('Termos de Uso:\n\n1. Você é responsável pela veracidade dos dados informados\n2. O uso do serviço deve ser feito de forma ética\n3. Reservamo-nos o direito de suspender contas que violem os termos\n4. Os preços podem ser alterados sem aviso prévio\n5. Entregas são feitas conforme disponibilidade');
+        }
+
+        // Event listeners
+        document.getElementById('senha').addEventListener('input', function() {
+            updatePasswordStrength(this.value);
+        });
+
         // Manipular envio do formulário
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -449,11 +625,13 @@
             try {
                 const formData = new FormData(this);
                 const usuarioData = {
-                    name: formData.get('nome'),
-                    email: formData.get('email'),
+                    name: formData.get('nome').trim(),
+                    email: formData.get('email').toLowerCase().trim(),
                     phone: formData.get('telefone'),
-                    address: formData.get('endereco'),
-                    password: formData.get('senha')
+                    address: formData.get('endereco') || null,
+                    password: formData.get('senha'),
+                    consentMarketing: formData.get('consent-marketing') === 'on',
+                    consentThirdParty: formData.get('consent-third-party') === 'on'
                 };
 
                 // Registrar usuário
@@ -480,6 +658,8 @@
                     errorMessage = 'Este e-mail já está cadastrado. Tente fazer login.';
                 } else if (error.message.includes('validation')) {
                     errorMessage = 'Dados inválidos. Verifique as informações.';
+                } else if (error.message.includes('network')) {
+                    errorMessage = 'Erro de conexão. Verifique sua internet.';
                 }
                 
                 showNotification(errorMessage, 'error');

@@ -11,7 +11,7 @@ const API_CONFIG = {
         CREATE_PRODUTO: '/products',
         
         // Usuários
-        CREATE_USUARIO: '/users',
+        CREATE_USUARIO: '/auth/register',
         LOGIN_USUARIO: '/auth/login',
         GET_USUARIO: '/users',
         UPDATE_USUARIO: '/users',
