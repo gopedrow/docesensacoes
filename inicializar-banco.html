@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicializar Banco de Dados - Doce Sensações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .step h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        
+        .api-url {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Inicializar Banco de Dados - Doce Sensações</h1>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 1: Verificar Status da API
+            </h3>
+            <p>Primeiro, vamos verificar se a API está funcionando:</p>
+            <div class="api-url">https://docesensacoes-2.onrender.com/api/test</div>
+            <button onclick="testAPI()">Testar API</button>
+            <div id="api-result" class="result info">
+                Clique em "Testar API" para verificar o status...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 2: Inicializar Banco de Dados
+            </h3>
+            <p>Execute a inicialização do banco de dados:</p>
+            <div class="api-url">POST https://docesensacoes-2.onrender.com/api/init-database</div>
+            <button onclick="initDatabase()" id="init-btn">Inicializar Banco</button>
+            <div id="init-result" class="result info">
+                Clique em "Inicializar Banco" para criar as tabelas...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 3: Testar Cadastro de Usuário
+            </h3>
+            <p>Teste se o cadastro está funcionando:</p>
+            <div class="api-url">POST https://docesensacoes-2.onrender.com/api/auth/register</div>
+            <button onclick="testRegister()" id="register-btn">Testar Cadastro</button>
+            <div id="register-result" class="result info">
+                Clique em "Testar Cadastro" para verificar...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 4: Testar Login
+            </h3>
+            <p>Teste se o login está funcionando:</p>
+            <div class="api-url">POST https://docesensacoes-2.onrender.com/api/auth/login</div>
+            <button onclick="testLogin()" id="login-btn">Testar Login</button>
+            <div id="login-result" class="result info">
+                Clique em "Testar Login" para verificar...
+            </div>
+        </div>
+        
+        <div class="step">
+            <h3>
+                <span class="status-indicator status-warning"></span>
+                Passo 5: Acessar o Site
+            </h3>
+            <p>Após todos os testes, acesse o site oficial:</p>
+            <div class="api-url">https://docesensacoes.vercel.app</div>
+            <button onclick="openSite()">Abrir Site</button>
+            <p><strong>Credenciais Admin:</strong></p>
+            <ul>
+                <li><strong>Email:</strong> admin@docesensacoes.com</li>
+                <li><strong>Senha:</strong> admin123</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com';
+        
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+        }
+        
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (loading) {
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            } else {
+                button.disabled = false;
+                button.textContent = button.getAttribute('data-original-text') || button.textContent;
+            }
+        }
+        
+        async function testAPI() {
+            setButtonLoading('test-api', true);
+            try {
+                const response = await fetch(`${API_BASE}/api/test`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('api-result', 
+                        `✅ API Funcionando!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}\nAmbiente: ${data.environment}`,
+                        'success'
+                    );
+                } else {
+                    showResult('api-result', 
+                        `❌ Erro na API: ${data.error || 'Erro desconhecido'}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('api-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('test-api', false);
+            }
+        }
+        
+        async function initDatabase() {
+            const button = document.getElementById('init-btn');
+            button.setAttribute('data-original-text', button.textContent);
+            setButtonLoading('init-btn', true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/init-database`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('init-result', 
+                        `✅ Banco inicializado com sucesso!\n\nStatus: ${data.status}\nMensagem: ${data.message}\nTimestamp: ${data.timestamp}`,
+                        'success'
+                    );
+                } else {
+                    showResult('init-result', 
+                        `❌ Erro na inicialização: ${data.error || data.message || 'Erro desconhecido'}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('init-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('init-btn', false);
+            }
+        }
+        
+        async function testRegister() {
+            const button = document.getElementById('register-btn');
+            button.setAttribute('data-original-text', button.textContent);
+            setButtonLoading('register-btn', true);
+            
+            try {
+                const userData = {
+                    name: 'Usuário Teste',
+                    email: `teste${Date.now()}@exemplo.com`,
+                    password: '123456',
+                    phone: '(11) 99999-9999',
+                    address: 'Rua Teste, 123'
+                };
+                
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('register-result', 
+                        `✅ Cadastro funcionando!\n\nUsuário criado:\nID: ${data.data.user.id}\nNome: ${data.data.user.name}\nEmail: ${data.data.user.email}`,
+                        'success'
+                    );
+                } else {
+                    showResult('register-result', 
+                        `❌ Erro no cadastro: ${data.error || data.message || 'Erro desconhecido'}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('register-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('register-btn', false);
+            }
+        }
+        
+        async function testLogin() {
+            const button = document.getElementById('login-btn');
+            button.setAttribute('data-original-text', button.textContent);
+            setButtonLoading('login-btn', true);
+            
+            try {
+                const loginData = {
+                    email: 'admin@docesensacoes.com',
+                    password: 'admin123'
+                };
+                
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('login-result', 
+                        `✅ Login funcionando!\n\nUsuário logado:\nNome: ${data.data.user.name}\nEmail: ${data.data.user.email}\nAdmin: ${data.data.user.isAdmin ? 'Sim' : 'Não'}\nToken: ${data.data.token ? 'Recebido' : 'Não recebido'}`,
+                        'success'
+                    );
+                } else {
+                    showResult('login-result', 
+                        `❌ Erro no login: ${data.error || data.message || 'Erro desconhecido'}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('login-result', 
+                    `❌ Erro de conexão: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setButtonLoading('login-btn', false);
+            }
+        }
+        
+        function openSite() {
+            window.open('https://docesensacoes.vercel.app', '_blank');
+        }
+        
+        // Testar API automaticamente ao carregar a página
+        window.onload = function() {
+            setTimeout(testAPI, 1000);
+        };
+    </script>
+</body>
+</html> 

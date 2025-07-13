@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const initDatabase = require('./scripts/init-database');
 require('dotenv').config();
 
 const app = express();
@@ -28,7 +29,8 @@ app.use(cors({
     'https://docesensacoes.com.br',
     'https://www.docesensacoes.com.br',
     'https://docesensacoes.com',
-    'https://www.docesensacoes.com'
+    'https://www.docesensacoes.com',
+    'https://docesensacoes.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -63,6 +65,26 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Rota para inicializar banco de dados
+app.post('/api/init-database', async (req, res) => {
+  try {
+    console.log('🚀 Inicializando banco de dados via API...');
+    await initDatabase();
+    res.json({
+      status: 200,
+      message: 'Banco de dados inicializado com sucesso!',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Erro ao inicializar banco:', error);
+    res.status(500).json({
+      status: 500,
+      error: 'Erro ao inicializar banco de dados',
+      message: error.message
+    });
+  }
+});
+
 // Rota raiz
 app.get('/', (req, res) => {
   res.json({
@@ -73,7 +95,8 @@ app.get('/', (req, res) => {
       users: '/api/users',
       products: '/api/products',
       orders: '/api/orders',
-      reviews: '/api/reviews'
+      reviews: '/api/reviews',
+      init: '/api/init-database'
     }
   });
 });
@@ -97,11 +120,30 @@ app.use('*', (req, res) => {
   });
 });
 
+// Inicializar banco de dados automaticamente na primeira execução
+let dbInitialized = false;
+
+async function initializeDatabaseOnStartup() {
+  if (!dbInitialized) {
+    try {
+      console.log('🔄 Verificando inicialização do banco de dados...');
+      await initDatabase();
+      dbInitialized = true;
+      console.log('✅ Banco de dados inicializado automaticamente!');
+    } catch (error) {
+      console.log('⚠️ Banco já inicializado ou erro na inicialização automática:', error.message);
+    }
+  }
+}
+
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`📱 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 URL: http://localhost:${PORT}`);
+  
+  // Inicializar banco após 5 segundos
+  setTimeout(initializeDatabaseOnStartup, 5000);
 });
 
 module.exports = app; 
