@@ -243,7 +243,13 @@ class AuthService {
     // Fazer login
     async login(credentials) {
         try {
-            const response = await apiService.loginUsuario(credentials);
+            // Converter senha para password para compatibilidade com o backend
+            const loginData = {
+                email: credentials.email,
+                password: credentials.senha || credentials.password
+            };
+            
+            const response = await apiService.loginUsuario(loginData);
             this.user = response.user;
             // Salvar token JWT
             if (response.token) {
