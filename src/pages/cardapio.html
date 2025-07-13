@@ -480,17 +480,26 @@
         console.log('É array?', Array.isArray(response));
         
         // A API retorna { status: 200, data: [...], count: ... }
-        if (response && Array.isArray(response) && response.length > 0) {
-          console.log('✅ Produtos encontrados:', response.length);
-          console.log('Primeiro produto:', response[0]);
-          displayProducts(response);
-        } else if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
-          console.log('✅ Produtos encontrados (estrutura data):', response.data.length);
-          console.log('Primeiro produto:', response.data[0]);
-          displayProducts(response.data);
+        let produtos = [];
+        
+        if (response && response.data && Array.isArray(response.data)) {
+          produtos = response.data;
+          console.log('✅ Produtos encontrados (estrutura data):', produtos.length);
+          console.log('Primeiro produto:', produtos[0]);
+        } else if (response && Array.isArray(response)) {
+          produtos = response;
+          console.log('✅ Produtos encontrados (array direto):', produtos.length);
+          console.log('Primeiro produto:', produtos[0]);
         } else {
           console.log('❌ Nenhum produto encontrado ou resposta inválida');
           console.log('Estrutura da resposta:', response);
+          showNoProducts();
+          return;
+        }
+        
+        if (produtos.length > 0) {
+          displayProducts(produtos);
+        } else {
           showNoProducts();
         }
       } catch (error) {
@@ -528,8 +537,8 @@
         descricao: produto.description || produto.descricao,
         preco: produto.price || produto.preco,
         categoria: produto.category || produto.categoria,
-        imagem: produto.image_url || produto.imagem || 'dish.png', // fallback
-        estoque: produto.stock_quantity || produto.estoque || 0,
+        imagem: produto.image || produto.image_url || produto.imagem || 'dish.png', // fallback
+        estoque: produto.stock || produto.stock_quantity || produto.estoque || 0,
         desconto: produto.discount_percentage || produto.desconto || 0
       };
       

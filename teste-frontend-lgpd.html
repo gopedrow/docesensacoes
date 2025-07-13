@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Frontend - LGPD e Produtos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #17a2b8;
+            font-weight: bold;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .checkbox-group {
+            margin: 10px 0;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            display: inline;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Frontend - LGPD e Produtos</h1>
+    
+    <div class="container">
+        <h2>Teste 1: API de Produtos</h2>
+        <div class="test-section">
+            <h3>Verificar se os produtos estão sendo carregados</h3>
+            <button onclick="testProducts()">Testar API de Produtos</button>
+            <div id="products-result" class="result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Teste 2: Cadastro com LGPD</h2>
+        <div class="test-section">
+            <h3>Testar cadastro de usuário com consentimentos LGPD</h3>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="name">Nome:</label>
+                    <input type="text" id="name" value="Teste LGPD" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" value="teste.lgpd@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Telefone:</label>
+                    <input type="text" id="phone" value="(11) 99999-9999" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" value="Senha123!" required>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consent-privacy" checked>
+                    <label for="consent-privacy">Concordo com a Política de Privacidade</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consent-marketing">
+                    <label for="consent-marketing">Aceito receber comunicações de marketing</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consent-third-party">
+                    <label for="consent-third-party">Aceito compartilhamento de dados com terceiros</label>
+                </div>
+                
+                <button type="button" onclick="testRegistration()">Testar Cadastro</button>
+            </form>
+            
+            <div id="register-result" class="result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Teste 3: Validações</h2>
+        <div class="test-section">
+            <h3>Testar validações de senha e formato</h3>
+            <button onclick="testValidations()">Testar Validações</button>
+            <div id="validation-result" class="result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Teste 4: Páginas do Site</h2>
+        <div class="test-section">
+            <h3>Links para testar as páginas principais</h3>
+            <a href="https://docesensacoes-2.onrender.com" target="_blank">
+                <button>🏠 Página Inicial</button>
+            </a>
+            <a href="https://docesensacoes-2.onrender.com/src/pages/cadastro.html" target="_blank">
+                <button>📝 Página de Cadastro</button>
+            </a>
+            <a href="https://docesensacoes-2.onrender.com/src/pages/cardapio.html" target="_blank">
+                <button>🍰 Página do Cardápio</button>
+            </a>
+            <a href="https://docesensacoes-2.onrender.com/src/pages/login.html" target="_blank">
+                <button>🔐 Página de Login</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://docesensacoes-2.onrender.com/api';
+
+        async function testProducts() {
+            const resultDiv = document.getElementById('products-result');
+            resultDiv.innerHTML = '🔄 Testando API de produtos...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const products = data.data || data;
+                    const productCount = Array.isArray(products) ? products.length : 0;
+                    
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ API de produtos funcionando!</span>
+                        <br>📊 Total de produtos: ${productCount}
+                        <br>📋 Primeiros 3 produtos:
+                        <br>${JSON.stringify(products.slice(0, 3), null, 2)}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Erro na API: ${data.error || 'Erro desconhecido'}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Erro de conexão: ${error.message}</span>`;
+            }
+        }
+
+        async function testRegistration() {
+            const resultDiv = document.getElementById('register-result');
+            resultDiv.innerHTML = '🔄 Testando cadastro...';
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                password: document.getElementById('password').value,
+                consent_privacy: document.getElementById('consent-privacy').checked,
+                consent_marketing: document.getElementById('consent-marketing').checked,
+                consent_third_party: document.getElementById('consent-third-party').checked
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Cadastro realizado com sucesso!</span>
+                        <br>👤 Usuário: ${data.user?.name || 'N/A'}
+                        <br>📧 Email: ${data.user?.email || 'N/A'}
+                        <br>📱 Telefone: ${data.user?.phone || 'N/A'}
+                        <br>✅ Consentimentos:
+                        <br>  - Privacidade: ${data.user?.consent_privacy ? 'Sim' : 'Não'}
+                        <br>  - Marketing: ${data.user?.consent_marketing ? 'Sim' : 'Não'}
+                        <br>  - Terceiros: ${data.user?.consent_third_party ? 'Sim' : 'Não'}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <span class="error">❌ Erro no cadastro: ${data.error || 'Erro desconhecido'}</span>
+                        <br>📋 Dados enviados: ${JSON.stringify(formData, null, 2)}
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Erro de conexão: ${error.message}</span>`;
+            }
+        }
+
+        function testValidations() {
+            const resultDiv = document.getElementById('validation-result');
+            resultDiv.innerHTML = '🔄 Testando validações...';
+            
+            const tests = [
+                {
+                    name: 'Senha forte',
+                    password: 'Senha123!',
+                    expected: true,
+                    test: (pwd) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(pwd)
+                },
+                {
+                    name: 'Senha fraca',
+                    password: '123',
+                    expected: false,
+                    test: (pwd) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(pwd)
+                },
+                {
+                    name: 'Email válido',
+                    email: 'teste@example.com',
+                    expected: true,
+                    test: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                },
+                {
+                    name: 'Email inválido',
+                    email: 'teste@',
+                    expected: false,
+                    test: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                },
+                {
+                    name: 'Telefone válido',
+                    phone: '(11) 99999-9999',
+                    expected: true,
+                    test: (phone) => /^\(\d{2}\) \d{5}-\d{4}$/.test(phone)
+                },
+                {
+                    name: 'Telefone inválido',
+                    phone: '11999999999',
+                    expected: false,
+                    test: (phone) => /^\(\d{2}\) \d{5}-\d{4}$/.test(phone)
+                }
+            ];
+            
+            let results = '📋 Resultados dos testes de validação:\n\n';
+            
+            tests.forEach(test => {
+                const result = test.test(test.password || test.email || test.phone);
+                const status = result === test.expected ? '✅' : '❌';
+                const value = test.password || test.email || test.phone;
+                
+                results += `${status} ${test.name}: "${value}" - ${result ? 'VÁLIDO' : 'INVÁLIDO'}\n`;
+            });
+            
+            resultDiv.innerHTML = results;
+        }
+
+        // Executar testes automáticos ao carregar a página
+        window.onload = function() {
+            setTimeout(testProducts, 1000);
+        };
+    </script>
+</body>
+</html> 
