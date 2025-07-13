@@ -19,7 +19,17 @@ app.use(limiter);
 
 // CORS configurado corretamente
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:8000', 'https://docesensacoes.onrender.com', 'https://docesensacoessite.vercel.app'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:5000', 
+    'http://localhost:8000', 
+    'https://docesensacoes.onrender.com', 
+    'https://docesensacoessite.vercel.app',
+    'https://docesensacoes.com.br',
+    'https://www.docesensacoes.com.br',
+    'https://docesensacoes.com',
+    'https://www.docesensacoes.com'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
