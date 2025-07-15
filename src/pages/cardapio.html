@@ -174,7 +174,7 @@
     }
 
     .product-name {
-      font-size: 18px;
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
       font-weight: 600;
       color: var(--color-neutral-1);
       margin-bottom: 8px;
@@ -228,9 +228,10 @@
       flex-shrink: 0;
     }
 
-    .add-to-cart-btn:hover {
+    .add-to-cart-btn:hover, .add-to-cart-btn:focus {
       background: var(--color-primary-6);
       transform: scale(1.1);
+      outline: 2px solid var(--color-primary-4);
     }
 
     .add-to-cart-btn i {
@@ -250,10 +251,11 @@
       transition: all 0.3s ease;
     }
 
-    .buy-now-btn:hover {
+    .buy-now-btn:hover, .buy-now-btn:focus {
       background: linear-gradient(135deg, var(--color-primary-6), var(--color-primary-4));
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(235, 46, 125, 0.3);
+      outline: 2px solid var(--color-primary-4);
     }
 
     .recommendation-section {
@@ -336,12 +338,13 @@
     @media (max-width: 768px) {
       header {
         flex-direction: column;
-        align-items: flex-end;
-        gap: 1rem;
+        align-items: flex-start;
+        padding: 1rem;
       }
 
       .products {
         grid-template-columns: 1fr;
+        gap: 1rem;
       }
 
       .product-card {
@@ -384,6 +387,21 @@
       footer {
         flex-direction: column;
       }
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 0.5rem;
+      }
+      .product-info {
+        padding: 10px;
+      }
+      .product-card {
+        min-height: 220px;
+      }
+    }
+    /* Acessibilidade */
+    img[alt=""] {
+      outline: 2px solid #e53e3e;
     }
   </style>
 </head>
@@ -449,12 +467,13 @@
         </div>
     </footer>
 
+  <script src="../componentes/product-card.js"></script>
+  <script src="../componentes/flash-message.js"></script>
+
   <script>
-    $(document).ready(function() {
-      // Carregar produtos da API
+    $(document).ready(async function() {
+      await loadProductTemplate();
       loadProducts();
-      
-      // Configurar ScrollReveal
       ScrollReveal().reveal('.product-card', {
         origin: 'bottom',
         duration: 1000,
@@ -509,120 +528,30 @@
       }
     }
 
-    // Função para exibir produtos
+    // Função para exibir produtos usando o Web Component
     function displayProducts(produtos) {
       const container = $('#products-container');
       container.empty();
-      
       produtos.forEach(produto => {
-        const productCard = createProductCardFromTemplate(produto);
-        container.append(productCard);
+        const preco = produto.price || produto.preco;
+        const desconto = produto.discount_percentage || produto.desconto || 0;
+        const precoFinal = desconto > 0 ? preco * (1 - desconto / 100) : preco;
+        const card = document.createElement('product-card');
+        card.setAttribute('product-id', produto.id);
+        card.setAttribute('name', produto.name || produto.nome);
+        card.setAttribute('description', produto.description || produto.descricao);
+        card.setAttribute('price', preco);
+        card.setAttribute('category', produto.category || produto.categoria);
+        card.setAttribute('image', produto.image || produto.image_url || produto.imagem || 'dish.png');
+        card.setAttribute('discount', desconto);
+        container.append(card);
       });
-      
-      // Reativar ScrollReveal para os novos elementos
       ScrollReveal().reveal('.product-card', {
         origin: 'bottom',
         duration: 1000,
         distance: '20px',
         delay: 200
       });
-    }
-
-    // Função para criar card de produto usando o template
-    function createProductCardFromTemplate(produto) {
-      // Mapear campos do banco para o template
-      const mappedProduct = {
-        id: produto.id,
-        nome: produto.name || produto.nome,
-        descricao: produto.description || produto.descricao,
-        preco: produto.price || produto.preco,
-        categoria: produto.category || produto.categoria,
-        imagem: produto.image || produto.image_url || produto.imagem || 'dish.png', // fallback
-        estoque: produto.stock || produto.stock_quantity || produto.estoque || 0,
-        desconto: produto.discount_percentage || produto.desconto || 0
-      };
-      
-      // Calcular preço com desconto
-      const precoOriginal = parseFloat(mappedProduct.preco);
-      const desconto = parseFloat(mappedProduct.desconto);
-      const precoFinal = desconto > 0 ? precoOriginal * (1 - desconto / 100) : precoOriginal;
-      
-      // Determinar se deve mostrar badge de promoção
-      const showPromoBadge = desconto > 0 ? 'block' : 'none';
-      const promoText = desconto > 0 ? `${desconto}% OFF` : '';
-      
-      // Determinar se deve mostrar preço original
-      const showOriginalPrice = desconto > 0 ? 'block' : 'none';
-      
-      // Carregar o template
-      const template = `
-        <div class="product-card" data-product-id="{{PRODUCT_ID}}">
-          <div class="product-image-container">
-            <!-- Badge de promoção (opcional) -->
-            <div class="promo-badge" style="display: {{SHOW_PROMO_BADGE}};">
-              {{PROMO_TEXT}}
-            </div>
-            
-            <!-- Imagem do produto -->
-            <div class="product-image">
-              <img src="{{PRODUCT_IMAGE}}" alt="{{PRODUCT_NAME}}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-              <!-- Placeholder caso a imagem não carregue -->
-              <div class="image-placeholder" style="display: none;">
-                <i class="fa-solid fa-image"></i>
-                <span>Imagem não disponível</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="product-info">
-            <!-- Preço original (se houver desconto) -->
-            <div class="price-original" style="display: {{SHOW_ORIGINAL_PRICE}};">
-              R$ {{ORIGINAL_PRICE}}
-            </div>
-            
-            <!-- Preço atual -->
-            <div class="product-price">
-              R$ {{PRODUCT_PRICE}}
-            </div>
-            
-            <!-- Nome do produto -->
-            <h3 class="product-name">{{PRODUCT_NAME}}</h3>
-            
-            <!-- Descrição do produto -->
-            <p class="product-description">{{PRODUCT_DESCRIPTION}}</p>
-            
-            <!-- Categoria -->
-            <div class="product-category">
-              <span class="category-badge">{{PRODUCT_CATEGORY}}</span>
-            </div>
-            
-            <!-- Ações -->
-            <div class="product-actions">
-              <button class="add-to-cart-btn" onclick="addToCart('{{PRODUCT_ID}}')" title="Adicionar ao carrinho" ${mappedProduct.estoque <= 0 ? 'disabled' : ''}>
-                <i class="fa-solid fa-cart-plus"></i>
-              </button>
-              <button class="buy-now-btn" onclick="buyNow('{{PRODUCT_ID}}')" ${mappedProduct.estoque <= 0 ? 'disabled' : ''}>
-                ${mappedProduct.estoque <= 0 ? 'Indisponível' : 'Comprar agora'}
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // Substituir placeholders pelos dados do produto
-      let productCard = template
-        .replace(/{{PRODUCT_ID}}/g, mappedProduct.id)
-        .replace(/{{PRODUCT_NAME}}/g, mappedProduct.nome)
-        .replace(/{{PRODUCT_DESCRIPTION}}/g, mappedProduct.descricao || 'Descrição não disponível')
-        .replace(/{{PRODUCT_PRICE}}/g, precoFinal.toFixed(2).replace('.', ','))
-        .replace(/{{ORIGINAL_PRICE}}/g, precoOriginal.toFixed(2).replace('.', ','))
-        .replace(/{{PRODUCT_CATEGORY}}/g, mappedProduct.categoria || 'Sem categoria')
-        .replace(/{{PRODUCT_IMAGE}}/g, `../images/${mappedProduct.imagem}`)
-        .replace(/{{SHOW_PROMO_BADGE}}/g, showPromoBadge)
-        .replace(/{{PROMO_TEXT}}/g, promoText)
-        .replace(/{{SHOW_ORIGINAL_PRICE}}/g, showOriginalPrice);
-      
-      return productCard;
     }
 
     // Função para mostrar mensagem de erro
@@ -729,6 +658,19 @@
         </style>
       `);
     }
+  </script>
+
+  <script>
+    // Exibir mensagem global se houver
+    document.addEventListener('DOMContentLoaded', function() {
+      const flash = window.getAndClearFlashMessage && window.getAndClearFlashMessage();
+      if (flash && flash.message) {
+        const msg = document.createElement('flash-message');
+        msg.setAttribute('message', flash.message);
+        msg.setAttribute('type', flash.type || 'info');
+        document.body.appendChild(msg);
+      }
+    });
   </script>
 
 </body>

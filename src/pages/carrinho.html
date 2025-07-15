@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="../javascript/config.js"></script>
+  <script src="../componentes/flash-message.js"></script>
   <style>
     :root {
       --color-primary-1: #FFF0F5;
@@ -15,31 +16,26 @@
       --color-primary-4: #FF1493;
       --color-primary-5: #FF69B4;
       --color-primary-6: #EB2E7D;
-
       --color-neutral-0: #fff;
       --color-neutral-1: #1d1d1d;
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Inter', sans-serif;
     }
-
     body {
       background-color: var(--color-primary-1);
       padding: 2rem;
       color: var(--color-neutral-1);
     }
-
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 2rem;
     }
-
     .back-btn {
       background: var(--color-primary-6);
       color: white;
@@ -51,30 +47,30 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      transition: background 0.3s;
     }
-
+    .back-btn:hover, .back-btn:focus {
+      background: var(--color-primary-4);
+      outline: 2px solid var(--color-primary-6);
+    }
     h1 {
-      font-size: 2rem;
+      font-size: clamp(1.3rem, 3vw, 2rem);
       margin-bottom: 2rem;
     }
-
     .cart-container {
       max-width: 1000px;
       margin: 0 auto;
     }
-
     .empty-cart {
       text-align: center;
       padding: 4rem 2rem;
       color: #666;
     }
-
     .empty-cart i {
       font-size: 4rem;
       color: var(--color-primary-3);
       margin-bottom: 1rem;
     }
-
     .cart-item {
       background-color: var(--color-neutral-0);
       border-radius: 16px;
@@ -84,8 +80,13 @@
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.3s, transform 0.3s;
     }
-
+    .cart-item:hover, .cart-item:focus-within {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+      outline: 2px solid var(--color-primary-4);
+    }
     .cart-item img {
       width: 80px;
       height: 80px;
@@ -93,34 +94,29 @@
       border-radius: 8px;
       margin-right: 1.5rem;
     }
-
     .item-info {
       flex: 1;
     }
-
     .item-title {
       font-weight: 600;
       margin-bottom: 0.3rem;
+      font-size: clamp(1rem, 2vw, 1.2rem);
     }
-
     .item-description {
       font-size: 0.9rem;
       color: #666;
     }
-
     .item-price {
       font-weight: 700;
       margin-left: 1.5rem;
       white-space: nowrap;
       color: var(--color-primary-6);
     }
-
     .quantity-controls {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
-
     .quantity-controls button {
       padding: 0.5rem 1.2rem;
       background-color: var(--color-primary-3);
@@ -129,12 +125,12 @@
       border-radius: 32px;
       cursor: pointer;
       font-weight: 600;
+      transition: background 0.3s;
     }
-
-    .quantity-controls button:hover {
+    .quantity-controls button:hover, .quantity-controls button:focus {
       background-color: var(--color-primary-6);
+      outline: 2px solid var(--color-primary-4);
     }
-
     .remove-btn {
       background: #ff4757;
       color: white;
@@ -143,8 +139,12 @@
       border-radius: 8px;
       cursor: pointer;
       margin-left: 1rem;
+      transition: background 0.3s;
     }
-
+    .remove-btn:hover, .remove-btn:focus {
+      background: #c53030;
+      outline: 2px solid #ff4757;
+    }
     .delivery-options {
       background-color: var(--color-neutral-0);
       border-radius: 16px;
@@ -152,12 +152,10 @@
       margin-top: 2rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
-
     .delivery-options h2 {
       font-size: 1.2rem;
       margin-bottom: 1rem;
     }
-
     .option {
       display: flex;
       align-items: flex-start;
@@ -165,11 +163,9 @@
       margin-bottom: 1rem;
       font-size: 0.9rem;
     }
-
     .option input {
       margin-top: 4px;
     }
-
     .summary-card {
       background-color: var(--color-primary-1);
       border-radius: 12px;
@@ -177,13 +173,11 @@
       margin-top: 1rem;
       font-size: 0.85rem;
     }
-
     .summary-row {
       display: flex;
       justify-content: space-between;
       margin-bottom: 0.5rem;
     }
-
     .checkout-button {
       margin-top: 2rem;
       width: 100%;
@@ -197,16 +191,40 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-
-    .checkout-button:hover {
+    .checkout-button:hover, .checkout-button:focus {
       background-color: var(--color-primary-6);
+      outline: 2px solid var(--color-primary-4);
     }
-
     .checkout-button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
-  </style>
+    @media (max-width: 768px) {
+      .cart-container {
+        padding: 0.5rem;
+      }
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+      }
+      .item-price {
+        margin-left: 0;
+        margin-top: 0.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .cart-container {
+        padding: 0.2rem;
+      }
+      h1 {
+        font-size: 1.1rem;
+      }
+    }
+    img[alt=""] {
+      outline: 2px solid #e53e3e;
+    }
+    </style>
 </head>
 <body>
   <div class="cart-container">

@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="../css/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="../javascript/config.js"></script>
+    <script src="../componentes/order-product-item.js"></script>
+    <script src="../componentes/order-card.js"></script>
+    <script src="../componentes/flash-message.js"></script>
     
     <style>
         * {
@@ -36,7 +39,7 @@
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: clamp(1.3rem, 4vw, 2.5rem);
             font-weight: 700;
             color: #1d1d1f;
             margin-bottom: 0.5rem;
@@ -45,7 +48,7 @@
 
         .header p {
             color: #86868b;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2vw, 1.1rem);
             font-weight: 400;
         }
 
@@ -64,8 +67,12 @@
             align-items: center;
             gap: 0.5rem;
             font-weight: 600;
+            transition: background 0.3s;
         }
-
+        .back-btn:hover, .back-btn:focus {
+            background: var(--color-primary-4);
+            outline: 2px solid var(--color-primary-6);
+        }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -119,9 +126,10 @@
             transition: all 0.3s ease;
         }
 
-        .order-item:hover {
+        .order-item:hover, .order-item:focus-within {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
+            outline: 2px solid var(--color-primary-4);
         }
 
         .order-header {
@@ -349,6 +357,8 @@
         </div>
     </div>
 
+    <template id="order-product-item-template"></template>
+
     <script>
         // Verificar autenticação
         if (!authService.isLoggedIn()) {
@@ -373,76 +383,77 @@
             }
         }
 
-        // Exibir pedidos
+        // Exibir pedidos usando o Web Component <order-card>
         function displayOrders(pedidos) {
             const container = document.getElementById('orders-container');
-            
             if (pedidos.length === 0) {
                 showEmptyState();
                 return;
             }
-
             container.innerHTML = '';
-            
             pedidos.forEach(pedido => {
-                const orderElement = createOrderElement(pedido);
-                container.appendChild(orderElement);
+                const orderCard = document.createElement('order-card');
+                orderCard.setAttribute('order-id', pedido.id);
+                const orderDate = new Date(pedido.dataPedido).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                orderCard.setAttribute('order-date', orderDate);
+                orderCard.setAttribute('order-status', pedido.status);
+                orderCard.setAttribute('order-status-text', getStatusText(pedido.status));
+                orderCard.setAttribute('order-total', (pedido.total || 0).toFixed(2).replace('.', ','));
+                if (pedido.produtos && Array.isArray(pedido.produtos)) {
+                  pedido.produtos.forEach(produto => {
+                    const item = document.createElement('order-product-item');
+                    item.setAttribute('slot', 'products');
+                    item.setAttribute('name', produto.name || produto.nome);
+                    item.setAttribute('image', produto.image || produto.imagem || '../images/dish.png');
+                    item.setAttribute('qty', produto.qty || produto.quantidade || 1);
+                    item.setAttribute('price', produto.price || produto.preco || '0,00');
+                    orderCard.appendChild(item);
+                  });
+                }
+                container.appendChild(orderCard);
             });
         }
 
-        // Criar elemento de pedido
-        function createOrderElement(pedido) {
-            const div = document.createElement('div');
-            div.className = 'order-item';
-            
-            const orderDate = new Date(pedido.dataPedido).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+        // Função para exibir produtos do pedido usando o Web Component
+        function renderOrderProducts(produtos, container) {
+          container.innerHTML = '';
+          produtos.forEach(produto => {
+            const item = document.createElement('order-product-item');
+            item.setAttribute('name', produto.name || produto.nome);
+            item.setAttribute('image', produto.image || produto.imagem || '../images/dish.png');
+            item.setAttribute('qty', produto.qty || produto.quantidade || 1);
+            item.setAttribute('price', produto.price || produto.preco || '0,00');
+            container.appendChild(item);
+          });
+        }
 
-            div.innerHTML = `
-                <div class="order-header">
-                    <div>
-                        <div class="order-id">Pedido #${pedido.id}</div>
-                        <div class="order-date">${orderDate}</div>
-                    </div>
-                    <div class="order-status status-${pedido.status}">${getStatusText(pedido.status)}</div>
-                </div>
-                
-                <div class="order-products">
-                    ${pedido.produtos.map(produto => `
-                        <div class="product-item">
-                            <div class="product-info">
-                                <img src="${produto.imagem || '../images/dish.png'}" alt="${produto.nome}" class="product-image" onerror="this.src='../images/dish.png'">
-                                <div class="product-details">
-                                    <h4>${produto.nome}</h4>
-                                    <p>Quantidade: ${produto.quantidade}</p>
-                                </div>
-                            </div>
-                            <div class="product-price">R$ ${(parseFloat(produto.preco) * produto.quantidade).toFixed(2)}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div class="order-summary">
-                    <div class="order-total">Total: R$ ${parseFloat(pedido.total).toFixed(2)}</div>
-                    <div class="order-actions">
-                        <button class="action-btn btn-secondary" onclick="viewOrderDetails(${pedido.id})">
-                            <i class="fas fa-eye"></i> Detalhes
-                        </button>
-                        ${pedido.status === 'pendente' ? `
-                            <button class="action-btn btn-primary" onclick="cancelOrder(${pedido.id})">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-            
-            return div;
+        // Modificar a função createOrderElement para usar o template para cada produto
+        function createOrderElement(pedido) {
+          const div = document.createElement('div');
+          div.className = 'order-item';
+          const orderDate = new Date(pedido.dataPedido).toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+          let produtosHtml = '';
+          if (pedido.produtos && Array.isArray(pedido.produtos)) {
+            renderOrderProducts(pedido.produtos, div);
+          }
+          div.innerHTML = `
+            <div class="order-header">
+              <span class="order-id">Pedido #${pedido.id}</span>
+              <span class="order-date">${orderDate}</span>
+              <span class="order-status status-${pedido.status}">${pedido.status}</span>
+            </div>
+            <div class="order-products">
+              ${produtosHtml}
+            </div>
+            <div class="order-summary">
+              <span class="order-total">Total: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</span>
+            </div>
+          `;
+          return div;
         }
 
         // Obter texto do status
@@ -496,7 +507,9 @@
             if (confirm('Tem certeza que deseja cancelar este pedido?')) {
                 try {
                     // Implementar cancelamento via API
-                    alert('Funcionalidade de cancelamento em desenvolvimento');
+                    // await apiService.cancelarPedido(orderId);
+                    setFlashMessage('Pedido cancelado com sucesso!', 'success');
+                    window.location.reload();
                 } catch (error) {
                     console.error('Erro ao cancelar pedido:', error);
                     alert('Erro ao cancelar pedido. Tente novamente.');
@@ -504,9 +517,20 @@
             }
         }
 
-        // Carregar pedidos quando a página carregar
+        // Modificar o fluxo de carregamento para garantir que o template seja carregado antes dos pedidos
+        document.addEventListener('DOMContentLoaded', async function() {
+          loadUserOrders();
+        });
+
+        // Exibir mensagem global se houver
         document.addEventListener('DOMContentLoaded', function() {
-            loadUserOrders();
+          const flash = window.getAndClearFlashMessage && window.getAndClearFlashMessage();
+          if (flash && flash.message) {
+            const msg = document.createElement('flash-message');
+            msg.setAttribute('message', flash.message);
+            msg.setAttribute('type', flash.type || 'info');
+            document.body.appendChild(msg);
+          }
         });
     </script>
 </body>

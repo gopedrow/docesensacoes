@@ -1,0 +1,14 @@
+<!-- Componente de card de pedido -->
+<div class="order-card">
+  <div class="order-header">
+    <span class="order-id">Pedido #{{ORDER_ID}}</span>
+    <span class="order-date">{{ORDER_DATE}}</span>
+    <span class="order-status status-{{ORDER_STATUS}}">{{ORDER_STATUS_TEXT}}</span>
+  </div>
+  <div class="order-products">
+    <slot name="products"></slot>
+  </div>
+  <div class="order-summary">
+    <span class="order-total">Total: R$ {{ORDER_TOTAL}}</span>
+  </div>
+</div> 

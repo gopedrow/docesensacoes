@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../javascript/config.js"></script>
+    <script src="../componentes/flash-message.js"></script>
     
     <style>
         * {
@@ -1083,6 +1084,18 @@
         window.onload = function() {
             loadDashboardData();
         };
+    </script>
+    <script>
+        // Exibir mensagem global se houver
+        document.addEventListener('DOMContentLoaded', function() {
+          const flash = window.getAndClearFlashMessage && window.getAndClearFlashMessage();
+          if (flash && flash.message) {
+            const msg = document.createElement('flash-message');
+            msg.setAttribute('message', flash.message);
+            msg.setAttribute('type', flash.type || 'info');
+            document.body.appendChild(msg);
+          }
+        });
     </script>
 </body>
 </html> 

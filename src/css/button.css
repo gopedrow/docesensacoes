@@ -64,9 +64,17 @@
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.2s;
 }
 
-.buy-button:hover {
+.buy-button:hover, .buy-button:focus {
   background-color: #e553a0;
+  color: #fff;
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+#cta_buttons a:focus {
+  outline: 2px solid var(--color-focus);
+  background: var(--color-focus-bg);
 }

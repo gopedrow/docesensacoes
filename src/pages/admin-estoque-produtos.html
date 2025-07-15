@@ -22,7 +22,8 @@
   />
 
   <!-- Incluir componente de card de produto -->
-  <script src="../componentes/product-stock-card.html"></script>
+  <script src="../componentes/product-stock-card.js"></script>
+  <script src="../componentes/flash-message.js"></script>
 
   <style>
     * {
@@ -177,6 +178,17 @@
   </div>
 
   <script>
+    // Exibir mensagem global se houver
+    document.addEventListener('DOMContentLoaded', function() {
+      const flash = window.getAndClearFlashMessage && window.getAndClearFlashMessage();
+      if (flash && flash.message) {
+        const msg = document.createElement('flash-message');
+        msg.setAttribute('message', flash.message);
+        msg.setAttribute('type', flash.type || 'info');
+        document.body.appendChild(msg);
+      }
+    });
+
     // Dados de exemplo baseados no formulário de cadastro
     let produtos = [
       {
@@ -250,10 +262,49 @@
       }
     };
 
-    // Carregar produtos ao iniciar a página
-    window.onload = function() {
-      loadProductsFromAPI();
-    };
+    // Função para renderizar os cards de produtos usando o Web Component
+    function renderProductCards(produtos, containerId) {
+      const container = document.getElementById(containerId);
+      if (!produtos || produtos.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>Nenhum produto encontrado</h3>
+            <p>Cadastre seu primeiro produto para começar!</p>
+            <button onclick="window.location.href='admin-cadastro-produto.html'" class="btn-default" style="margin-top: 1rem;">
+              <i class="fas fa-plus"></i> Cadastrar Produto
+            </button>
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = '';
+      produtos.forEach(produto => {
+        const card = document.createElement('product-stock-card');
+        card.setAttribute('product-id', produto.id);
+        card.setAttribute('name', produto.nome);
+        card.setAttribute('description', produto.descricao);
+        card.setAttribute('price', produto.preco);
+        card.setAttribute('category', produto.categoria);
+        card.setAttribute('image', produto.imagem || 'dish.png');
+        card.setAttribute('discount', produto.desconto || 0);
+        card.setAttribute('status', produto.status || '');
+        card.setAttribute('modalidade', Array.isArray(produto.modalidade) ? produto.modalidade.join(', ') : (produto.modalidade || ''));
+        container.appendChild(card);
+      });
+    }
+
+    // Função para atualizar estatísticas
+    function updateProductStats(produtos) {
+      const total = produtos.length;
+      const ativos = produtos.filter(p => p.status === 'ativo').length;
+      const pendentes = produtos.filter(p => p.status === 'pendente').length;
+      const valorTotal = produtos.reduce((sum, p) => sum + p.preco, 0);
+
+      document.getElementById('total-produtos').textContent = total;
+      document.getElementById('produtos-ativos').textContent = ativos;
+      document.getElementById('produtos-pendentes').textContent = pendentes;
+      document.getElementById('valor-total').textContent = `R$ ${valorTotal.toFixed(2)}`;
+    }
 
     // Integração com Google Sheets e localStorage
     async function loadProductsFromAPI() {
@@ -314,71 +365,10 @@
       }
     }
 
-    // Função para renderizar os cards de produtos
-    function renderProductCards(produtos, containerId) {
-      const container = document.getElementById(containerId);
-      
-      if (!produtos || produtos.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <h3>Nenhum produto encontrado</h3>
-            <p>Cadastre seu primeiro produto para começar!</p>
-            <button onclick="window.location.href='admin-cadastro-produto.html'" class="btn-default" style="margin-top: 1rem;">
-              <i class="fas fa-plus"></i> Cadastrar Produto
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      const produtosHTML = produtos.map(produto => `
-        <div class="product-card" style="background: white; border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #1d1d1f; margin: 0;">${produto.nome}</h3>
-            <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; background: ${produto.status === 'ativo' ? '#34c759' : produto.status === 'pendente' ? '#ff9500' : '#ff3b30'}; color: white;">
-              ${produto.status}
-            </span>
-          </div>
-          
-          <p style="color: #86868b; margin-bottom: 1rem; line-height: 1.4;">${produto.descricao}</p>
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <span style="font-size: 1.1rem; font-weight: 600; color: #007aff;">R$ ${produto.preco.toFixed(2)}</span>
-            <span style="color: #86868b; font-size: 0.9rem;">${produto.categoria}</span>
-          </div>
-          
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-            ${produto.modalidade ? produto.modalidade.map(m => 
-              `<span style="background: #f2f2f7; color: #1d1d1f; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${m}</span>`
-            ).join('') : ''}
-          </div>
-          
-          <div style="display: flex; gap: 0.5rem;">
-            <button onclick="onEditProduct(${produto.id})" style="background: #007aff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
-              <i class="fas fa-edit"></i> Editar
-            </button>
-            <button onclick="onDeleteProduct(${produto.id})" style="background: #ff3b30; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
-              <i class="fas fa-trash"></i> Excluir
-            </button>
-          </div>
-        </div>
-      `).join('');
-
-      container.innerHTML = produtosHTML;
-    }
-
-    // Função para atualizar estatísticas
-    function updateProductStats(produtos) {
-      const total = produtos.length;
-      const ativos = produtos.filter(p => p.status === 'ativo').length;
-      const pendentes = produtos.filter(p => p.status === 'pendente').length;
-      const valorTotal = produtos.reduce((sum, p) => sum + p.preco, 0);
-
-      document.getElementById('total-produtos').textContent = total;
-      document.getElementById('produtos-ativos').textContent = ativos;
-      document.getElementById('produtos-pendentes').textContent = pendentes;
-      document.getElementById('valor-total').textContent = `R$ ${valorTotal.toFixed(2)}`;
-    }
+    // Modificar o fluxo de carregamento para garantir que o template seja carregado antes dos produtos
+    window.onload = async function() {
+      loadProductsFromAPI();
+    };
   </script>
 </body>
 </html> 

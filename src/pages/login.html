@@ -55,7 +55,7 @@
 
         .login-header h1 {
             color: #2d3748;
-            font-size: 28px;
+            font-size: clamp(1.3rem, 4vw, 2rem);
             font-weight: 700;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
@@ -63,7 +63,7 @@
 
         .login-header p {
             color: #718096;
-            font-size: 16px;
+            font-size: clamp(1rem, 2vw, 1.1rem);
             font-weight: 400;
         }
 
@@ -123,8 +123,9 @@
             transition: color 0.3s ease;
         }
 
-        .password-toggle:hover {
+        .password-toggle:hover, .password-toggle:focus {
             color: #667eea;
+            outline: 2px solid #667eea;
         }
 
         .login-btn {
@@ -143,9 +144,10 @@
             overflow: hidden;
         }
 
-        .login-btn:hover {
+        .login-btn:hover, .login-btn:focus {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            outline: 2px solid #667eea;
         }
 
         .login-btn:active {
@@ -308,14 +310,13 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
             .login-container {
-                padding: 32px 24px;
-                margin: 20px;
+                padding: 16px;
+                max-width: 100vw;
             }
-            
-            .login-header h1 {
-                font-size: 24px;
+            body {
+                padding: 4px;
             }
         }
     </style>
@@ -444,10 +445,11 @@
                         // Login bem-sucedido
                         showSuccess('Login realizado com sucesso!');
                         
-                        // Redirecionar após 1 segundo
-                        setTimeout(() => {
-                            window.location.href = '../index.html';
-                        }, 1000);
+                        // Após login bem-sucedido
+                        setFlashMessage('Login realizado com sucesso!', 'success');
+                        const redirectTo = sessionStorage.getItem('redirect_after_login') || '../index.html';
+                        sessionStorage.removeItem('redirect_after_login');
+                        window.location.replace(redirectTo);
                     } else {
                         showError('Credenciais inválidas. Verifique seu email e senha.');
                     }

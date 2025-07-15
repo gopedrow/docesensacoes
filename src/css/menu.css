@@ -26,6 +26,17 @@
     box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.dish:focus-within, .dish:hover {
+    box-shadow: 0px 0px 18px 8px rgba(235, 46, 125, 0.15);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.dish .buy-button:focus {
+    outline: 2px solid var(--color-focus);
+    background: var(--color-focus-bg);
 }
 
 .dish-heart {
@@ -62,19 +73,26 @@
     #dishes {
         flex-wrap: wrap;
         justify-content: center;
+        gap: 16px;
     }
 
     .dish {
         width: calc(50% - 12px);
+        margin-bottom: 18px;
     }
 }
 
 @media screen and (max-width: 600px) {
     .dish {
         width: 100%;
+        margin-bottom: 18px;
+        padding: 14px;
     }
 
     #menu .section-subtitle {
         text-align: center;
+    }
+    #dishes {
+        gap: 10px;
     }
 } 

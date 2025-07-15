@@ -7,6 +7,12 @@ footer {
     justify-content: space-between;
     padding: 0px 8% 24px 8%;
     align-items: center;
+    gap: 8px;
+}
+
+#footer_items a:focus {
+    outline: 2px solid var(--color-focus);
+    background: var(--color-focus-bg);
 }
 
 #copyright {

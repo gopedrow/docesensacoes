@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="../javascript/config.js"></script>
+    <script src="../componentes/flash-message.js"></script>
     
     <style>
         * {
@@ -584,11 +585,8 @@
                 authService.saveUser();
                 
                 showNotification('Perfil atualizado com sucesso!', 'success');
-                
-                // Recarregar dados na tela
-                setTimeout(() => {
-                    loadUserData();
-                }, 1000);
+                setFlashMessage('Perfil atualizado com sucesso!', 'success');
+                window.location.reload();
 
             } catch (error) {
                 console.error('Erro ao atualizar perfil:', error);
@@ -631,6 +629,18 @@
         window.onload = function() {
             loadUserData();
         };
+    </script>
+    <script>
+        // Exibir mensagem global se houver
+        document.addEventListener('DOMContentLoaded', function() {
+            const flash = window.getAndClearFlashMessage && window.getAndClearFlashMessage();
+            if (flash && flash.message) {
+                const msg = document.createElement('flash-message');
+                msg.setAttribute('message', flash.message);
+                msg.setAttribute('type', flash.type || 'info');
+                document.body.appendChild(msg);
+            }
+        });
     </script>
 </body>
 </html> 

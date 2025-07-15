@@ -117,6 +117,41 @@
     <button class="add-to-cart-btn">
       Adicionar ao Carrinho
     </button>
+
+    <hr style="margin:2rem 0;">
+    <h2>Avalie este produto</h2>
+    <form id="review-form" style="margin-top:1rem;">
+      <label for="review-rating">Nota:</label>
+      <select id="review-rating" name="rating" required>
+        <option value="">Selecione</option>
+        <option value="5">5 - Excelente</option>
+        <option value="4">4 - Muito bom</option>
+        <option value="3">3 - Bom</option>
+        <option value="2">2 - Regular</option>
+        <option value="1">1 - Ruim</option>
+      </select>
+      <label for="review-comment">Comentário:</label>
+      <textarea id="review-comment" name="comment" rows="3" required placeholder="Conte como foi sua experiência..."></textarea>
+      <button type="submit" class="add-to-cart-btn" style="margin-top:1rem;">Enviar Avaliação</button>
+    </form>
   </div>
+  <script src="../componentes/flash-message.js"></script>
+  <script src="../javascript/config.js"></script>
+  <script>
+    document.getElementById('review-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const rating = document.getElementById('review-rating').value;
+      const comment = document.getElementById('review-comment').value;
+      try {
+        // Exemplo: enviar avaliação via API (ajuste conforme seu backend)
+        // await apiService.createAvaliacao({ produtoId: 1, rating, comment });
+        setFlashMessage('Avaliação enviada com sucesso! Obrigado pelo seu feedback.', 'success');
+        window.location.reload();
+      } catch (error) {
+        setFlashMessage('Erro ao enviar avaliação. Tente novamente.', 'error');
+        window.location.reload();
+      }
+    });
+  </script>
 </body>
 </html>

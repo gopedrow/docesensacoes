@@ -289,10 +289,8 @@ class AuthService {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         this.updateAuthUI();
-        // Redirecionar para página inicial
-        if (window.location.pathname.includes('perfil') || window.location.pathname.includes('admin')) {
-            window.location.href = '/index.html';
-        }
+        setFlashMessage('Logout realizado com sucesso!', 'success');
+        window.location.replace('/index.html');
     }
 
     // Verificar se está logado
@@ -459,6 +457,22 @@ class AuthService {
 
 // Instância global de autenticação
 const authService = new AuthService();
+
+// Utilitário global para mensagens/contexto entre páginas
+window.setFlashMessage = function(message, type = 'info') {
+  sessionStorage.setItem('flash_message', JSON.stringify({ message, type }));
+};
+
+window.getAndClearFlashMessage = function() {
+  const data = sessionStorage.getItem('flash_message');
+  if (!data) return null;
+  sessionStorage.removeItem('flash_message');
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
+};
 
 // Inicialização quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', function() {
